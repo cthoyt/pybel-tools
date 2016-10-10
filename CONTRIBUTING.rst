@@ -1,5 +1,6 @@
 How To Contribute
 =================
 
-1. Make a new folder with your cool too. Testing appreciated!
-2. Add it to the Cool Pool of Tools
+1. Make a branch with git flow for your tool
+2. Test it if you can
+3. Merge to the cool pool of tools! 
