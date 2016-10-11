@@ -1,4 +1,5 @@
 import io
+import os
 
 import flask
 from flask import Flask, request, redirect, flash
@@ -6,8 +7,10 @@ from flask import Flask, request, redirect, flash
 from src.pybel_tools import owlparser
 
 ALLOWED_EXTENSIONS = {'owl'}
+OWL_FOLDER = os.environ['OWL_FOLDER']
 
 app = Flask(__name__)
+app.config['OWL_FOLDER'] = OWL_FOLDER
 
 
 def allowed_file(filename):
@@ -17,6 +20,21 @@ def allowed_file(filename):
 @app.route('/', methods=['GET'])
 def no_place_like_home():
     return app.send_static_file('index.html')
+
+
+@app.route('/asbel/<ns>', methods=['GET'])
+def get_as_bel(ns):
+    if not ns.endswith('.owl'):
+        return "invalid file extension for: {}".format(ns)
+
+    path = os.path.expanduser(os.path.join(app.config['OWL_FOLDER'], ns))
+    if not os.path.exists(path):
+        return "non-existent file: {}".format(ns)
+
+    with open(path) as f:
+        out_stream = io.StringIO()
+        owlparser.build(f, '', '', '', '', '', output=out_stream)
+        return flask.Response(out_stream.getvalue(), mimetype='text/plain')
 
 
 @app.route('/conv', methods=['GET', 'POST'])
