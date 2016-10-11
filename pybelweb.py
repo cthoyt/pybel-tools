@@ -1,6 +1,7 @@
 import io
 
-from flask import Flask, request, redirect, flash, Response, url_for, render_template
+import flask
+from flask import Flask, request, redirect, flash
 
 from src.pybel_tools import owlparser
 
@@ -35,7 +36,10 @@ def upload_file():
             in_stream = io.StringIO(file.stream.getvalue().decode('utf-8'))
             out_stream = io.StringIO()
             owlparser.build(in_stream, '', '', '', '', '', output=out_stream)
-            return Response(out_stream.getvalue(), mimetype='text/plain')
+            # out_name = '{}.belns'.format(file.filename.split('.')[0])
+            # out_stream.seek(0)
+            # return flask.send_file(out_stream, attachment_filename=out_name, as_attachment=True)
+            return flask.Response(out_stream.getvalue(), mimetype='text/plain')
 
     return '''
     <!doctype html>
