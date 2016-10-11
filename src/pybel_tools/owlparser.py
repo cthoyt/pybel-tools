@@ -1,7 +1,5 @@
-"""Utilities for serializing OWL namespaces in the XML format from Protege to BEL Namespace File
-"""
+"""Utilities for serializing OWL namespaces in the XML format from Protege to BEL Namespace File"""
 
-import os
 import sys
 import time
 import xml.etree.ElementTree as ET
