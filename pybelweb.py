@@ -7,7 +7,7 @@ from flask import Flask, request, redirect, flash
 from src.pybel_tools import owlparser
 
 ALLOWED_EXTENSIONS = {'owl'}
-OWL_FOLDER = os.environ['OWL_FOLDER']
+OWL_FOLDER = os.path.expanduser(os.environ['OWL_FOLDER'])
 
 app = Flask(__name__)
 app.config['OWL_FOLDER'] = OWL_FOLDER
@@ -22,12 +22,21 @@ def no_place_like_home():
     return app.send_static_file('index.html')
 
 
+@app.route('/asbel/', methods=['GET'])
+def get_as_bel_listing():
+    files = os.listdir(app.config['OWL_FOLDER'])
+    files = [file for file in files if file.endswith('.owl')]
+    files = ['<a href="/asbel/{path}">{path}</a>'.format(path=path) for path in files]
+    html = '<html><ul>' + "\n".join(files) + '</ul></html>'
+    return html
+
+
 @app.route('/asbel/<ns>', methods=['GET'])
 def get_as_bel(ns):
     if not ns.endswith('.owl'):
         return "invalid file extension for: {}".format(ns)
 
-    path = os.path.expanduser(os.path.join(app.config['OWL_FOLDER'], ns))
+    path = os.path.join(app.config['OWL_FOLDER'], ns)
     if not os.path.exists(path):
         return "non-existent file: {}".format(ns)
 
