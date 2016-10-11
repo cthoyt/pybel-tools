@@ -2,6 +2,7 @@
 """
 
 import os
+import sys
 import time
 import xml.etree.ElementTree as ET
 
@@ -64,12 +65,12 @@ def make_values(value_dict):
 
 
 class OWLParser:
-    def __init__(self, path):
+    def __init__(self, source):
         """Builds a model of an OWL document using a NetworkX graph
-        :param path: input OWL path
+        :param source: input OWL path or filelike object
         """
 
-        tree = ET.parse(path)
+        tree = ET.parse(source)
         root = tree.getroot()
 
         self.name_url = root.attrib['ontologyIRI']
@@ -98,37 +99,36 @@ class OWLParser:
             self.G.add_edge(source, target)
 
 
-def build(input_path, output_path, ns_name, ns_keyword, ns_description, author, contact):
+def build(source, ns_name, ns_keyword, ns_description, author, contact, output=sys.stdout):
     """
 
-    :param input_path: Path to .OWL file in
-    :param output_path:
+    :param source: Path to OWL file or filelike object
     :param ns_name:
     :param ns_keyword:
     :param ns_description:
     :param author:
     :param contact:
+    :param output: output stream. Defaults to sys.stdout
     :return:
     """
-    owl = OWLParser(os.path.expanduser(input_path))
+    owl = OWLParser(source)
 
-    with open(os.path.expanduser(output_path), 'w') as f:
-        for line in make_namespace_header(ns_name, ns_keyword, ns_description):
-            print(line, file=f)
-        print(file=f)
+    for line in make_namespace_header(ns_name, ns_keyword, ns_description):
+        print(line, file=output)
+    print(file=output)
 
-        for line in make_author_header(author, contact):
-            print(line, file=f)
-        print(file=f)
+    for line in make_author_header(author, contact):
+        print(line, file=output)
+    print(file=output)
 
-        for line in make_citation_header(author, ns_description, owl.name_url):
-            print(line, file=f)
-        print(file=f)
+    for line in make_citation_header(author, ns_description, owl.name_url):
+        print(line, file=output)
+    print(file=output)
 
-        for line in make_properties_header():
-            print(line, file=f)
-        print(file=f)
+    for line in make_properties_header():
+        print(line, file=output)
+    print(file=output)
 
-        print('[Values]', file=f)
-        for node in sorted(owl.G.nodes()):
-            print('{}|'.format(node), file=f)
+    print('[Values]', file=output)
+    for node in sorted(owl.G.nodes()):
+        print('{}|'.format(node), file=output)
