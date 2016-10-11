@@ -6,7 +6,7 @@ import re
 #################################################################
 
 PACKAGES = setuptools.find_packages(where='src')
-META_PATH = os.path.join('src', 'pybel-tools', '__init__.py')
+META_PATH = os.path.join('src', 'pybel_tools', '__init__.py')
 KEYWORDS = ['Fraunhofer', 'SCAI', 'BEL']
 CLASSIFIERS = [
     'Development Status :: 1 - Planning',
