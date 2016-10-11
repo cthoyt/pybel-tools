@@ -218,4 +218,3 @@ def make_boilerplate(output_path, document_name, contact, description, version=N
         if pmids is not None:
             for line in make_document_statement_group(pmids):
                 print(line, file=f)
-
