@@ -25,7 +25,7 @@ def no_place_like_home():
 @app.route('/asbel/', methods=['GET'])
 def get_as_bel_listing():
     files = os.listdir(app.config['OWL_FOLDER'])
-    files = [file for file in files if file.endswith('.owl')]
+    files = [file for file in files if allowed_file(file)]
     files = ['<a href="/asbel/{path}">{path}</a>'.format(path=path) for path in files]
     html = '<html><ul>' + "\n".join(files) + '</ul></html>'
     return html
