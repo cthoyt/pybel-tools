@@ -1,23 +1,24 @@
 import io
-import os
 
-from flask import Flask, request, redirect, flash, Response
+from flask import Flask, request, redirect, flash, Response, url_for, render_template
 
 from src.pybel_tools import owlparser
 
-UPLOAD_FOLDER = os.path.expanduser('~/Desktop/flaskups/')
 ALLOWED_EXTENSIONS = {'owl'}
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+    return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET'])
+def no_place_like_home():
+    return app.send_static_file('index.html')
+
+
+@app.route('/conv', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
         # check if the post request has the file part
@@ -40,7 +41,7 @@ def upload_file():
     <!doctype html>
     <title>Upload new File</title>
     <h1>Convert OWL File to BEL Namespace</h1>
-    <form action="" method=post enctype=multipart/form-data>
+    <form action="conv" method=post enctype=multipart/form-data>
         <p><input type=file name=file></p>
         <p><input type=submit value="Convert"></p>
     </form>
