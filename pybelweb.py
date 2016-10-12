@@ -11,6 +11,12 @@ ALLOWED_OWL_EXTENSIONS = {'owl'}
 ALLOWED_BEL_EXTENSIONS = {'bel'}
 
 app = Flask(__name__)
+
+if not os.path.exists(os.path.expanduser('~/.pybel')):
+    os.mkdir(os.path.expanduser('~/.pybel'))
+    os.mkdir(os.path.expanduser('~/.pybel/owl'))
+    os.mkdir(os.path.expanduser('~/.pybel/bel'))
+
 app.config['OWL_FOLDER'] = os.path.expanduser('~/.pybel/owl')
 app.config['BEL_DIR'] = os.path.expanduser('~/.pybel/bel')
 
@@ -46,7 +52,7 @@ def get_as_bel(ns):
 
     with open(path) as f:
         out_stream = io.StringIO()
-        owlparser.build(f, '', '', '', '', '', output=out_stream)
+        owlparser.build(f, out_stream)
         return flask.Response(out_stream.getvalue(), mimetype='text/plain')
 
 
@@ -66,7 +72,10 @@ def upload_file():
         if file and allowed_file(file.filename, ALLOWED_OWL_EXTENSIONS):
             in_stream = io.StringIO(file.stream.getvalue().decode('utf-8'))
             out_stream = io.StringIO()
-            owlparser.build(in_stream, '', '', '', '', '', output=out_stream)
+            try:
+                owlparser.build(in_stream, out_stream)
+            except Exception as e:
+                return '{}<br>{}'.format(file.filename, e)
             # out_name = '{}.belns'.format(file.filename.split('.')[0])
             # out_stream.seek(0)
             # return flask.send_file(out_stream, attachment_filename=out_name, as_attachment=True)
@@ -156,9 +165,6 @@ try:
             return "non-existent file: {}".format(ns)
 
         return flask.send_file(path, mimetype='text/plain', as_attachment=True)
-
-
-
 except:
     print('unable to load pybel')
 

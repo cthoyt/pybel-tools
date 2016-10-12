@@ -6,3 +6,5 @@ scratch/*
 src/PyBEL_Tools.egg-info/*
 
 *.pyc
+
+examples/PTSD.owl

@@ -62,6 +62,17 @@ def make_values(value_dict):
         lines.append('{}|{}'.format(key, value_dict[key]))
 
 
+def find_dc(r, term, ns):
+    for el in r.findall('./owl:Annotation/owl:AnnotationProperty[@abbreviatedIRI="dc:{}"]/../owl:Literal'.format(term),
+                        ns):
+        return el.text.strip()
+
+    for el in r.findall(
+            './owl:Annotation/owl:AnnotationProperty[@IRI="http://purl.org/dc/elements/1.1/{}"]/../owl:Literal'.format(
+                term), ns):
+        return el.text.strip()
+
+
 class OWLParser:
     def __init__(self, source):
         """Builds a model of an OWL document using a NetworkX graph
@@ -73,53 +84,78 @@ class OWLParser:
 
         self.name_url = root.attrib['ontologyIRI']
 
-        label_dict = {}
-        edges = []
-        self.G = nx.DiGraph()
+        labels = {}
+        self.graph = nx.DiGraph()
+        self.metadata = {}
 
-        # TODO in ./owl:Annotation look for dc:title, dc:creator, dc:date, dc:description, dc:contributor, dc:rights, and dc:subject
+        owl_ns = {
+            'owl': 'http://www.w3.org/2002/07/owl#',
+            'dc': 'http://purl.org/dc/elements/1.1'
+        }
 
-        for child in root:
-            if child.tag == '{http://www.w3.org/2002/07/owl#}SubClassOf':
-                u = child[0].attrib['IRI'].strip()
-                v = child[1].attrib['IRI'].strip()
-                edges.append((u, v))
+        email = root.find('''./owl:Annotation/owl:AnnotationProperty[@IRI='#email']/../owl:Literal''', owl_ns)
+        if not email:
+            raise Exception('Missing #email document Annotation. Add this custom metadata with protege')
+        self.metadata['email'] = email.text.strip()
 
-            elif child.tag == '{http://www.w3.org/2002/07/owl#}AnnotationAssertion':
-                if 'abbreviatedIRI' in child[0].attrib and 'rdfs:label' == child[0].attrib['abbreviatedIRI']:
-                    iri = child[1].text.strip()
-                    label = child[2].text.strip()
-                    label_dict[iri] = label
+        required_dc = 'title', 'subject', 'creator', 'description', 'date'
 
-        for u, v in edges:
-            source = u.strip('#').strip() if u not in label_dict else label_dict[u]
-            target = v.strip('#').strip() if v not in label_dict else label_dict[v]
-            self.G.add_edge(source, target)
+        for dc_term in required_dc:
+            self.metadata[dc_term] = find_dc(root, dc_term, owl_ns)
+
+        if not all(key in self.metadata and self.metadata[key] for key in required_dc):
+            raise Exception(
+                'Missing DC terms in Annotation section. Required: {}. See purl.org/dc/elements/1.1/. Found {}'.format(
+                    required_dc, self.metadata))
+
+        for el in root.findall('./owl:AnnotationAssertion', owl_ns):
+            if len(el) == 3:
+                prop, iri, lit = el
+
+                if '{http://www.w3.org/XML/1998/namespace}lang' in lit.attrib:
+                    if 'en' != lit.attrib['{http://www.w3.org/XML/1998/namespace}lang']:
+                        print('non-english detected')
+                        continue
+
+                labels[iri.text.lstrip('#').strip()] = lit.text.strip()
+
+        for el in root.findall('./owl:SubClassOf', owl_ns):
+            children = el.findall('./owl:Class[@IRI]', owl_ns)
+            if len(children) == 2:
+                sub, sup = children
+
+                u = sub.attrib['IRI'].lstrip('#').strip()
+                v = sup.attrib['IRI'].lstrip('#').strip()
+
+                if u in labels:
+                    u = labels[u]
+                if v in labels:
+                    v = labels[v]
+
+                self.graph.add_edge(u, v)
+
+    def __getitem__(self, item):
+        return self.metadata[item]
 
 
-def build(source, ns_name, ns_keyword, ns_description, author, contact, output=sys.stdout):
+def build(source, output=sys.stdout):
     """
 
     :param source: Path to OWL file or filelike object
-    :param ns_name:
-    :param ns_keyword:
-    :param ns_description:
-    :param author:
-    :param contact:
     :param output: output stream. Defaults to sys.stdout
     :return:
     """
     owl = OWLParser(source)
 
-    for line in make_namespace_header(ns_name, ns_keyword, ns_description):
+    for line in make_namespace_header(owl['title'], owl['subject'], owl['description']):
         print(line, file=output)
     print(file=output)
 
-    for line in make_author_header(author, contact):
+    for line in make_author_header(owl['creator'], owl['email']):
         print(line, file=output)
     print(file=output)
 
-    for line in make_citation_header(author, ns_description, owl.name_url):
+    for line in make_citation_header(owl['creator'], owl['description'], owl.name_url):
         print(line, file=output)
     print(file=output)
 
@@ -128,5 +164,5 @@ def build(source, ns_name, ns_keyword, ns_description, author, contact, output=s
     print(file=output)
 
     print('[Values]', file=output)
-    for node in sorted(owl.G.nodes()):
+    for node in sorted(owl.graph.nodes()):
         print('{}|'.format(node), file=output)
