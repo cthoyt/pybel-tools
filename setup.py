@@ -20,6 +20,8 @@ CLASSIFIERS = [
 ]
 INSTALL_REQUIRES = [
     'requests',
+    'flask',
+    'networkx'
 ]
 EXTRAS_REQUIRE = {}
 TESTS_REQUIRE = []
