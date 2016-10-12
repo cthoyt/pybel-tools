@@ -1,3 +1,7 @@
+from .boilerplate import make_boilerplate
+
+__all__ = ['make_boilerplate']
+
 __version__ = '0.0.1'
 
 __title__ = 'PyBEL Tools'
