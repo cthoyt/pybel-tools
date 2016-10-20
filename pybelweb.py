@@ -100,7 +100,7 @@ try:
 
 
     @app.route('/bel/validate', methods=['GET', 'POST'])
-    def valiate():
+    def validate():
         if request.method == 'POST':
             # check if the post request has the file part
             if 'file' not in request.files:
