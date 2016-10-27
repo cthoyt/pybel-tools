@@ -1,5 +1,4 @@
 import click
-from .webparser.app import app as webparserapp
 
 
 @click.group(help="PyBEL-Tools Command Line Utilities")
@@ -10,4 +9,5 @@ def main():
 
 @main.command()
 def run():
+    from .webparser.app import app as webparserapp
     webparserapp.run()

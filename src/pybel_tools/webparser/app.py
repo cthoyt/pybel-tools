@@ -7,6 +7,9 @@ from flask import Flask, request
 
 app = Flask(__name__)
 
+parser = pybel.parser.BelParser()
+parser.statement.streamline()
+app.config['GRAPH'] = parser
 
 @app.route('/', methods=['GET'])
 def no_place_like_home():
@@ -43,7 +46,4 @@ def clear():
 
 
 if __name__ == '__main__':
-    parser = pybel.parser.BelParser()
-    parser.statement.streamline()
-    app.config['GRAPH'] = parser
     app.run()

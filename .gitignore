@@ -2,9 +2,6 @@
 .ipynb_checkpoints/*
 scratch/*
 */__pycache__
-
 src/PyBEL_Tools.egg-info/*
-
 *.pyc
-
 examples/PTSD.owl
