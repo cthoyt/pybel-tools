@@ -8,6 +8,8 @@ def main():
 
 
 @main.command()
-def run():
+@click.option('--host')
+@click.option('--debug', is_flag=True)
+def run(host, debug):
     from .webparser.app import app as webparserapp
-    webparserapp.run()
+    webparserapp.run(debug=debug, host=host)
