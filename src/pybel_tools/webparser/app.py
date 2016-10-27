@@ -4,13 +4,8 @@ import time
 import flask
 import pybel.parser
 from flask import Flask, request
-from pyparsing import ParseException
 
 app = Flask(__name__)
-
-parser = pybel.parser.BelParser()
-parser.statement.streamline()
-app.config['GRAPH'] = parser
 
 
 @app.route('/', methods=['GET'])
@@ -48,4 +43,7 @@ def clear():
 
 
 if __name__ == '__main__':
+    parser = pybel.parser.BelParser()
+    parser.statement.streamline()
+    app.config['GRAPH'] = parser
     app.run()

@@ -1,6 +1,4 @@
-from .boilerplate import make_boilerplate
-
-__all__ = ['make_boilerplate']
+"""Tools for using BEL documents in python"""
 
 __version__ = '0.0.1'
 

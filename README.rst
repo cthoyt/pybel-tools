@@ -5,4 +5,4 @@ Cool tools for using BEL. Install with:
 
 .. code-block:: sh
 
-    pip install git+https://github.com/pybel/pybel.git@master
+    pip install git+https://github.com/cthoyt/pybel-tools.git@master
