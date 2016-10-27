@@ -1,14 +1,14 @@
 import io
 import os
+import time
 
 import flask
 import pybel.parser
 from flask import Flask, request, redirect, flash
-from werkzeug.utils import secure_filename
 from pyparsing import ParseException
-import time
+from werkzeug.utils import secure_filename
 
-from src.pybel_tools import owlparser
+from .. import owlparser
 
 ALLOWED_OWL_EXTENSIONS = {'owl'}
 ALLOWED_BEL_EXTENSIONS = {'bel'}
