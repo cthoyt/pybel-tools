@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PyBEL Web Statement Parser</title>
+</head>
+<body>
+
+<h1>PyBEL Web Statement Parser</h1>
+<p>
+    This web application parses BEL statements
+</p>
+<ul>
+    <li><a href="/parse">/parse/&lt;statement&gt;</a> to parse a statement that's been URL encoded.
+        URL Parameters get saved into graph with statement. Returns parsed BEL as JSON
+    </li>
+    <li><a href="/dump">/dump</a> to dump the current graph as a PyBEL *.gpickle</li>
+    <li><a href="/clear">/clear</a> to clear the current graph</li>
+</ul>
+
+</body>
+</html>

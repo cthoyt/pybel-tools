@@ -21,7 +21,9 @@ CLASSIFIERS = [
 INSTALL_REQUIRES = [
     'requests',
     'flask',
-    'networkx'
+    'networkx',
+    'pybel',
+    'click'
 ]
 EXTRAS_REQUIRE = {}
 TESTS_REQUIRE = []
