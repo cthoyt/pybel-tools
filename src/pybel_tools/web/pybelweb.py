@@ -99,6 +99,8 @@ def upload_file():
     '''
 
 
+# BEL Document Parser
+
 @app.route('/bel/validate', methods=['GET', 'POST'])
 def validate():
     if request.method == 'POST':
@@ -119,8 +121,9 @@ def validate():
             qname = '.'.join(filename.split('.')[:-1])
 
             file.save(fp)
-
-            g = pybel.from_path(fp)
+            log_output = open(os.path.join(app.config['BEL_DIR'], '{}_log.txt'.format(qname)), 'w')
+            g = pybel.from_path(fp, log_stream=log_output)
+            log_output.close()
             pybel.to_pickle(g, os.path.join(app.config['BEL_DIR'], '{}.gpickle'.format(qname)))
 
             return "job done"
@@ -144,19 +147,22 @@ def list_bel():
 
     links = []
 
-    for fname in file_names:
-        bel_link = '<a href="/bel/get/{path}.bel">{path}.bel</a>'.format(path=fname)
-        pickle_link = '' if '{}.gpickle'.format(
-            fname) not in files else '<a href="/bel/get/{path}.gpickle">{path}.gpickle</a>'.format(path=fname)
-        links.append('<div>{} {}</div>'.format(bel_link, pickle_link))
 
-    html = '<html><h1>BEL Files</h1><ul>' + "\n".join(links) + '</ul></html>'
+    for fname in file_names:
+        bel_link = '<a href="/bel/get/{path}.bel">source bel</a>'.format(path=fname)
+        pickle_link = '' if '{}.gpickle'.format(
+            fname) not in files else '<a href="/bel/get/{path}.gpickle">gpickle</a>'.format(path=fname)
+        log_link = '' if '{}_log.txt'.format(
+            fname) not in files else '<a href="/bel/get/{path}_log.txt">log</a>'.format(path=fname)
+        links.append('<tr><td>{}</td><td>{}</td><td>{}</td><td>{}</td></tr>'.format(fname, bel_link, pickle_link, log_link))
+
+    html = '<html><h1>BEL Files</h1><table>' + "\n".join(links) + '</table></html>'
     return html
 
 
 @app.route('/bel/get/<ns>', methods=['GET'])
 def get_bel(ns):
-    if not ns.endswith('.bel') and not ns.endswith('.gpickle'):
+    if not any(ns.endswith(x) for x in ('.bel', '.gpickle', '.txt')):
         return "invalid file extension for: {}".format(ns)
 
     path = os.path.join(app.config['BEL_DIR'], ns)
