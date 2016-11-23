@@ -59,7 +59,7 @@ def get_as_bel(ns):
 
     with open(path) as f:
         out_stream = io.StringIO()
-        owlparser.build(f, out_stream)
+        owlparser.build_from_owl(f, out_stream)
         return flask.Response(out_stream.getvalue(), mimetype='text/plain')
 
 
@@ -80,7 +80,7 @@ def upload_file():
             in_stream = io.StringIO(file.stream.getvalue().decode('utf-8'))
             out_stream = io.StringIO()
             try:
-                owlparser.build(in_stream, out_stream)
+                owlparser.build_from_owl(in_stream, out_stream)
             except Exception as e:
                 return '{}<br>{}'.format(file.filename, e)
             # out_name = '{}.belns'.format(file.filename.split('.')[0])
