@@ -1,0 +1,871 @@
+##################################################################################
+# Document Properties Section
+
+SET DOCUMENT Name = "Document name"
+SET DOCUMENT Description = "Document description"
+SET DOCUMENT Version = "1.0"
+SET DOCUMENT Copyright = "Copyright (c) 2012, Nanditha. All Rights Reserved."
+SET DOCUMENT Authors = "Nanditha"
+SET DOCUMENT Licenses = "Document license"
+SET DOCUMENT ContactInfo = "your@email.com"
+
+##################################################################################
+# NAMESPACE URLS
+
+DEFINE NAMESPACE ADO AS URL "http://belief.scai.fraunhofer.de/openbel/repository/namespaces/ADO.belns"
+DEFINE NAMESPACE AFFX AS URL "http://resource.belframework.org/belframework/20150611/namespace/affy-probeset-ids.belns"
+DEFINE NAMESPACE BRCO AS URL "http://belief.scai.fraunhofer.de/openbel/repository/namespaces/BRCO.belns"
+DEFINE NAMESPACE CHEBI AS URL "http://resource.belframework.org/belframework/20150611/namespace/chebi.belns"
+DEFINE NAMESPACE CHEBIID AS URL "http://resource.belframework.org/belframework/20150611/namespace/chebi-ids.belns"
+DEFINE NAMESPACE CHEMBL AS URL "http://belief-demo.scai.fraunhofer.de/openbel/repository/namespaces/chembl-names.belns"
+DEFINE NAMESPACE CHEMBLID AS URL "http://belief-demo.scai.fraunhofer.de/openbel/repository/namespaces/chembl-ids.belns"
+DEFINE NAMESPACE CTO AS URL "http://belief.scai.fraunhofer.de/openbel/repository/namespaces/CTO.belns"
+DEFINE NAMESPACE DO AS URL "http://resource.belframework.org/belframework/20150611/namespace/disease-ontology.belns"
+DEFINE NAMESPACE DOID AS URL "http://resource.belframework.org/belframework/20150611/namespace/disease-ontology-ids.belns"
+DEFINE NAMESPACE EGID AS URL "http://resource.belframework.org/belframework/20150611/namespace/entrez-gene-ids.belns"
+DEFINE NAMESPACE FlyBase AS URL "http://belief.scai.fraunhofer.de/openbel/repository/namespaces/Dmel.belns"
+DEFINE NAMESPACE GOBP AS URL "http://resource.belframework.org/belframework/20150611/namespace/go-biological-process.belns"
+DEFINE NAMESPACE GOBPID AS URL "http://resource.belframework.org/belframework/20150611/namespace/go-biological-process-ids.belns"
+DEFINE NAMESPACE GOCC AS URL "http://resource.belframework.org/belframework/20150611/namespace/go-cellular-component.belns"
+DEFINE NAMESPACE GOCCID AS URL "http://resource.belframework.org/belframework/20150611/namespace/go-cellular-component-ids.belns"
+DEFINE NAMESPACE HGNC AS URL "http://resource.belframework.org/belframework/20150611/namespace/hgnc-human-genes.belns"
+DEFINE NAMESPACE LMSD AS URL "http://belief-demo.scai.fraunhofer.de/openbel/repository/namespaces/LMSD.belns"
+DEFINE NAMESPACE MESHC AS URL "http://resource.belframework.org/belframework/20150611/namespace/mesh-chemicals.belns"
+DEFINE NAMESPACE MESHCID AS URL "http://resource.belframework.org/belframework/20150611/namespace/mesh-chemicals-ids.belns"
+DEFINE NAMESPACE MESHCS AS URL "http://resource.belframework.org/belframework/20150611/namespace/mesh-cellular-structures.belns"
+DEFINE NAMESPACE MESHCSID AS URL "http://resource.belframework.org/belframework/20150611/namespace/mesh-cellular-structures-ids.belns"
+DEFINE NAMESPACE MESHD AS URL "http://resource.belframework.org/belframework/20150611/namespace/mesh-diseases.belns"
+DEFINE NAMESPACE MESHDID AS URL "http://resource.belframework.org/belframework/20150611/namespace/mesh-diseases-ids.belns"
+DEFINE NAMESPACE MESHPP AS URL "http://resource.belframework.org/belframework/20150611/namespace/mesh-processes.belns"
+DEFINE NAMESPACE MESHPPID AS URL "http://resource.belframework.org/belframework/20150611/namespace/mesh-processes-ids.belns"
+DEFINE NAMESPACE MGI AS URL "http://resource.belframework.org/belframework/20150611/namespace/mgi-mouse-genes.belns"
+DEFINE NAMESPACE NIFT AS URL "http://belief.scai.fraunhofer.de/openbel/repository/namespaces/NIFT.belns"
+DEFINE NAMESPACE NTN AS URL "http://belief.scai.fraunhofer.de/openbel/repository/namespaces/Nutrition.belns"
+DEFINE NAMESPACE PDO AS URL "http://belief.scai.fraunhofer.de/openbel/repository/namespaces/PDO.belns"
+DEFINE NAMESPACE PH AS URL "http://belief-demo.scai.fraunhofer.de/openbel/repository/namespaces/Placeholder.belns"
+DEFINE NAMESPACE PMIBP AS URL "http://belief-demo.scai.fraunhofer.de/BeliefDashboard/dicten/namespaces/pmibp.belns"
+DEFINE NAMESPACE PMICHEM AS URL "http://belief-demo.scai.fraunhofer.de/BeliefDashboard/dicten/namespaces/pmichem.belns"
+DEFINE NAMESPACE PMICOMP AS URL "http://belief-demo.scai.fraunhofer.de/BeliefDashboard/dicten/namespaces/pmicomp.belns"
+DEFINE NAMESPACE PMIDIS AS URL "http://belief-demo.scai.fraunhofer.de/BeliefDashboard/dicten/namespaces/pmidis.belns"
+DEFINE NAMESPACE PMIPFAM AS URL "http://belief-demo.scai.fraunhofer.de/BeliefDashboard/dicten/namespaces/pmipfam.belns"
+DEFINE NAMESPACE PTS AS URL "http://belief.scai.fraunhofer.de/openbel/repository/namespaces/PTS.belns"
+DEFINE NAMESPACE RGD AS URL "http://resource.belframework.org/belframework/20150611/namespace/rgd-rat-genes.belns"
+DEFINE NAMESPACE SCHEM AS URL "http://resource.belframework.org/belframework/20150611/namespace/selventa-legacy-chemicals.belns"
+DEFINE NAMESPACE SCOMP AS URL "http://resource.belframework.org/belframework/20150611/namespace/selventa-named-complexes.belns"
+DEFINE NAMESPACE SDIS AS URL "http://resource.belframework.org/belframework/20150611/namespace/selventa-legacy-diseases.belns"
+DEFINE NAMESPACE SFAM AS URL "http://resource.belframework.org/belframework/20150611/namespace/selventa-protein-families.belns"
+DEFINE NAMESPACE SP AS URL "http://resource.belframework.org/belframework/20150611/namespace/swissprot.belns"
+DEFINE NAMESPACE SPID AS URL "http://resource.belframework.org/belframework/20150611/namespace/swissprot-ids.belns"
+DEFINE NAMESPACE dbSNP AS URL "http://belief.scai.fraunhofer.de/openbel/repository/namespaces/SNP.belns"
+
+
+# ANNOTATION URLS
+
+DEFINE ANNOTATION Anatomy AS URL "http://resource.belframework.org/belframework/20131211/annotation/anatomy.belanno"
+DEFINE ANNOTATION BodyRegion AS URL "http://resource.belframework.org/belframework/1.0/annotation/mesh-body-region.belanno"
+DEFINE ANNOTATION CardiovascularSystem AS URL "http://resource.belframework.org/belframework/1.0/annotation/mesh-cardiovascular-system.belanno"
+DEFINE ANNOTATION Cell AS URL "http://resource.belframework.org/belframework/20131211/annotation/cell.belanno"
+DEFINE ANNOTATION CellLine AS URL "http://resource.belframework.org/belframework/20131211/annotation/cell-line.belanno"
+DEFINE ANNOTATION CellStructure AS URL "http://resource.belframework.org/belframework/20131211/annotation/cell-structure.belanno"
+DEFINE ANNOTATION DigestiveSystem AS URL "http://resource.belframework.org/belframework/1.0/annotation/mesh-digestive-system.belanno"
+DEFINE ANNOTATION Disease AS URL "http://resource.belframework.org/belframework/20131211/annotation/disease.belanno"
+DEFINE ANNOTATION FluidAndSecretion AS URL "http://resource.belframework.org/belframework/1.0/annotation/mesh-fluid-and-secretion.belanno"
+DEFINE ANNOTATION HemicAndImmuneSystem AS URL "http://resource.belframework.org/belframework/1.0/annotation/mesh-hemic-and-immune-system.belanno"
+DEFINE ANNOTATION IntegumentarySystem AS URL "http://resource.belframework.org/belframework/1.0/annotation/mesh-integumentary-system.belanno"
+DEFINE ANNOTATION MeSHAnatomy AS URL "http://resource.belframework.org/belframework/20131211/annotation/mesh-anatomy.belanno"
+DEFINE ANNOTATION MeSHDisease AS URL "http://resource.belframework.org/belframework/20131211/annotation/mesh-diseases.belanno"
+DEFINE ANNOTATION NervousSystem AS URL "http://resource.belframework.org/belframework/1.0/annotation/mesh-nervous-system.belanno"
+DEFINE ANNOTATION RespiratorySystem AS URL "http://resource.belframework.org/belframework/1.0/annotation/mesh-respiratory-system.belanno"
+DEFINE ANNOTATION Species AS URL "http://resource.belframework.org/belframework/20131211/annotation/species-taxonomy-id.belanno"
+DEFINE ANNOTATION Tissue AS URL "http://resource.belframework.org/belframework/1.0/annotation/mesh-tissue.belanno"
+DEFINE ANNOTATION UrogenitalSystem AS URL "http://resource.belframework.org/belframework/1.0/annotation/mesh-urogenital-system.belanno"
+##################################################################################
+# Statements Section
+
+SET STATEMENT_GROUP = "Group 1"
+
+# Add statements below this comment
+
+# Citation :source,"first line",PubMed id"
+
+########################################### 1 ###################################
+
+SET Citation = {"PubMed","J Immunol. 2012 Jul 1;189(1):381-92. doi: 10.4049/jimmunol.1200409. Epub 2012 Jun 1.","22661091"}
+SET Evidence = "The recruitment of neutrophils to the brain can contribute to neurotoxicity, 
+particularly during acute brain injuries, such as cerebral ischemia, trauma, and seizures."
+
+a("neutrophils") -- path(MESHD:"Neurotoxicity Syndromes")
+a("neutrophils") -- path(MESHD:"Brain Ischemia")
+a("neutrophils") -- a("trauma")
+a("neutrophils") -- path(MESHD:"Seizures")
+
+##########################################2##########################################
+
+SET Citation = {"PubMed","J Neuroinflammation. 2012 Jun 20;9:135. doi: 10.1186/1742-2094-9-135.","22716035"}
+SET Evidence = "In a mouse model of Alzheimer's disease (AD) the orally administered natural product 4'-O-methylhonokiol (MH) has been shown to prevent 
+amyloidogenesis and progression of AD by inhibiting neuroinflammation."
+
+SET Species = "10090"
+
+a(MESHC:"4-O-methylhonokiol") -| path(MESHD:"Amyloidosis")
+a(MESHC:"4-O-methylhonokiol") -| path(ADO:"neuroinflammation")
+
+SET Evidence = "We argue that the novel cannabimimetic MH may exert its beneficial effects 
+via modulation of CB₂ receptors expressed in microglial cells and astrocytes"
+
+SET Cell ={"microglial cell","astrocyte"}
+
+a(MESHC:"4-O-methylhonokiol") -- p(MGI:"Cnr2")
+
+#########################################3#########################################
+
+SET Citation = {"PubMed","Proteomics. 2012 Aug;12(15-16):2571-83. doi: 10.1002/pmic.201200024.","22778045"}
+SET Evidence ="Pathway and network analysis indicate that hypothermia influences various biological functions of
+glia such as molecular transport, cell movement, immune response, cell death, and stress response"
+
+SET Species = "10090"
+SET Cell = "glial cell"
+
+path(MESHD:"Hypothermia") -> bp(MESHPP:"Cell Movement")
+path(MESHD:"Hypothermia") -> bp(GOBP:"immune response")
+path(MESHD:"Hypothermia") -> bp(MESHPP:"Cell Death")
+path(MESHD:"Hypothermia") -> bp(GOBP:"regulation of response to stress")
+path(MESHD:"Hypothermia") -> bp(MESHPP:"Biological Transport")
+
+SET Evidence ="In conclusion, moderate hypothermia seems to have a significant effect on the protein expression 
+profiles of brain glia and possibly ensuing neuroinflammation"
+
+path(MESHD:"Hypothermia") -- bp(GOBP:"gene expression")
+bp(GOBP:"gene expression") -- path(ADO:"neuroinflammation")
+
+###########################################4############################################
+
+SET Citation = {"PubMed","J Virol. 2012 Oct;86(19):10377-83. doi: 10.1128/JVI.01340-12. Epub 2012 Jul 11.","22787236"}
+SET Evidence = "Neurodegenerative diseases are typically associated with an activation of glia and an increased level of cytokines"
+
+SET Species = "10090"
+
+path(MESHD:"Neurodegenerative Diseases") -- bp(GOBP:"regulation of cytokine activity")
+path(MESHD:"Neurodegenerative Diseases") -- bp(GOBP:"microglial cell activation")
+
+SET Evidence ="Here, in time course studies of C57BL/10 mice intracerebrally inoculated with 22L scrapie, 
+abnormal protease-resistant prion protein (PrPres), astrogliosis, and microgliosis were first detected at 40 days
+after intracerebral scrapie inoculation"
+
+path(MESHD:"Scrapie") -> path(ADO:"astrocyte_activation")
+path(MESHD:"Scrapie") -> path(ADO:"Microglial_activation")
+
+
+SET Evidence ="In cytokine studies, IL-12p40 was first elevated by 60 days;
+CCL3, IL-1β, and CXCL1 were elevated by 80 days; and CCL2 and CCL5 were elevated by 115 days."
+
+path(MESHD:"Scrapie") -> p(MGI:Il12b)
+path(MESHD:"Scrapie") -> p(MGI:Ccl3)
+path(MESHD:"Scrapie") -> p(MGI:Il1b)
+path(MESHD:"Scrapie") -> p(MGI:Cxcl1)
+path(MESHD:"Scrapie") -> p(MGI:Ccl5)
+path(MESHD:"Scrapie") -> p(MGI:Ccl2)
+
+SET Evidence = "Thus, neither IL-12p40 nor IL-12p35 molecules were required for prion disease-associated 
+neurodegeneration or neuroinflammation."
+
+p(MGI:Il12b) causesNoChange path(MESHD:"Prion Diseases")
+p(MGI:Il12a) causesNoChange path(MESHD:"Prion Diseases")
+
+
+##################################################5#########################
+
+SET Citation = {"PubMed","J Neuroinflammation. 2012 Jul 12;9:171. doi: 10.1186/1742-2094-9-171.","22788993"}
+SET Species = "10090"
+
+SET Evidence ="Production of the chemokine CCL2 by cells of the neurovascular unit (NVU) 
+drives critical aspects of neuroinflammation"
+
+SET NervousSystem = "Blood-Brain Barrier"
+p(MGI:Ccl2)-- path(ADO:"neuroinflammation")
+
+SET Evidence ="Accordingly, we sought to determine if the compound bindarit, which inhibits CCL2 synthesis"
+
+a("bindarit") -| p(MGI:Ccl2)
+
+SET Evidence = "Bindarit repressed CCL2 expression by all three cultured cells and 
+antagonized upregulated expression of CCL2 in both brain and spinal cord in vivo following LPS administration"
+
+SET Cell = {"astrocyte","microglial cell","cerebral cortex endothelial cell"}
+a("bindarit") -| p(MGI:Ccl2)
+
+SET Anatomy ={"brain","spinal cord"}
+a("bindarit") -| p(MGI:Ccl2)
+
+SET Evidence = " Bindarit also significantly modified the course and severity of clinical EAE,
+diminished the incidence and onset of disease, and evidenced signs of disease reversal."
+
+a("bindarit") -- a("experimental autoimmune encephalomyelitis")
+
+
+
+###########################################6######################################
+
+SET Citation = {"PubMed","J Neuroinflammation. 2012 Jul 20;9:177. doi: 10.1186/1742-2094-9-177.","22818222"}
+SET Species = "9606" 
+
+SET Evidence ="CCAAT enhancer-binding protein (C/EBP)β regulates gene expression in multiple organ systems and cell types, including astrocytes in the central nervous system (CNS)"
+p(HGNC:IL1B) -- p(HGNC:CEBPB)
+
+SET Evidence =" Inflammatory stimuli, interleukin (IL)-1β, 
+tumor necrosis factor-α, human immunodeficiency virus (HIV)-1 and 
+lipopolysaccharide induce astrocyte C/EBPβ expression."
+
+a(SCHEM:Lipopolysaccharide) -> r(HGNC:CEBPB)
+p(HGNC:TNF) -> r(HGNC:CEBPB)
+p(HGNC:IL1B) -> r(HGNC:CEBPB)
+a(SCHEM:"HIV-1") -> r(HGNC:CEBPB)
+
+SET Evidence ="C/EBPβ is detectable in brains of Alzheimer's disease (AD), Parkinson's disease (PD) and HIV-1-associated dementia (HAD) patients,
+yet little is known about how C/EBPβ contributes to astrocyte gene regulation during neuroinflammation."
+
+path(MESHD:Dementia) -- path(MESHD:"Alzheimer Disease")
+
+
+SET Evidence ="Astrocytes were treated with mitogen-activated protein kinase-selective inhibitors, 
+then with IL-1β for 12 or 24 h followed by COX-2 and BDKRB2, expression analyses"
+
+p(HGNC:IL1B) -- a(CHEBI:mitogen)
+p(HGNC:PTGS2) -- a(CHEBI:mitogen)
+
+SET Evidence = "Inhibiting extracellular-regulated kinase (ERK)1/2 
+activation blocked IL-1β-induced BDKRB2 mRNA expression while increasing COX-2 expression."
+
+p(HGNC:PTGS2) -- p(HGNC:MAPK3)  
+p(HGNC:BDKRB2) -- p(HGNC:MAPK3)
+p(HGNC:IL1B) -- p(HGNC:MAPK3)
+p(HGNC:PTGS2) -- p(HGNC:IL1B)
+
+SET Evidence ="Additionally, this work suggests p38K and ERK1/2 pathways may regulate gene expression in a 
+complementary manner to fine tune the IL-1β-mediated astrocyte inflammatory response."
+
+p(HGNC:IL1B) -> bp(GOBP:"inflammatory response")
+
+
+############################################7#########################
+SET Citation = {"PubMed","Proc Natl Acad Sci U S A. 2012 Aug 28;109(35):E2334-42. doi: 10.1073/pnas.1209577109. Epub 2012 Jul 23.","22826245"}
+
+SET Species ="10090"
+
+SET Evidence = "Here we investigated the contribution of astrocytes to neurodegeneration in multiple sulfatase deficiency (MSD), a severe lysosomal
+storage disorder caused by mutations in the sulfatase modifying factor 1 (SUMF1) gene."
+
+p(HGNC:SUMF1) -- a("multiple sulfatase deficiency")
+
+SET Evidence ="behavioral analysis of mice with astrocyte-specific deletion of Sumf1 compared with mice with Sumf1 deletion in both astrocytes
+ and neurons allowed us to link a subset of neurological manifestations of MSD to astrocyte dysfunction."
+ 
+a("multiple sulfatase deficiency") -- a("astrocyte dysfunction")
+
+#############################################8########################
+
+SET Citation = {"PubMed","Oxid Med Cell Longev. 2012;2012:624925. doi: 10.1155/2012/624925. Epub 2012 Jul 8.","22829959"}
+
+SET Evidence ="There is extensive evidence in Parkinson's disease of a link between oxidative stress and some of
+ the monogenically inherited Parkinson's disease-associated genes. "
+
+bp(MESHPP:"Oxidative Stress") --  a("Parkinson's disease-associated genes")
+
+SET Evidence = "This paper focuses on the importance of this link and potential impact on neuronal function.
+Basic mechanisms of oxidative stress, the cellular antioxidant machinery, and the main sources of cellular oxidative stress 
+are reviewed. Moreover, attention is given to the complex interaction between oxidative stress and other prominent pathogenic pathways in 
+Parkinson's disease, such as mitochondrial dysfunction and neuroinflammation. "
+
+bp(MESHPP:"Oxidative Stress") -- path(ADO:"neuroinflammation")
+bp(MESHPP:"Oxidative Stress") -- path(MESHD:"Mitochondrial Diseases")
+
+##########################################9########################
+
+SET Citation = {"PubMed","Exp Neurol. 2012 Oct;237(2):296-303. doi: 10.1016/j.expneurol.2012.07.010. Epub 2012 Jul 24.","22836148"}
+
+SET Evidence = "Multiple sclerosis (MS) causes a variety of motor and sensory deficits and it is also associated with mood disturbances"
+
+path(MESHD:"Multiple Sclerosis") -> a("Motor deficit")
+path(MESHD:"Multiple Sclerosis") -> a("Sensory deficit")
+
+SET Evidence = " First, we observed high anxiety indexes in EAE mice, preceding the appearance of motor defects. Then, we demonstrated
+ that tumor necrosis factor α (TNF-α) has a crucial role in anxiety associated with neuroinflammation. "
+
+path(ADO:"anxiety") -> a("motor defect")
+p(MGI:Tnf) -- path(ADO:"anxiety")
+path(ADO:"anxiety") -- path(ADO:"neuroinflammation")
+
+###################################10#############################
+
+SET Citation ={"PubMed","J Nucl Med. 2012 Sep;53(9):1383-91. doi: 10.2967/jnumed.112.105734. Epub 2012 Jul 31.","22851635"}
+SET Evidence = "Arachidonic acid (AA) is found in high concentrations in brain phospholipids and is released as a second messenger
+during neurotransmission and much more so during neuroinflammation and excitotoxicity."
+
+bp(GOBP:"chemical synaptic transmission") -> a(CHEBI:"arachidonic acid")
+path(ADO:"neuroinflammation") -> a(CHEBI:"arachidonic acid")
+
+SET Evidence = "Upregulated brain AA metabolism associated with neuroinflammation has been imaged in rodents
+ using [1-(14)C]AA and with PET in Alzheimer disease patients using [1-(11)C]AA."
+
+SET Disease ="Alzheimer's disease"
+a("arachidonic acid metabolism") -- path(ADO:"neuroinflammation")
+
+
+#######################################11############################
+
+SET Citation={"PubMed","Gene Ther. 2013 May;20(5):487-96. doi: 10.1038/gt.2012.58. Epub 2012 Aug 2.","22855093"}
+
+SET Evidence = "Interleukin-25 (IL-25) is the only anti-inflammatory cytokine of the IL-17 family,
+ and it has been shown to be efficacious in inhibiting neuroinflammation."
+
+SET Species= "10090"
+
+p(MGI:Il25) -| path(ADO:"neuroinflammation")
+
+SET Evidence =" In both, we found that IL-25 gene therapy was able to modulate CNS myeloid cells, either infiltrating macrophages or resident microglia,
+towards an anti-inflammatory, tissue-protective phenotype"
+        
+p(MGI:Il25) -> a("alternative activation of microglia")
+
+##########################################12###########################
+
+SET Citation = {"PubMed","PLoS One. 2012;7(7):e42078. doi: 10.1371/journal.pone.0042078. Epub 2012 Jul 31.","22860058"}
+SET Species= "10090"
+
+SET Evidence = "Molecular hydrogen has been shown to have neuroprotective effects in mouse models of acute neurodegeneration.
+ The effect was suggested to be mediated by its free-radical scavenger properties."
+ 
+a(MESHC:"Hydrogen") -| path(ADO:"neuroinflammation")
+ 
+SET Evidence ="However, it has been shown recently that molecular hydrogen alters gene expression and protein phosphorylation."
+ 
+a(MESHC:"Hydrogen") -- bp(GOBP:"gene expression")
+a(MESHC:"Hydrogen") -- bp(MESHPP:"Phosphorylation")
+
+SET Evidence = "We found that molecular hydrogen reduces the LPS-induced sickness behaviour and promotes recovery.
+These effects are associated with a shift towards anti-inflammatory gene expression profile at baseline 
+(downregulation of TNF- α and upregulation of IL-10). "
+ 
+a(MESHC:"Hydrogen") -| a("LPS-induced sickness behaviour")
+a(MESHC:"Hydrogen") -| p(MGI:Tnf)
+a(MESHC:"Hydrogen") -> p(MGI:Il10)
+
+UNSET Species
+##############################################13#################
+
+SET Citation = {"PubMed","J Vis Exp. 2012 Jul 23;(65). pii: 4097. doi: 10.3791/4097.","22872097"}
+
+SET Evidence = "Microglia in a normal CNS express macrophage marker CD11b and exhibit a resting
+phenotype by expressing low levels of activation markers such as CD45."
+
+r(HGNC:CDK11B)
+p(HGNC:PTPRC) -- p(HGNC:CDK11B)
+
+SET Evidence = "MicroRNAs (miRNAs) are a growing family of conserved molecules (~22 nucleotides long)
+that are involved in many normal physiological processes such as cell growth and differentiation(4) and pathologies 
+such as inflammation(5)."
+
+path(MESHD:Inflammation) -- bp(GOBP:"cell growth")
+
+
+#####################################14###########################
+
+SET Citation = {"PubMed","Nat Rev Neurol. 2012 Sep;8(9):518-30. doi: 10.1038/nrneurol.2012.156. Epub 2012 Aug 14.","22890216"}
+SET Evidence = "GEP studies have implicated the ubiquitin-proteasome system in PD pathogenesis, and have provided evidence of 
+mitochondrial dysfunction in PD and AD."
+
+path(MESHD:"Parkinson Disease") -- p(HGNC:UBA52)
+
+
+SET Evidence = "Lastly, in AD, a possible role for dysregulation of intracellular signalling pathways, 
+including calcium signalling, has been highlighted."
+
+a(SCHEM:Calcium) -- path(MESHD:"Alzheimer Disease")
+
+###########################################15#########################
+
+SET Citation = {"PubMed","J Neurosci. 2012 Aug 22;32(34):11511-23. doi: 10.1523/JNEUROSCI.0182-12.2012.","22915098"}
+
+SET Evidence = "Nuclear factor κB activation impairs ependymal ciliogenesis and links neuroinflammation to hydrocephalus formation."
+path(MESHD:Hydrocephalus) -- p(HGNC:NFKB1)
+
+SET Evidence = "In this animal model, hydrocephalus formation is specifically induced during a critical time period of early postnatal development,
+ in which IKK/NF-κB-induced neuroinflammation interferes with ependymal ciliogenesis."
+
+p(HGNC:NFKB1) -- path(MESHD:Hydrocephalus)  
+
+SET Evidence = "Therefore, our study might open up new perspectives for the treatment of certain types of neonatal and childhood 
+hydrocephalus associated with hemorrhages and infections."
+
+path(MESHD:Infection) -- path(MESHD:Hydrocephalus)
+path(MESHD:Hemorrhage) -- path(MESHD:Hydrocephalus)
+
+
+UNSET STATEMENT_GROUP
+
+##################################################################################
+# Statements Section
+
+SET STATEMENT_GROUP = "Group 2"
+
+# Add statements below this comment
+##### paper 1 ###
+
+SET Citation = {"PubMed","Neurotherapeutics. 2013 Jan;10(1):143-53. doi: 10.1007/s13311-012-0165-2."," 23296837"}
+
+SET Evidence = "Consumption of coffee is associated with reduced risk of Parkinson's disease (PD), an effect that has largely been
+ attributed to caffeine. However, coffee contains numerous components that may also be neuroprotective. One of these compounds is
+ eicosanoyl-5-hydroxytryptamide (EHT), which ameliorates the phenotype of α-synuclein transgenic mice associated with decreased 
+ protein aggregation and phosphorylation, improved neuronal integrity and reduced neuroinflammation. The neuroinflammatory 
+ response to MPTP was markedly attenuated, and indices of oxidative stress and JNK activation were significantly prevented with 
+ EHT"
+
+a(CHEBI:caffeine) -- path(MESHD:"Parkinson Disease")
+SET Species = "9606"
+a("eicosanoyl-5-hydroxytryptamide") decreases  bp(MESHPP:"Aggregation")
+a("eicosanoyl-5-hydroxytryptamide") decreases  bp(MESHPP:"Phosphorylation")
+a("eicosanoyl-5-hydroxytryptamide") decreases  bp(ADO:"neuroinflammation")
+#improved neuronal integrity?
+a("eicosanoyl-5-hydroxytryptamide") decreases bp(MESHPP:"Oxidative Stress")
+a("eicosanoyl-5-hydroxytryptamide") decreases act(p(HGNC:MAPK9))
+
+SET Evidence = "Mice fed a diet containing EHT for four weeks exhibited dose-dependent preservation of nigral dopaminergic
+ neurons following MPTP challenge compared to animals given control feed. Reductions in striatal dopamine and tyrosine 
+ hydroxylase content were also less pronounced with EHT treatment."
+
+SET NervousSystem = "Neostriatum"
+a("eicosanoyl-5-hydroxytryptamide") increases a(CHEBI:"1-methyl-4-phenyl-1,2,3,6-tetrahydropyridine")
+a("eicosanoyl-5-hydroxytryptamide") increases a(CHEBI:dopamine)
+a("eicosanoyl-5-hydroxytryptamide") increases a(MGI:Th)
+UNSET NervousSystem
+UNSET Species
+
+SET Evidence = "In cultured primary microglia and astrocytes, EHT had a direct anti-inflammatory effect demonstrated by 
+repression of lipopolysaccharide-induced NFκB activation, iNOS induction, and nitric oxide production."
+SET NervousSystem = {"Microglia","Astrocytes"}
+a("eicosanoyl-5-hydroxytryptamide") decreases act(p(HGNC:LITAF))
+a("eicosanoyl-5-hydroxytryptamide") decreases a("iNOS")
+a("eicosanoyl-5-hydroxytryptamide") decreases a(CHEBI:"nitric oxide")
+#couldnt find iNOS enzyme. ASk
+
+UNSET NervousSystem 
+
+# bel statement
+SET Evidence = "Additionally, in SH-SY5Y cells, MPP(+)-induced demethylation of phosphoprotein phosphatase 2A (PP2A), the master 
+ regulator of the cellular phosphoregulatory network, and cytotoxicity were ameliorated by EHT. "
+ a("eicosanoyl-5-hydroxytryptamide") decreases g(MGI:Mpz)
+ 
+#check where MPP is
+############### paper 2 $$
+
+
+SET Citation = {"PubMed","Anesthesiology. 2013 Mar;118(3):502-15. doi: 10.1097/ALN.0b013e3182834d77.","23314110"}
+SET Evidence = " anesthesia with 3% sevoflurane for 2 h daily for 3 days induced cognitive impairment and neuroinflammation
+ (e.g., increased interleukin-6 levels, 151 ± 2.3% [mean ± SD] vs. 100 ± 9.0%, P = 0.035, n = 6) in young but not in adult mice"
+#how to diff between young and old mice
+SET Species = "9606"
+a(CHEBI:sevoflurane) -- path(ADO:"neuroinflammation")
+a(CHEBI:sevoflurane) -- bp(ADO:"Mild_cognitive_impairment")
+
+a(CHEBI:sevoflurane) -> p(MGI:Il6)
+
+SET Evidence = " Anesthesia with 3% sevoflurane for 2 h daily for 1 day and 9% desflurane for 2 h daily for 3 days induced 
+neither cognitive impairment nor neuroinflammation"
+a(CHEBI:desflurane) decreases path(ADO:"neuroinflammation")
+a(CHEBI:desflurane) decreases path(ADO:"Mild_cognitive_impairment")
+p(MGI:Il6) -- a(CHEBI:sevoflurane)
+UNSET Species
+####################paper 3 $$
+
+
+SET Citation = {"PubMed","Anesthesiology. 2013 Mar;118(3):502-15. doi: 10.1097/ALN.0b013e3182834d77.","24890099"}
+SET Evidence = "Using a model of chronic neuroinflammation following murine cytomegalovirus (MCMV)-induced encephalitis, we found
+that CD8(+) T-cells persisting within the brain expressed PD-1. Conversely, activated microglia expressed PD-L1. "
+complex(p(HGNC:CD274),p(HGNC:SPATA2))
+ 
+SET Evidence = "PD-L1 on microglia has been shown to negatively regulate T-cell activation in models of multiple sclerosis and acute viral encephalitis."
+SET MeSHAnatomy = "Microglia"
+bp(GOBP:"T cell activation") -- p(HGNC:CD274) 
+UNSET MeSHAnatomy 
+
+SET Evidence = "PD-L1 on microglia has been shown to negatively regulate T-cell activation in models of multiple sclerosis and acute viral encephalitis"
+SET MeSHAnatomy = "Microglia"
+path(MESHD:"Multiple Sclerosis") -- p(HGNC:CD274)
+UNSET MeSHAnatomy
+
+SET Evidence = "In vitro, primary murine microglia, which express low basal levels of PD-L1, upregulated the co-inhibitory ligand on IFN-γ-treatment."
+p(HGNC:IFNG) -- p(HGNC:CD274)
+
+SET Evidence = "Blockade of the PD-1: PD-L1 pathway in microglial: CD8(+) T-cell co-cultures increased T-cell IFN-γ and interleukin (IL)-2 production."
+p(HGNC:IFNG) -- p(HGNC:CD274)
+p(HGNC:IL2) -- p(HGNC:IFNG)
+#PD-L1 is HGNC:CD274
+
+SET Evidence = "Using ex vivo cultures of brain leukocytes, including microglia and CD8(+) T-cells, obtained from mice with MCMV-induced chronic 
+neuroinflammation, we found that neutralization of either PD-1 or PD-L1 increased IFN-γ production from virus-specific CD8(+) T-cells stimulated with
+ MCMV IE1168-176 peptide."
+
+p(HGNC:IFNG) -- p(HGNC:CD274)
+
+############paper4 : 24898638 ## $$$
+
+SET Citation = {"PubMed","J Alzheimers Dis. 2014;42(2):421-33. doi: 10.3233/JAD-132165","24898638 "}
+
+SET Evidence = "Metabolomic analyses of both whole blood and plasma showed a clear separation between untreated AL mice and the
+other two groups, with levels of several metabolites involved in energy metabolism, including pyruvate and creatine, being 
+significantly reduced in untreated AL mice compared with control and treated AL mice."
+SET Species = "10090"
+
+a(CHEBI:"beta-amyloid") increases a(pyruvate)
+a(CHEBI:"beta-amyloid") increases a(creatine)
+
+SET Evidence  = "Gallate treatment suppressed Aβ-induced overproduction of the inflammatory cytokine tumor necrosis factor-α in the hippocampus and 
+normalized plasma levels of the affected metabolites."
+SET MeSHAnatomy = "Hippocampus"
+a(CHEBI:gallate) -| p(MGI:Tnf)
+a(CHEBI:gallate) decreases act(a(CHEBI:"beta-amyloid"))
+#a(CHEBI:gallate) -- p(MGI:App)
+UNSET MeSHAnatomy
+UNSET Species
+
+
+########## paper 5 : 24898660### $
+
+SET Citation = {"PubMed","J Alzheimers Dis. 2014;42(2):459-83. doi: 10.3233/JAD-140036.","24898660"}
+
+SET Evidence = "The p75 neurotrophin receptor (p75NTR) is involved in degenerative mechanisms related to Alzheimer's disease (AD).
+ In addition, p75NTR levels are increased in AD and the receptor is expressed by neurons that are particularly vulnerable in the
+ disease. Therefore, modulating p75NTR function may be a significant disease-modifying treatment approach"
+
+SET Species = "10090"
+path(DO:"Alzheimer's disease") -> p(MGI:Ngfr)
+
+SET Evidence = "Prior studies indicated that the non-peptide, small molecule p75NTR ligands LM11A-31, and chemically unrelated
+ LM11A-24, could block amyloid-β-induced deleterious signaling and neurodegeneration in vitro, and LM11A-31 was found to mitigate
+ neuritic degeneration and behavioral deficits in a mouse model of AD"
+ 
+a("LM11A-24") decreases act(a(CHEBI:"beta-amyloid"))
+a("LM11A-31") decreases act(a(CHEBI:"beta-amyloid"))
+a("LM11A-31") decreases path(DO:"neurodegenerative disease") 
+path(MESHD:"Alzheimer Disease") -- g(MGI:Ngfr)
+path(MESHD:"Alzheimer Disease") -- g(MGI:App)
+ 
+SET Evidence = " Both ligands decreased activation of microglia, while LM11A-31 attenuated reactive astrocytes"
+ 
+SET Cell = "microglial cell"
+a("LM11A-24") decreases bp(ADO:"Microglial_activation")
+a("LM11A-31") decreases bp(ADO:"Microglial_activation")
+UNSET CellLine 
+UNSET Species 
+
+####### paper 6 : 24907647 #####$$$
+
+ 
+ SET Citation = {"PubMed","Toxicol In Vitro. 2014 Oct;28(7):1183-9. doi: 10.1016/j.tiv.2014.05.006. Epub 2014 Jun 4.","24907647"}
+ 
+ SET Evidence = "2-Deoxy-d-glucose attenuates sevoflurane-induced neuroinflammation through nuclear factor-kappa B pathway in vitro."
+ p(MGI:Nfkb1) -- a(CHEBI:"2-deoxy-D-glucose")
+ 
+SET Evidence = " Mouse microglia cells were treated with 4.1% sevoflurane for 6h to examine the expression of interleukin (IL)-6 and tumor necrosis 
+factor (TNF-α) and activation of nuclear factor-kappa B (NF-κB). Pyrrolidine dithiocarbamate (PDTC) or 2-DG was used 1h before sevoflurane treatment."
+ 
+ SET Species = "10090" 
+ SET Cell = "microglial cell"
+a(CHEBI:sevoflurane) increases r(MGI:Il6)
+a(CHEBI:sevoflurane) increases r(MGI: Tnf)
+a(CHEBI:sevoflurane) increases act(p(MGI:Nfkb1))
+ 
+a(CHEBI:"2-deoxy-D-glucose") decreases p(MGI:Il6)
+a(CHEBI:"2-deoxy-D-glucose") decreases p(MGI: Tnf)
+a(CHEBI:"2-deoxy-D-glucose") decreases p(MGI: Nfkb1)
+ 
+UNSET Species
+
+####### paper 7 : 24920309 ######$
+
+ SET Citation = {"PubMed","J Neuroinflammation. 2014 Jun 11;11:104. doi: 10.1186/1742-2094-11-104","24920309"}
+ SET Evidence = "Early passage human brain cell cultures were a mixture of microglia, astrocytes, fibroblasts and pericytes.
+ Later passage cultures contained proliferating fibroblasts and pericytes only. Under basal culture conditions all cell types 
+showed cytoplasmic NFκB indicating that they were in a non-activated state. Expression of IP-10 and MCP-1 were significantly 
+increased in response to pro-inflammatory stimuli. The two chemokines were expressed in mixed cultures as well as cultures of
+ fibroblasts and pericytes only. The expression of IP-10 and MCP-1 were regulated at the mRNA and protein level, and both were 
+secreted into cell culture media. "
+SET Species = "9606"
+SET MeSHDisease = "Epilepsy"
+SET Cell = {"microglial cell","astrocyte","fibroblast","pericyte cell"}
+p(HGNC:CXCL10) -- path(MESHD:Inflammation)
+p(HGNC:CCL2) -- path(MESHD:Inflammation)
+UNSET Cell
+UNSET MeSHDisease 
+UNSET Species
+#tloc(nuclear,p(HGNC:NFKB1))
+    
+###### paper 8 : 24928797 #######
+  
+SET Citation = {"PubMed","Nat Med. 2010 Aug;16(8):897-902. doi: 10.1038/nm.2183. Epub 2010 Jul 25.","24928797"}
+
+SET Evidence = "Multiple system atrophy (MSA) is a sporadic, adult onset, relentlessly progressive neurodegenerative disease characterized by 
+autonomic abnormalities associated with parkinsonism, cerebellar dysfunction, pyramidal signs, or combinations thereof."
+SET Species = "10090" 
+path(MESHD:"Parkinsonian Disorders") -- path(MESHD:"Multiple System Atrophy")
+path(MESHD:"Cerebellar Diseases") -- path(MESHD:"Multiple System Atrophy")
+path(MESHD:"Multiple System Atrophy") -- path(MESHD:"Neurodegenerative Diseases")
+
+SET Evidence = "MSA is neuropathologically defined by the presence of α-synuclein-containing inclusions, particularly in the cytoplasm of 
+oligodendrocytes (glial cytoplasmic inclusions, GCIs), which are associated with neurodegeneration."
+p(MGI:Snca) -- path(MESHD:"Multiple System Atrophy")
+
+SET Evidence = "The MSA neurodegenerative process likely comprises cell-to-cell transmission of α-synuclein in a prion-like manner, α-synuclein
+ aggregation, increased oxidative stress, abnormal expression of tubulin proteins, decreased expression of neurotrophic factors, excitotoxicity and
+ microglial activation, and neuroinflammation."
+path(MESHD:"Multiple System Atrophy") -> bp(MESHPP:"Oxidative Stress")
+path(MESHD:"Multiple System Atrophy") -| r(MGI:Ntf3)
+
+SET Evidence = "These include sertraline, paroxetine, and lithium, which hamper arrival of α-synuclein to oligodendroglia; rifampicin, lithium,
+and non-steroidal anti-inflammatory drugs, which inhibit α-synuclein aggregation in oligodendrocytes; riluzole, rasagiline, fluoxetine and mesenchymal
+stem cells, which exert neuroprotective actions; and minocycline and intravenous immunoglobulins, which reduce neuroinflammation and microglial 
+activation"
+SET MeSHAnatomy = "Oligodendroglia"
+a(CHEBI:"lithium atom") -| r(MGI:Snca)
+a(CHEBI:sertraline) -| r(MGI:Snca)
+a(CHEBI:paroxetine) -| r(MGI:Snca)
+
+UNSET MeSHAnatomy
+UNSET Species 
+
+####### paper 9 : 24990149##### in process 
+
+SET Citation = {"PubMed","Hum Mol Genet. 2014 Dec 1;23(23):6286-301. doi: 10.1093/hmg/ddu348. Epub 2014 Jul 2.","24990149"}
+SET Species = "10090"
+SET Evidence = "The role of inflammatory miRNAs in Alzheimer's disease (AD) and their ability to modulate glia responses are now 
+beginning to be explored." 
+SET Species = "10090"
+a("inflammatory miRNAs") -- path(DO:"Alzheimer's disease")
+
+SET Evidence = "In this study, we propose to disclose the functional role of miR-155, one of the most well studied immune-related miRNAs in AD-associated neuroinflammatory events, employing the 3xTg AD animal model."
+g(MGI:Mir155) -- bp(ADO:"neuroinflammation")
+
+SET Evidence = "This event occurred simultaneously with an increase of microglia and astrocyte activation, and before the 
+appearance of extracellular Aβ aggregates, suggesting that less complex Aβ species, such as Aβ oligomers may contribute to early 
+neuroinflammation."
+SET MeSHDisease = "Alzheimer Disease"
+m(MGI:Mir155) -> bp(ADO:"Microglial_activation")
+m(MGI:Mir155) -> bp(ADO:"astrocyte_activation")
+UNSET MeSHDisease
+
+SET Evidence = "Our results suggest early miR-155 and c-Jun upregulation in the 3xTg AD mice, as well as in Aβ-activated 
+microglia and astrocytes, thus contributing to the production of inflammatory mediators such as IL-6 and IFN-β."
+g(MGI:Jun) -> g(MGI:Il6)
+g(MGI:Mir155) -> g(MGI:Ifnb1)
+UNSET Species
+#check
+
+###### paper 10 : 25008863##### in process
+
+#check for IL-22RA2
+
+SET Citation ={"PubMed","Genes Immun. 2014 Oct;15(7):457-65. doi: 10.1038/gene.2014.36. Epub 2014 Jul 10.","25008863"}
+SET Evidence = "Single-nucleotide polymorphisms close to IL22RA2, coding for the soluble interleukin (IL)-22-binding protein 
+(IL-22BP), are strongly and reproducibly associated with multiple sclerosis (MS),"
+SET Species = "10090"
+g(MGI:Il22ra2) -- path(DO:"multiple sclerosis")
+
+SET Evidence = "Because IL-22BP is known to antagonize IL-22 signaling, a primarily pro-inflammatory cytokine, we hypothesized
+ that the Il22ra2-deficient mice would have more severe EAE.Paradoxically, the knockout mice displayed a less severe disease course,
+ less demyelination and less infiltration of immune cells in the CNS."
+g(MGI:Il22ra2) -> path(MESHD:"Encephalomyelitis, Autoimmune, Experimental")
+
+SET Evidence = "lack of IL-22BP leads to a higher availability of IL-22, which in the case of CNS inflammation, surprisingly acts
+ in a protective fashion. Thus, deletion of the ortholog of the MS risk gene Il22ra2 in mice has beneficial effects on EAE, which 
+may be considered in new therapeutic strategies for treating neuroinflammation"
+g(MGI:Il22ra2) negativeCorrelation g(MGI:Il22) 
+UNSET Species
+
+###### paper 11 : 25019688####
+
+SET Citation ={"PubMed","Neurosci Lett. 2014 Sep 5;579:18-23. doi: 10.1016/j.neulet.2014.07.003. Epub 2014 Jul 11.","25019688"}
+SET Evidence = "Stroke induces a profound neuroinflammatory reaction that leads to secondary cerebral tissue injury. 
+Interleukin-10 (IL-10) is a key anti-inflammatory cytokine that is endogenously produced by immune cells and limits this 
+inflammatory reaction.Previously, therapeutic administration of IL-10 has been shown to be neuroprotective in experimental stroke"
+SET Species = "10090"
+path(MESHD:Stroke) -- path(DO:"cerebral infarction")
+g(MGI:Il10) -| path(MESHD:Inflammation)
+ 
+SET Evidence = "IL-10 treatment effectively downregulated pro-inflammatory signaling cascades which were upregulated by the 
+ischemic lesion in the acute phase after the stroke. Our results emphasize the key role of IL-10 as a neuroprotective cytokine "
+path(MESHD:Stroke) -- path(ADO:"ischemic_lesion") 
+g(MGI:Il10) -| bp(ADO:neuroinflammation)
+UNSET Species
+
+###### paper 12 : 25051986#####
+SET Citation = {"PubMed","J Neuroinflammation. 2014 Jul 23;11:126. doi: 10.1186/1742-2094-11-126.","25051986"}
+
+SET Evidence = "Aging is characterized by a low-grade systemic inflammation that contributes to the pathogenesis of
+ neurodegenerative disorders such as Alzheimer's disease (AD)."
+SET Species = "10090"
+path(MESHD:Inflammation) -- path(MESHD:"Alzheimer Disease")
+path(MESHD:"Alzheimer Disease") -- path(MESHD:"Neurodegenerative Diseases")
+bp(MESHPP:Aging) -- path(MESHD:Inflammation)
+
+SET Evidence = "role of chromatin regulators in inflammation and longevity including the REST corepressor (Rcor)-2 factor,"
+p(MGI:Rcor2) -- path(MESHD:Inflammation)
+
+SET Evidence = "Rcor2 reduction in astrocytes was accompanied by an increased basal expression of the interleukin (Il)-6 gene.A negative correlation
+between Rcor2 and Il6 gene expression was also verified in LPS-treated C6 glioma cells"
+SET Cell = "astrocyte"
+p(MGI:Rcor2) negativeCorrelation g(MGI:Il6)
+UNSET Cell
+
+SET Evidence = "Data presented here show interplay between Rcor2 downregulation and increased inflammation and suggest that
+ Rcor2 may be a key regulator of inflammaging."
+p(MGI:Rcor2) negativeCorrelation path(MESHD:Inflammation)
+UNSET Species
+
+###### paper 13 :25064079### $$$$
+
+SET Citation = {"PubMed","Neurotoxicology. 2014 Sep;44:250-62. doi: 10.1016/j.neuro.2014.07.006. Epub 2014 Jul 23.","25064079"}
+
+SET Evidence = "Neuroprotective effect of the chemical chaperone, trehalose in a chronic MPTP-induced Parkinson's disease mouse model."
+SET Species = "10090"
+path(MESHD:"Parkinson Disease") -- a(CHEBI:trehalose)
+path(MESHD:"Parkinson Disease") -- a(CHEBI:"1-methyl-4-phenyl-1,2,3,6-tetrahydropyridine")
+
+#SET Evidence = "The clinical features of PD emerge due to selective degeneration of dopamine (DA) neurons in the substantia nigra pars compacta (SNc),
+#which project to the caudate putamen (CPu) where they release DA"
+#check how to encode dopamine neuron
+
+SET Evidence = " 1-methyl-4-phenyl-1,2,3,6-tetrahydropyridine (MPTP)-induced damage to DA neurons. "
+a(CHEBI:"1-methyl-4-phenyl-1,2,3,6-tetrahydropyridine") -- a(BRCO:"Ventral_tegmental_area_dopamine_neuron")
+
+SET Evidence = "In the current in vivo mouse model study, we tested trehalose for its ability to protect against 1-methyl-4-phenyl-1,2,3,6-tetrahydropyridine 
+(MPTP)-induced damage to DA neurons."
+a(CHEBI:"1-methyl-4-phenyl-1,2,3,6-tetrahydropyridine") -- a(CHEBI:"dAMP residue")
+
+SET Evidence = "MPTP-induced losses in tyrosine hydroxylase and DA transporter immunoreactivity in the ventral midbrain SNc and CPu were significantly 
+reduced by trehalose. Decreases in CPu dopamine levels produced by MPTP were also blocked by trehalose. Microglial activation and astrocytic hypertrophy
+induced by MPTP were greatly reduced by trehalose, indicating protection against neuroinflammation."
+a(CHEBI:trehalose) -- a(CHEBI:"1-methyl-4-phenyl-1,2,3,6-tetrahydropyridine")
+a(CHEBI"1-methyl-4-phenyl-1,2,3,6-tetrahydropyridine") -| p(MGI:Th)
+a(CHEBI:trehalose) -> p(MGI:Th)
+
+SET Evidence = " Two tight junctional proteins, ZO-1 and occludin, are downregulated following MPTP treatment and trehalose blocks this effect"
+a(CHEBI:trehalose) -> g(MGI:Tjp1)
+a(CHEBI:trehalose) -> g(MGI:Ocln)
+
+#SET Evidence = "the glucose transporter-1 that is expressed in brain endothelial cells is also protected by trehalose from MPTP-induced down-regulation"
+UNSET Species  
+
+####### paper 14 : 25086214 ###$$$
+
+SET Citation = {"PubMed","Stem Cell Res. 2014 Sep;13(2):227-39. doi: 10.1016/j.scr.2014.06.001. Epub 2014 Jun 21.","25086214"}
+SET Evidence = "cell migration is a crucial element in regenerative processes in MS, dictating the route of delivery, when cell transplantation is considered."
+SET Species = "10090"
+path(MESHD:"Multiple Sclerosis") -- bp(GOBP:"cell migration")
+
+SET Evidence = "We have previously shown that inflammation triggers migration of multi-potential neural precursor cells (NPCs) into the white matter 
+of experimental autoimmune encephalomyelitis (EAE) rodents, a widely used model of MS."
+SET MeSHDisease = "Encephalomyelitis, Autoimmune, Experimental"
+bp(GOBP:"cell migration") -- path(MESHD:Inflammation)
+UNSET MeSHDisease
+
+SET Evidence = "Stromal cell-derived factor-1α, monocyte chemo-attractant protein-1 and hepatocyte growth factor were expressed in the EAE brain and
+specifically in microglia and astrocytes."
+SET MeSHAnatomy = {"Microglia","Astrocytes"}
+path(MESHD:Encephalomyelitis) -- r(MGI:Cxcl12)
+path(MESHD:Encephalomyelitis) -- r(MGI:Hgf)
+UNSET MeSHAnatomy
+
+SET Evidence = "Selective blockage of CXCR4, CCR2 or c-Met partially inhibited NPC migration in EAE brains"
+SET MeSHDisease = "Encephalomyelitis, Autoimmune, Experimental"
+SET CellLine = NPC
+g(MGI:Cxcr4) -> bp(GOBP:"cell migration")
+g(MGI:Ccr2) -> bp(GOBP:"cell migration")
+g(MGI:Met) -> bp(GOBP:"cell migration")
+UNSET CellLine
+UNSET MeSHDisease
+UNSET Species
+
+###paper 15 : 25086357#####
+
+SET Citation = {"PubMed","Biochem Biophys Res Commun. 2014 Aug 22;451(2):239-45. doi: 10.1016/j.bbrc.2014.07.107. Epub 2014 Jul 30.","25086357"}
+
+SET Evidence = "Microglia-mediated neuroinflammation is implicated in the pathogenesis of several neurodegenerative disorders."
+path(ADO:neuroinflammation) -- path(ADO:"neurodegenerative_disease")
+
+SET Evidence = "Rotenone is an environmental toxin that has been shown to activate microglia and neuroinflammation"
+a(CHEBI:rotenone) -> bp(ADO:"Microglial_activation")
+a(CHEBI:rotenone) -> path(ADO:"neuroinflammation")
+
+SET Evidence = "rotenone enhanced the levels of M1 phenotypic genes including TNF-α, iNOS and COX-2/PGE2 but reduced that of M2 markers such as Ym1/2
+ and IL-10 in mouse primary and immortalized microglia."
+SET Species = "10090"
+a(CHEBI:rotenone) -> g(MGI:Tnf)
+a(CHEBI:rotenone) -> g(MGI:Nos2)
+a(CHEBI:rotenone) -> g(MGI:Ptgs2)
+a(CHEBI:rotenone) -| p(MGI:Il10)
+UNSET Species
+#check
+
+SET Evidence = "transcription and protein expression of cystathionine-β-synthase (CBS), as well as hydrogen sulfide (H2S) production were decreased in 
+rotenone-treated primary microglia."
+a(CHEBI:rotenone) -| a(CHEBI:"EC 4.2.1.22 (cystathionine beta-synthase) inhibitor")
+a(CHEBI:rotenone) -| a(CHEBI:"hydrogen sulfide")
+
+SET Evidence = "via triggering ROS formation, rotenone suppressed the CBS-H2S pathway and thus promoted microglia polarization toward M1 
+pro-inflammatory phenotype."
+
+a(CHEBI:rotenone) -> a(CHEBI:"reactive oxygen species")
+
+#### paper 16: 25093162####
+
+SET Citation = {"PubMed","Biomed Res Int. 2014;2014:290182. doi: 10.1155/2014/290182. Epub 2014 Jul 1.","25093162"}
+
+SET Evidence = "Tumor necrosis factor-α (TNF-α) is a critical proinflammatory cytokine regulating neuroinflammation. Elevated levels of TNF-α have 
+been associated with various neurodegenerative diseases such as Alzheimer's disease and Parkinson's disease"
+g(MGI:Tnf) -- path(ADO:Neuroinflammation)
+g(MGI:Tnf) -- path(MESHD:"Alzheimer Disease")
+
+SET Evidence = "we report that RIP3-mediated necroptosis, a form of regulated necrosis, is activated in the mouse hippocampus after 
+intracerebroventricular injection of TNF-α."
+SET MeSHAnatomy = Hippocampus
+g(MGI:Tnf) -> act(p(MGI:Ripk3))
+
+
+SET Evidence = "IP3 deficiency attenuates TNF-α-initiated loss of hippocampal neurons."
+g(MGI:Itpka) -- g(MGI:Tnf)
+SET Evidence = " TNF-α promotes CYLD-RIP1-RIP3-MLKL-mediated necroptosis of hippocampal neurons largely bypassing ROS accumulation and calcium influx."
+g(MGI:Tnf) -- g(MGI:Cyld)
+g(MGI:Tnf) -- g(MGI:Ralbp1)
+g(MGI:Tnf) -- g(MGI:Mprip)
+g(MGI:Tnf) -- g(MGI:Mlkl)
+g(MGI:Cyld) -- bp(GOBP:"execution phase of necroptosis")
+g(MGI:Ralbp1) -- bp(GOBP:"execution phase of necroptosis")
+g(MGI:Mprip) -- bp(GOBP:"execution phase of necroptosis")
+g(MGI:Mlkl) -- bp(GOBP:"execution phase of necroptosis")
+UNSET MeSHAnatomy
+
+###### paper 17 : 25172655 ##### $$$$
+SET Citation = {"PubMed","Biochem Biophys Res Commun. 2014 Sep 26;452(3):450-6. doi: 10.1016/j.bbrc.2014.08.092. Epub 2014 Aug 27.","25172655"}
+
+SET Evidence = "Alcohol-induced neuroinflammation is mediated by the innate immunesystem."
+SET Species = "10090"
+a(CHEBI:alcohol) -- path(ADO:"neuroinflammation")
+
+SET Evidence = "The miRNA miR-339-5p has previously been found to be upregulated in alcohol-induced neuroinflammation."
+path(ADO:Neuroinflammation) -> g(MGI:Mlxip)
+
+SET Evidence = "miR-339-5p inhibits alcohol-induced brain inflammation through regulating NF-κB pathway."
+SET MeSHAnatomy = "Brain"
+g(MGI:Mlxip) -| r(MGI:Nfkb1)
+UNSET MeSHAnatomy
+
+SET Evidence = "Our results show that alcohol induces transcription of miR 339-5p, IL-6, IL-1β and TNF-α in mouse brain 
+tissue and isolated microglial cells by activating NF-κB. "
+
+SET MeSHAnatomy = {"Brain","Tissues"} 
+g(MGI:Nfasc) -> r(MGI:Mir339)
+g(MGI:Nfasc) -> r(MGI:Il6)
+g(MGI:Nfasc) -> r(MGI:Ptx3)
+g(MGI:Nfasc) -> r(MGI:Tnf)
+UNSET MeSHAnatomy 
+UNSET Species
