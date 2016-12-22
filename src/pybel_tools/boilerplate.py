@@ -2,7 +2,7 @@
 
 import os
 from operator import itemgetter
-
+import sys
 import requests
 
 default_namespaces = {
@@ -177,11 +177,9 @@ def make_document_statement_group(pmids):
     return s
 
 
-def make_boilerplate(output_path, document_name, contact, description, version=None, copyright=None, authors=None,
-                     licenses=None, namespace_dict=None, annoations_dict=None, pmids=None):
+def make_boilerplate(document_name, contact, description, version=None, copyright=None, authors=None,
+                     licenses=None, namespace_dict=None, annotations_dict=None, pmids=None, file=sys.stdout):
     """
-
-    :param output_path: file path to output file
     :param document_name: The unique name for this BEL document
     :param contact: The email address of the maintainer
     :param description: A description of the contents of this document
@@ -189,6 +187,7 @@ def make_boilerplate(output_path, document_name, contact, description, version=N
     :param copyright: Copyright information about this document
     :param authors: The authors of this document
     :param licenses: The license applied to this document
+    :param file: output stream
     :type document_name: str
     :type contact: str
     :type description: str
@@ -204,17 +203,18 @@ def make_boilerplate(output_path, document_name, contact, description, version=N
     :type pmids: iterable
     :return:
     """
-    with open(os.path.expanduser(output_path), 'w') as f:
-        for line in make_document_metadata(document_name, contact, description, version, copyright, authors, licenses):
-            print(line, file=f)
-        print(file=f)
-        for line in make_document_namespaces(namespace_dict):
-            print(line, file=f)
-        print(file=f)
-        for line in make_document_annotations(annoations_dict):
-            print(line, file=f)
-        print(file=f)
+    for line in make_document_metadata(document_name, contact, description, version, copyright, authors, licenses):
+        print(line, file=file)
+    print('', file=file)
 
-        if pmids is not None:
-            for line in make_document_statement_group(pmids):
-                print(line, file=f)
+    for line in make_document_namespaces(namespace_dict):
+        print(line, file=file)
+    print('', file=file)
+
+    for line in make_document_annotations(annotations_dict):
+        print(line, file=file)
+    print('', file=file)
+
+    if pmids is not None:
+        for line in make_document_statement_group(pmids):
+            print(line, file=file)
