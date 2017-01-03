@@ -4,19 +4,37 @@ import time
 
 import flask
 from flask import Flask, request, redirect, flash
+from flask_restless_swagger import SwagAPIManager as APIManager
 from requests.utils import quote
 from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import secure_filename
 
 import pybel
 import pybel.parser
+from pybel.manager import models
+from pybel.manager.cache import CacheManager
 from pybel.manager.graph_cache import GraphCacheManager
 
 ALLOWED_BEL_EXTENSIONS = {'bel'}
 PARSER_RESOURCE_KEY = 'parser_resource_key'
+CACHE_MANAGER = 'cache_manager'
 
 log = logging.getLogger('pybel')
 app = Flask(__name__)
+
+cm = CacheManager()
+models.Base.metadata.bind = cm.engine
+
+manager = APIManager(app, session=cm.session)
+
+manager.create_api(models.Network,
+                   methods=['GET', 'POST'],
+                   collection_name='network',
+                   exclude_columns=['blob'])
+
+manager.create_api(models.Namespace, methods=['GET', 'POST'],
+                   collection_name='namespace',
+                   exclude_columns=['entries'])
 
 app.config[PARSER_RESOURCE_KEY] = pybel.parser.BelParser()
 app.config[PARSER_RESOURCE_KEY].statement.streamline()

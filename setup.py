@@ -21,7 +21,10 @@ CLASSIFIERS = [
 ]
 INSTALL_REQUIRES = [
     'requests',
+    'sqlalchemy',
     'flask',
+    'flask-restless',
+    'flask-restless-swagger',
     'networkx',
     'pybel',
     'click'
