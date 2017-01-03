@@ -4,7 +4,7 @@ from getpass import getuser
 import click
 
 from .boilerplate import make_boilerplate
-from .owlparser import build
+from .namespace_utils import build_namespace
 
 
 @click.group(help="PyBEL-Tools Command Line Utilities on {}".format(sys.executable))
@@ -16,16 +16,8 @@ def main():
 @main.command()
 @click.option('--host')
 @click.option('--debug', is_flag=True)
-def run(host, debug):
-    from .webparser.app import app as webparserapp
-    webparserapp.run(debug=debug, host=host)
-
-
-@main.command()
-@click.option('--host')
-@click.option('--debug', is_flag=True)
-def run_full(host, debug):
-    from .web.pybelweb import app
+def web(host, debug):
+    from .web.app import app
     app.run(debug=debug, host=host)
 
 
@@ -41,7 +33,7 @@ def run_full(host, debug):
 @click.option('--output', default=sys.stdout)
 @click.option('--value-prefix', default='')
 def buildns(title, subject, description, creator, email, url, values, functions, output, value_prefix):
-    build(title, subject, description, creator, email, url, values, functions, output, value_prefix)
+    build_namespace(title, subject, description, creator, email, url, values, functions, output, value_prefix)
 
 
 @main.command()
