@@ -50,7 +50,7 @@ def upload_bel():
 
             log_stream = io.StringIO()
 
-            g = pybel.BELGraph(lines=file.stream, log_stream=log_stream)
+            g = pybel.BELGraph(lines=(line.decode('utf-8') for line in file.stream), log_stream=log_stream)
 
             try:
                 pybel.to_database(g)
@@ -77,7 +77,7 @@ def list_bel():
 
     links = []
 
-    fmt = '<tr><td><a href="/bel/get/{}">{}</a></td><td>{}</td></tr>'
+    fmt = '<tr><td><a href="/bel/{}">{}</a></td><td>{}</td></tr>'
     for name, version in gcm.ls():
         links.append(fmt.format(quote(name), name, version))
 
