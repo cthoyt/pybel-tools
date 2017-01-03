@@ -4,17 +4,13 @@ import time
 
 import flask
 from flask import Flask, request, redirect, flash
+from requests.utils import quote
 from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import secure_filename
 
 import pybel
 import pybel.parser
 from pybel.manager.graph_cache import GraphCacheManager
-
-try:
-    import urllib.parse.quote as quote
-except ImportError:
-    import urllib.quote as quote
 
 ALLOWED_BEL_EXTENSIONS = {'bel'}
 PARSER_RESOURCE_KEY = 'parser_resource_key'
@@ -85,7 +81,8 @@ def list_bel():
     for name, version in gcm.ls():
         links.append(fmt.format(quote(name), name, version))
 
-    html = '<html><h1>BEL Files</h1><table>' + "\n".join(links) + '</table></html>'
+    html = '<html><h1>BEL Files</h1><table><tr><td>Document</td><td>Version</td></tr>' + "\n".join(
+        links) + '</table></html>'
     return html
 
 
