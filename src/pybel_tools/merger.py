@@ -13,7 +13,7 @@ from itertools import islice
 from .boilerplate import make_document_metadata
 
 
-def split_docuent(lines):
+def split_document(lines):
     lines = list(lines)
     end_document_section = 1 + max(i for i, line in enumerate(lines) if line.startswith('SET DOCUMENT'))
     end_definitions_section = 1 + max(i for i, line in enumerate(lines) if
@@ -33,7 +33,7 @@ def merge(output_path, *input_paths, merge_document_name=None, merge_document_co
 
     for input_path in input_paths:
         with open(os.path.expanduser(input_path)) as f:
-            a, b, c = split_docuent([line.strip() for line in f])
+            a, b, c = split_document([line.strip() for line in f])
             metadata.append(a)
             defs.append(set(b))
             statements.append(c)

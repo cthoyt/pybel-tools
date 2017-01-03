@@ -197,8 +197,8 @@ def make_boilerplate(document_name, contact, description, version=None, copyrigh
     :type licenses: str
     :param namespace_dict: an optional dictionary of {str name: str URL} of namespaces
     :type namespace_dict: dict
-    :param annotation_dict: an optional dictionary of {str name: str URL} of annotations
-    :type annotation_dict: dict
+    :param annotations_dict: an optional dictionary of {str name: str URL} of annotations
+    :type annotations_dict: dict
     :param pmids: an optional list of PMID's to autopopulate with citation and abstract
     :type pmids: iterable
     :return:
