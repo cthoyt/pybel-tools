@@ -22,18 +22,25 @@ def web(host, debug):
 
 
 @main.command()
-@click.option('--title', default='')
-@click.option('--subject', default='')
-@click.option('--description', default='')
-@click.option('--creator', default=getuser())
-@click.option('--email', default='')
-@click.option('--url', default='')
+@click.argument('name')
+@click.argument('keyword')
+@click.argument('domain')
+@click.argument('citation')
+@click.option('--author', default=getuser())
+@click.option('--description')
+@click.option('--species')
+@click.option('--version')
+@click.option('--contact')
+@click.option('--license')
 @click.option('--values', default=sys.stdin)
 @click.option('--functions')
-@click.option('--output', default=sys.stdout)
+@click.option('--output', type=click.File('w'), default=sys.stdout)
 @click.option('--value-prefix', default='')
-def buildns(title, subject, description, creator, email, url, values, functions, output, value_prefix):
-    build_namespace(title, subject, description, creator, email, url, values, functions, output, value_prefix)
+def buildns(name, keyword, domain, citation, author, description, species, version, contact, license, values, functions,
+            output, value_prefix):
+    build_namespace(name, keyword, domain, author, citation, values, namespace_description=description,
+                    namespace_species=species, namespace_version=version, author_contact=contact,
+                    author_copyright=license, functions=functions, output=output, value_prefix=value_prefix)
 
 
 @main.command()
