@@ -32,11 +32,11 @@ def split_document(lines):
 def merge(output_path, *input_paths, merge_document_name=None, merge_document_contact=None,merge_document_description=None):
     """
 
-    :param output_path:
-    :param input_paths:
-    :param merge_document_name:
-    :param merge_document_contact:
-    :param merge_document_description:
+    :param output_path: Path to file to write merged BEL document
+    :param input_paths: List of paths to input BEL document files
+    :param merge_document_name: name for combined document
+    :param merge_document_contact: contact information for combine document
+    :param merge_document_description: description of combine document
     :return:
     """
     metadata, defs, statements = [], [], []
