@@ -1,5 +1,9 @@
+sqlalchemy
 requests
 flask
+flask-restless
+flask-restless-swagger
 networkx
 pybel
 click
+pygments

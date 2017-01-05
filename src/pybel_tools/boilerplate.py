@@ -1,6 +1,7 @@
 """Utilities for building boilerplate BEL documents"""
+from __future__ import print_function
 
-import os
+import sys
 from operator import itemgetter
 
 import requests
@@ -75,6 +76,7 @@ default_annotations = {
 }
 
 
+# TODO merge with code from pybel to_bel
 def make_document_metadata(document_name, contact, description, version=None, copyright=None, authors=None,
                            licenses=None):
     """Builds a document metadata section for a BEL document
@@ -177,11 +179,9 @@ def make_document_statement_group(pmids):
     return s
 
 
-def make_boilerplate(output_path, document_name, contact, description, version=None, copyright=None, authors=None,
-                     licenses=None, namespace_dict=None, annoations_dict=None, pmids=None):
+def make_boilerplate(document_name, contact, description, version=None, copyright=None, authors=None,
+                     licenses=None, namespace_dict=None, annotations_dict=None, pmids=None, file=sys.stdout):
     """
-
-    :param output_path: file path to output file
     :param document_name: The unique name for this BEL document
     :param contact: The email address of the maintainer
     :param description: A description of the contents of this document
@@ -189,6 +189,7 @@ def make_boilerplate(output_path, document_name, contact, description, version=N
     :param copyright: Copyright information about this document
     :param authors: The authors of this document
     :param licenses: The license applied to this document
+    :param file: output stream
     :type document_name: str
     :type contact: str
     :type description: str
@@ -198,23 +199,24 @@ def make_boilerplate(output_path, document_name, contact, description, version=N
     :type licenses: str
     :param namespace_dict: an optional dictionary of {str name: str URL} of namespaces
     :type namespace_dict: dict
-    :param annotation_dict: an optional dictionary of {str name: str URL} of annotations
-    :type annotation_dict: dict
+    :param annotations_dict: an optional dictionary of {str name: str URL} of annotations
+    :type annotations_dict: dict
     :param pmids: an optional list of PMID's to autopopulate with citation and abstract
     :type pmids: iterable
     :return:
     """
-    with open(os.path.expanduser(output_path), 'w') as f:
-        for line in make_document_metadata(document_name, contact, description, version, copyright, authors, licenses):
-            print(line, file=f)
-        print(file=f)
-        for line in make_document_namespaces(namespace_dict):
-            print(line, file=f)
-        print(file=f)
-        for line in make_document_annotations(annoations_dict):
-            print(line, file=f)
-        print(file=f)
+    for line in make_document_metadata(document_name, contact, description, version, copyright, authors, licenses):
+        print(line, file=file)
+    print('', file=file)
 
-        if pmids is not None:
-            for line in make_document_statement_group(pmids):
-                print(line, file=f)
+    for line in make_document_namespaces(namespace_dict):
+        print(line, file=file)
+    print('', file=file)
+
+    for line in make_document_annotations(annotations_dict):
+        print(line, file=file)
+    print('', file=file)
+
+    if pmids is not None:
+        for line in make_document_statement_group(pmids):
+            print(line, file=file)

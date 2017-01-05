@@ -7,13 +7,15 @@ Steps:
 3. postpend all statement groups with "- {author email}" and add comments with document information
 """
 
+from __future__ import print_function
+
 import os
 from itertools import islice
 
 from .boilerplate import make_document_metadata
 
 
-def split_docuent(lines):
+def split_document(lines):
     lines = list(lines)
     end_document_section = 1 + max(i for i, line in enumerate(lines) if line.startswith('SET DOCUMENT'))
     end_definitions_section = 1 + max(i for i, line in enumerate(lines) if
@@ -27,13 +29,21 @@ def split_docuent(lines):
     return documents, definitions, statements
 
 
-def merge(output_path, *input_paths, merge_document_name=None, merge_document_contact=None,
-          merge_document_description=None):
+def merge(output_path, *input_paths, merge_document_name=None, merge_document_contact=None,merge_document_description=None):
+    """
+
+    :param output_path: Path to file to write merged BEL document
+    :param input_paths: List of paths to input BEL document files
+    :param merge_document_name: name for combined document
+    :param merge_document_contact: contact information for combine document
+    :param merge_document_description: description of combine document
+    :return:
+    """
     metadata, defs, statements = [], [], []
 
     for input_path in input_paths:
         with open(os.path.expanduser(input_path)) as f:
-            a, b, c = split_docuent([line.strip() for line in f])
+            a, b, c = split_document([line.strip() for line in f])
             metadata.append(a)
             defs.append(set(b))
             statements.append(c)

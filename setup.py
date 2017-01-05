@@ -1,7 +1,8 @@
-import setuptools
 import codecs  # To use a consistent encoding
 import os
 import re
+
+import setuptools
 
 #################################################################
 
@@ -20,14 +21,21 @@ CLASSIFIERS = [
 ]
 INSTALL_REQUIRES = [
     'requests',
+    'sqlalchemy',
     'flask',
+    'flask-restless',
+    'flask-restless-swagger',
     'networkx',
     'pybel',
     'click'
 ]
 EXTRAS_REQUIRE = {}
 TESTS_REQUIRE = []
-ENTRY_POINTS = {}
+ENTRY_POINTS = {
+    'console_scripts': [
+        'pybel-tools = pybel_tools.cli:main',
+    ]
+}
 
 #################################################################
 
@@ -38,6 +46,7 @@ def read(*parts):
     """Build an absolute path from *parts* and return the contents of the resulting file. Assume UTF-8 encoding."""
     with codecs.open(os.path.join(HERE, *parts), 'rb', 'utf-8') as f:
         return f.read()
+
 
 META_FILE = read(META_PATH)
 
@@ -59,6 +68,7 @@ def get_long_description():
         long_description = f.read()
     return long_description
 
+
 if __name__ == '__main__':
     setuptools.setup(
         name=find_meta('title'),
@@ -79,4 +89,3 @@ if __name__ == '__main__':
         tests_require=TESTS_REQUIRE,
         entry_points=ENTRY_POINTS
     )
-

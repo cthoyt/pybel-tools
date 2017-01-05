@@ -7,4 +7,4 @@ WORKDIR /app
 RUN pip install -r requirements.txt
 RUN pip install .
 ENTRYPOINT ["python"]
-CMD ["-m", "pybel_tools", "run", "--host", "0.0.0.0"]
+CMD ["-m", "pybel_tools", "web", "--host", "0.0.0.0"]

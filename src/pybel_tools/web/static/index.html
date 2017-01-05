@@ -5,20 +5,30 @@
     <title>Title</title>
 </head>
 <body>
-<h1>Applications</h1>
+<h1>Parser Endpoints</h1>
 <ul>
-    <li><a href="/conv">OWL Ontology Conversion Service</a></li>
-    <li><a href="/asbel">Serialized OWL Directory</a></li>
-    <li><a href="/bel/list">BEL File and Pickle Directory</a></li>
-    <li><a href="/bel/validate">BEL Uploader</a></li>
+    <li><a href="/parser/parse">/parse/&lt;statement&gt;</a> to parse a statement that's been URL encoded.
+        URL Parameters get saved into graph with statement. Returns parsed BEL as JSON
+    </li>
+    <li><a href="/parser/dump">/dump</a> to dump the current graph as a PyBEL *.gpickle</li>
+    <li><a href="/parser/clear">/clear</a> to clear the current graph</li>
+</ul>
+<h1>BEL Utilities</h1>
+
+<ul>
+    <li><a href="/bel">BEL Directory</a></li>
+    <li><a href="/upload">BEL Uploader</a></li>
 </ul>
 
 <h2>Links to Example BEL Documents</h2>
 <ul>
 
-    <li><a href="http://resource.belframework.org/belframework/20150611/knowledge/full_abstract1.bel">Selventa Small Corpus</a></li>
-    <li><a href="http://resource.belframework.org/belframework/20150611/knowledge/small_corpus.bel">Selventa Medium Corpus</a></li>
-    <li><a href="http://resource.belframework.org/belframework/20150611/knowledge/large_corpus.bel">Selventa Large Corpus</a></li>
+    <li><a href="http://resource.belframework.org/belframework/20150611/knowledge/full_abstract1.bel">Selventa Small
+        Corpus</a></li>
+    <li><a href="http://resource.belframework.org/belframework/20150611/knowledge/small_corpus.bel">Selventa Medium
+        Corpus</a></li>
+    <li><a href="http://resource.belframework.org/belframework/20150611/knowledge/large_corpus.bel">Selventa Large
+        Corpus</a></li>
 </ul>
 
 </body>

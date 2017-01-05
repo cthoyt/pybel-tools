@@ -3,7 +3,8 @@ from getpass import getuser
 
 import click
 
-from .owlparser import build
+from .boilerplate import make_boilerplate
+from .namespace_utils import build_namespace
 
 
 @click.group(help="PyBEL-Tools Command Line Utilities on {}".format(sys.executable))
@@ -15,32 +16,46 @@ def main():
 @main.command()
 @click.option('--host')
 @click.option('--debug', is_flag=True)
-def run(host, debug):
-    from .webparser.app import app as webparserapp
-    webparserapp.run(debug=debug, host=host)
-
-
-@main.command()
-@click.option('--host')
-@click.option('--debug', is_flag=True)
-def run_full(host, debug):
-    from .web.pybelweb import app
+def web(host, debug):
+    from .web.app import app
     app.run(debug=debug, host=host)
 
 
 @main.command()
-@click.option('--title', default='')
-@click.option('--subject', default='')
-@click.option('--description', default='')
-@click.option('--creator', default=getuser())
-@click.option('--email', default='')
-@click.option('--url', default='')
+@click.argument('name')
+@click.argument('keyword')
+@click.argument('domain')
+@click.argument('citation')
+@click.option('--author', default=getuser())
+@click.option('--description')
+@click.option('--species')
+@click.option('--version')
+@click.option('--contact')
+@click.option('--license')
 @click.option('--values', default=sys.stdin)
 @click.option('--functions')
-@click.option('--output', default=sys.stdout)
+@click.option('--output', type=click.File('w'), default=sys.stdout)
 @click.option('--value-prefix', default='')
-def buildns(title, subject, description, creator, email, url, values, functions, output, value_prefix):
-    build(title, subject, description, creator, email, url, values, functions, output, value_prefix)
+def buildns(name, keyword, domain, citation, author, description, species, version, contact, license, values, functions,
+            output, value_prefix):
+    build_namespace(name, keyword, domain, author, citation, values, namespace_description=description,
+                    namespace_species=species, namespace_version=version, author_contact=contact,
+                    author_copyright=license, functions=functions, output=output, value_prefix=value_prefix)
+
+
+@main.command()
+@click.argument('document-name')
+@click.argument('contact')
+@click.argument('description')
+@click.argument('pmids', nargs=-1)
+@click.option('--version')
+@click.option('--copyright')
+@click.option('--authors')
+@click.option('--licenses')
+@click.option('--output', type=click.File('wb'), default=sys.stdout)
+def boilerplate(document_name, contact, description, pmids, version, copyright, authors, licenses, output):
+    make_boilerplate(document_name, contact, description, version, copyright, authors, licenses, pmids=pmids,
+                     file=output)
 
 
 if __name__ == '__main__':
