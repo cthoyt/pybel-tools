@@ -1,6 +1,6 @@
 """Tools for using BEL documents in python"""
 
-__version__ = '0.0.1'
+__version__ = '0.0.2-dev'
 
 __title__ = 'PyBEL Tools'
 __description__ = 'Tools for using BEL documents in python'
