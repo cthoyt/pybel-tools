@@ -1,5 +1,7 @@
 """Utilities for serializing OWL namespaces in the XML format from Protege to BEL Namespace File"""
 
+from __future__ import print_function
+
 import sys
 import time
 
@@ -160,8 +162,10 @@ def build_namespace(namespace_name, namespace_keyword, namespace_domain, author_
     function_values = ''.join(sorted(functions if functions is not None else language.value_map.keys()))
 
     print('[Values]', file=output)
-    for node in sorted(value.strip() for value in values if value.strip()):
-        print('{}{}|{}'.format(value_prefix, node, function_values), file=output)
+    for value in values:
+        if not value.strip():
+            continue
+        print('{}{}|{}'.format(value_prefix, value.strip(), function_values), file=output)
 
 
 def build_namespace_from_owl(url, output=sys.stdout):

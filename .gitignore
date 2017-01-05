@@ -5,3 +5,6 @@ scratch/*
 src/PyBEL_Tools.egg-info/*
 *.pyc
 examples/PTSD.owl
+.tox/*
+.cache/*
+.coverage

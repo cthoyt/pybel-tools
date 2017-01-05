@@ -7,6 +7,8 @@ Steps:
 3. postpend all statement groups with "- {author email}" and add comments with document information
 """
 
+from __future__ import print_function
+
 import os
 from itertools import islice
 
@@ -27,8 +29,16 @@ def split_document(lines):
     return documents, definitions, statements
 
 
-def merge(output_path, *input_paths, merge_document_name=None, merge_document_contact=None,
-          merge_document_description=None):
+def merge(output_path, *input_paths, merge_document_name=None, merge_document_contact=None,merge_document_description=None):
+    """
+
+    :param output_path:
+    :param input_paths:
+    :param merge_document_name:
+    :param merge_document_contact:
+    :param merge_document_description:
+    :return:
+    """
     metadata, defs, statements = [], [], []
 
     for input_path in input_paths:

@@ -1,8 +1,9 @@
 """Utilities for building boilerplate BEL documents"""
+from __future__ import print_function
 
-import os
-from operator import itemgetter
 import sys
+from operator import itemgetter
+
 import requests
 
 default_namespaces = {
