@@ -14,3 +14,5 @@ def graph_to_json(graph):
 
     return io
 
+def render_graph():
+    """calls graph_json and renders the output in html"""
