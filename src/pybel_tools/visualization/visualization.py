@@ -12,6 +12,7 @@ def graph_to_json(graph):
     # to_json output needs to be modified (single quotes and backslashes)
     io.getvalue()
 
+
     return io
 
 def render_graph():
