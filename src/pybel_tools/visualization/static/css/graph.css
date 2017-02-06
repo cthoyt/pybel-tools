@@ -1,0 +1,173 @@
+.node-dropdown {
+    /* If words are too long activate max width. Overflow necessary when text is out of the box*/
+    /*max-width: 400px;*/
+    /*overflow: hidden;*/
+}
+
+#export-node-list {
+    width: 300px;
+}
+
+.edge-dropdown {
+    /*max-width: 400px;*/
+    /*overflow: hidden;*/
+}
+
+.candidate_mechanism {
+    padding-left: 15px;
+    min-width: 300px;
+}
+
+.candidate_nodes {
+    padding-left: 15px;
+    min-width: 500px;
+    padding-right: 15px;
+}
+
+.edge-info {
+    max-width: 400px;
+}
+
+.dropdown-submenu {
+    position: relative;
+}
+
+.dropdown-submenu > .dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-top: -6px;
+    margin-left: -1px;
+    -webkit-border-radius: 0 6px 6px 6px;
+    -moz-border-radius: 0 6px 6px;
+    border-radius: 0 6px 6px 6px;
+}
+
+.dropdown-submenu:hover > .dropdown-menu {
+    display: block;
+}
+
+.dropdown-submenu > a:after {
+    display: block;
+    content: " ";
+    float: right;
+    width: 0;
+    height: 0;
+    border-color: transparent;
+    border-style: solid;
+    border-width: 5px 0 5px 5px;
+    border-left-color: #ccc;
+    margin-top: 5px;
+    margin-right: -10px;
+}
+
+.dropdown-submenu:hover > a:after {
+    border-left-color: #fff;
+}
+
+.dropdown-submenu.pull-left {
+    float: none;
+}
+
+.dropdown-submenu.pull-left > .dropdown-menu {
+    left: -100%;
+    margin-left: 10px;
+    -webkit-border-radius: 6px 0 6px 6px;
+    -moz-border-radius: 6px 0 6px 6px;
+    border-radius: 6px 0 6px 6px;
+}
+
+@media (min-width: 768px) {
+    /*added by T Morphy */
+    /*from http://www.barrykooij.com/bootstrap-submenu-open-on-mouse-over/ to get hover behaviour on desktop */
+    ul.nav li.dropdown:hover ul.dropdown-menu {
+        display: block;
+    }
+
+    ul.nav li.dropdown:hover ul.dropdown-menu li.dropdown-submenu ul.dropdown-menu {
+        display: none;
+    }
+
+    ul.nav li.dropdown ul.dropdown-menu li.dropdown-submenu:hover ul.dropdown-menu {
+        display: block;
+    }
+
+    .lead {
+        font-size: 21px;
+    }
+}
+
+ul.no-bullets li {
+    list-style-type: none;
+}
+
+#edge-search {
+    text-align: center;
+    min-width: 240px;
+}
+
+#node-search {
+    text-align: center;
+}
+
+td.bigger-rows {
+    line-height: 2.38 !important;
+}
+
+.wide {
+    width: 100%;
+    padding-bottom: 2px;
+}
+
+.min-padding-left {
+    padding-left: 5px;
+}
+
+#bel-logo {
+    height: 20px;
+    width: 20px;
+    vertical-align: middle;
+}
+
+#json-logo {
+    height: 17px;
+    width: 17px;
+    vertical-align: middle;
+}
+
+#graph-chart {
+    display: block;
+    margin: auto;
+    vertical-align: middle;
+}
+
+.graph-controller {
+    width: 100%;
+}
+
+.float_left {
+    float: left;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.color_red {
+    color: darkred;
+}
+
+.color_black {
+    color: black;
+}
+
+.link_continuous {
+    fill: none;
+    stroke-width: 1px;
+}
+
+.link_dashed {
+    fill: none;
+    stroke-width: 1px;
+    stroke-dasharray: 4, 4;
+
+}
