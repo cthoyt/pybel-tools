@@ -10,7 +10,7 @@ DEFINE NAMESPACE HGNC AS URL "http://resources.openbel.org/belframework/20150611
 DEFINE ANNOTATION TESTAN1 AS LIST {"1","2","3"}
 DEFINE ANNOTATION TESTAN2 AS LIST {"1","2","3"}
 
-SET Citation = {"Pubmed","That one article from last week","123455"}
+SET Citation = {"PubMed","That one article from last week","123455"}
 SET TESTAN1 = "1"
 SET Evidence = "Evidence 1"
 
@@ -22,7 +22,7 @@ SET TESTAN2 = "3"
 p(HGNC:EGFR) -| p(HGNC:FADD)
 p(HGNC:EGFR) =| p(HGNC:CASP8)
 
-SET Citation = {"Pubmed","That other article from last week","123456"}
+SET Citation = {"PubMed","That other article from last week","123456"}
 SET TESTAN1 = "2"
 SET Evidence = "Evidence 3"
 
@@ -38,7 +38,7 @@ DEFINE NAMESPACE HGNC AS URL "http://resources.openbel.org/belframework/20150611
 DEFINE ANNOTATION TESTAN1 AS LIST {"1","2","3"}
 DEFINE ANNOTATION TESTAN2 AS LIST {"1","2","3"}
 
-SET Citation = {"Pubmed","That one article from last week","123455"}
+SET Citation = {"PubMed","That one article from last week","123455"}
 SET TESTAN1 = "1"
 SET Evidence = "Evidence 1"
 
@@ -51,7 +51,7 @@ SET TESTAN2 = "3"
 p(HGNC:EGFR) -| p(HGNC:FADD)
 p(HGNC:EGFR) =| p(HGNC:CASP8)
 
-SET Citation = {"Pubmed","That other article from last week","123456"}
+SET Citation = {"PubMed","That other article from last week","123456"}
 SET TESTAN1 = {"2","3"}
 SET Evidence = "Evidence 3"
 

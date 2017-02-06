@@ -1,9 +1,11 @@
+import networkx as nx
+
 import pybel
 
 
 def graph_equal(G, H):
     """Tests that two graphs are equal, defined by having the same nodes, and all edges (with same attributes)"""
-    pass
+    return nx.MultiDiGraph()
 
 
 def graph_intersection(a, b):
@@ -16,7 +18,7 @@ def graph_intersection(a, b):
     :return:
     :rtype: :class:`pybel.BELGraph`
     """
-    pass
+    return nx.MultiDiGraph()
 
 
 def graph_asymmetric_subtract(G, H):
@@ -29,7 +31,7 @@ def graph_asymmetric_subtract(G, H):
     :return:
     :rtype: :class:`pybel.BELGraph`
     """
-    pass
+    return nx.MultiDiGraph()
 
 
 def graph_difference(a, b):
@@ -42,4 +44,4 @@ def graph_difference(a, b):
     :return:
     :rtype: :class:`pybel.BELGraph`
     """
-    pass
+    return nx.MultiDiGraph()
