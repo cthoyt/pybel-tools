@@ -84,6 +84,7 @@ if __name__ == '__main__':
         keywords=KEYWORDS,
         packages=PACKAGES,
         package_dir={'': 'src'},
+        include_package_data=True,
         install_requires=INSTALL_REQUIRES,
         extras_require=EXTRAS_REQUIRE,
         tests_require=TESTS_REQUIRE,
