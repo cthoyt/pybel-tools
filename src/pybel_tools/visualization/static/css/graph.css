@@ -171,3 +171,44 @@ td.bigger-rows {
     stroke-dasharray: 4, 4;
 
 }
+
+.pathology{
+    stroke:'#FF7F0E';
+}
+
+.Abundance{
+    stroke:'#AEC7E8';
+}
+
+.Gene{
+    color:'#FFBB78';
+}
+
+.miRNA{
+    stroke:'#D62728';
+}
+
+.Protein{
+    stroke:'#1F77B4';
+}
+
+.RNA{
+    stroke:'#FF9896';
+}
+
+.BiologicalProcess{
+    stroke:'#2CA02C';
+}
+
+.Pathology{
+    stroke:'#FF7F0E';
+}
+
+.Complex{
+    stroke:'#98DF8A';
+}
+
+.Composite{
+    stroke:'#9467BD';
+}
+

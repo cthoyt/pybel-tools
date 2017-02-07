@@ -2,26 +2,42 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href='{% static "pathways/bootstrap/css/bootstrap.min.css" %}'/>
-    <link rel="stylesheet" href='{% static "pathways/css/graph.css" %}'/>
-    <link rel="stylesheet" href='{% static "pathways/css/sankey.css" %}'/>
-    <link rel="stylesheet" href='{% static "pathways/css/legend.css" %}'/>
-    <link rel="stylesheet" href='{% static "pathways/project_core/js/d3-context-menu/css/d3-context-menu.css" %}'/>
-    <link type="image/x-icon" href='{% static "pathways/project_core/images/icons/favicon.ico" %}' rel="shortcut icon"/>
+    <link rel="stylesheet" type="text/css" href='https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css'/>
+    <link rel="stylesheet"
+          href="{{ STATIC_PREFIX }}Fonts/font-awesome-4.6.3/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="{{ STATIC_PREFIX }}js/bootstrap/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="{{ STATIC_PREFIX }}css/graph.css"/>
+    <link rel="stylesheet" href="{{ STATIC_PREFIX }}css/sankey.css"/>
+    <link rel="stylesheet" href="{{ STATIC_PREFIX }}css/legend.css"/>
+    <link type="image/x-icon" href="{{ STATIC_PREFIX }}images/icons/favicon.ico" rel="shortcut icon"/>
+    <script type="text/javascript">
+    window.graph = {{ json|tojson }}
+    </script>
     <script type="text/javascript"
-            src='{% static "pathways/project_core/js/d3/d3.v4.js" %}'></script>
+            src="{{ STATIC_PREFIX }}js/jquery/jquery.min.js"></script>
     <script type="text/javascript"
-            src='{% static "pathways/project_core/js/d3/sankey.js" %}'></script>
+            src="{{ STATIC_PREFIX }}js/jquery/jquery-ui.min.js"></script>
     <script type="text/javascript"
-            src='{% static "pathways/project_core/js/jquery_validate/jquery.validate.min.js" %}'></script>
+            src="{{ STATIC_PREFIX }}js/bootstrap/3.3.5/bootstrap.min.js"></script>
     <script type="text/javascript"
-            src='{% static "pathways/project_core/js/jquery/external/jquery_svg/jquery.svg.min.js" %}'></script>
+            src="{{ STATIC_PREFIX }}js/d3/d3.v4.js"></script>
     <script type="text/javascript"
-            src='{% static "pathways/project_core/js/FileSaver.js/FileSaver.min.js" %}'></script>
+            src="{{ STATIC_PREFIX }}js/d3/sankey.js"></script>
     <script type="text/javascript"
-            src='{% static "pathways/project_core/js/graph_controller/graph_controller.js" %}'></script>
+            src="{{ STATIC_PREFIX }}js/jquery_validate/jquery.validate.min.js"></script>
     <script type="text/javascript"
-            src='{% static "pathways/project_core/js/d3-context-menu/js/d3-context-menu.js" %}'></script>
+            src="{{ STATIC_PREFIX }}js/jquery/external/jquery_svg/jquery.svg.min.js"></script>
+    <script type="text/javascript"
+            src="{{ STATIC_PREFIX }}js/FileSaver.js/FileSaver.min.js"></script>
+    <script type="text/javascript"
+            src="{{ STATIC_PREFIX }}js/graph_controller/graph_controller.js"></script>
+    <script type="text/javascript">
+    $( document ).ready(function() {
+        init_d3_force(window.graph);
+    });
+    </script>
+
+
 </head>
 <body>
 <div class="container"><!-- /.container-fluid -->
@@ -77,12 +93,12 @@
                                 <li class="align_left"><a href="pathways/graph/get_graph_bel/{{ pks }}"
                                                           download="graph.bel"
                                 >BEL File <img id="bel-logo" alt="BEL-logo"
-                                               src="{% static "pathways/project_core/images/icons/bel300x.png" %}"></a>
+                                               src="{{ STATIC_PREFIX }}images/icons/bel300x.png"></a>
                                 </li>
                                 <li class="align_left"><a href="pathways/graph/get_json_pks/{{ pks }}"
                                                           download="graph.json"
                                 >Export JSON <img id="json-logo" alt="JSON-logo"
-                                                  src="{% static "pathways/project_core/images/icons/json-icon.png" %}"></a>
+                                                  src="{{ STATIC_PREFIX }}images/icons/json-icon.png"></a>
                                 </li>
                                 <li class="align_left"><a id="save-svg-graph">Save image <i class="fa fa-file-image-o"
                                 ></i></a></li>
@@ -104,10 +120,6 @@
             <div id="graph-chart">
             </div>
             <!-- /.Force -->
-            <!-- / Sankey -->
-            <div id="sankey">
-            </div>
-            <!-- /.Sankey -->
         </div>
     </div>
 </div><!-- /.container-fluid -->
@@ -125,82 +137,16 @@
             <div class="modal-body text-left"><!-- /.Modal body -->
 
                 <h4>Subgraph info</h4>
+                <p class="color_red text-left">Number of nodes: <span class="color_black">{{ number_nodes }}</span></p>
 
+                <p class="color_red text-left">Number of edges: <span class="color_black">{{ number_edges }}</span></p>
+
+                <p class="color_red text-left">Average degree connectivity: <span
+                        class="color_black">{{ number_edges }}</span>
+                </p>
 
                 <h5 class="text-left"><span class="color_red">Selection </span> Network</h5>
                 <hr>
-                <h4>Search functionalities</h4>
-                <div>
-                    <p class="color_red text-left">Shortest path between two nodes
-                    </p>
-                    <form id="shortest-path-form" method="get">
-
-                        <label>
-                            <input class="text-left" type="checkbox" name="visualization-options" value="hide">
-                            Hide other nodes
-                        </label>
-                        <div class="input-group">
-                        <span class="input-group-addon" id="sizing-addon"><i class="fa fa-arrow-circle-o-right"
-                                                                             aria-hidden="true"></i></span>
-                            <input placeholder="Source node" name="source" id="source-node" class="text-left"
-                                   aria-describedby="sizing-addon1" type="text"/>
-
-                        </div>
-                        <div class="input-group">
-                        <span class="input-group-addon" id="sizing-addon"><i class="fa fa-paper-plane-o"
-                                                                             aria-hidden="true"></i></span>
-                            <input placeholder="Target node" name="target" id="target-node" class="text-left"
-                                   aria-describedby="sizing-addon1" type="text"/>
-                        </div>
-
-                    </form>
-                    <div class="buttons">
-                        <input type="button" class="button-shortest-path" id="show-network-input" value="Show"/>
-                        <input type="button" class="button-shortest-path" id="get-shortest-path-bel-input"
-                               value="Extract to BEL"/>
-                    </div>
-                </div>
-                <div>
-                    <p class="color_red text-left">All chains of causations (mechanisms) between two nodes
-                    </p>
-                    <form id="all-paths-form" method="get">
-                        <label>
-                            <input class="text-left" type="checkbox" name="visualization-options" value="hide">
-                            Hide other nodes
-                        </label>
-                        <div class="input-group">
-                        <span class="input-group-addon" id="sizing-addon"><i class="fa fa-arrow-circle-o-right"
-                                                                             aria-hidden="true"></i></span>
-                            <input placeholder="Source node" name="source" id="source-node2" class="text-left"
-                                   aria-describedby="sizing-addon1" type="text"/>
-                        </div>
-                        <div class="input-group">
-                        <span class="input-group-addon" id="sizing-addon"><i class="fa fa-paper-plane-o"
-                                                                             aria-hidden="true"></i></span>
-                            <input placeholder="Target node" name="target" id="target-node2" class="text-left"
-                                   aria-describedby="sizing-addon1" type="text"/>
-                        </div>
-                    </form>
-                    <div class="buttons">
-                        <input type="button" class="button-all-paths" id="all-paths-show-input" value="Show"/>
-                        <input type="button" class="button-all-paths" id="get-all-paths-bel-input"
-                               value="Extract to BEL"/>
-                    </div>
-                </div>
-                <div>
-                    <p class="color_red text-left">Extract network with list of nodes</p>
-                    <form id="export-gml" action="pathways/graph/subnetwork_to_gml/" method="get">
-                        <input type="hidden" name="expand_nodes[]" id="expand_nodes[]" value="">
-                        <input type="hidden" name="delete_nodes[]" id="delete_nodes[]" value="">
-                        <input type="hidden" name="pks" id="pks" value="">
-
-                        <input placeholder="Please select all nodes in the subnetwork" name="export-node-list"
-                               id="export-node-list"
-                               type="text"/>
-                        <input type="submit" id="export-to-gml"
-                               value="Export to GraphML"/>
-                    </form>
-                </div>
                 <hr>
                 <div class="text-center">
                     <button type="button" id="hide_node_names" class="btn btn-info">Hide BEL names
