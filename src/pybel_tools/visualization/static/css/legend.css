@@ -13,7 +13,7 @@ span.after-hr {
     float: left;
 }
 
-.legend-circle-pathology {
+div.Pathology {
     width: 20px;
     height: 20px;
     background: #FF7F0E;
@@ -22,7 +22,7 @@ span.after-hr {
     border-radius: 60px;
 }
 
-.legend-circle-protein {
+div.Protein {
     width: 20px;
     height: 20px;
     background: #1F77B4;
@@ -31,7 +31,7 @@ span.after-hr {
     border-radius: 60px;
 }
 
-.legend-circle-micro-rna {
+div.miRNA {
     width: 20px;
     height: 20px;
     background: #D62728;
@@ -40,7 +40,7 @@ span.after-hr {
     border-radius: 60px;
 }
 
-.legend-circle-m-rna {
+div.RNA {
     width: 20px;
     height: 20px;
     background: #FF9896;
@@ -49,7 +49,7 @@ span.after-hr {
     border-radius: 60px;
 }
 
-.legend-circle-complex {
+div.Complex {
     width: 20px;
     height: 20px;
     background: #98DF8A;
@@ -58,7 +58,7 @@ span.after-hr {
     border-radius: 60px;
 }
 
-.legend-circle-composite {
+div.Composite {
     width: 20px;
     height: 20px;
     background: #9467BD;
@@ -67,16 +67,7 @@ span.after-hr {
     border-radius: 60px;
 }
 
-.legend-circle-degradation {
-    width: 20px;
-    height: 20px;
-    background: #C5B0D5;
-    -moz-border-radius: 60px;
-    -webkit-border-radius: 60px;
-    border-radius: 60px;
-}
-
-.legend-circle-gene {
+div.Gene {
     width: 20px;
     height: 20px;
     background: #FFBB78;
@@ -85,7 +76,7 @@ span.after-hr {
     border-radius: 60px;
 }
 
-.legend-circle-bioprocess {
+div.BiologicalProcess {
     width: 20px;
     height: 20px;
     background: #2CA02C;
@@ -94,145 +85,11 @@ span.after-hr {
     border-radius: 60px;
 }
 
-.legend-circle-reaction {
-    width: 20px;
-    height: 20px;
-    background: #8C564B;
-    -moz-border-radius: 60px;
-    -webkit-border-radius: 60px;
-    border-radius: 60px;
-}
 
-.legend-circle-abundance {
+div.Abundance {
     width: 20px;
     height: 20px;
     background: #AEC7E8;
-    -moz-border-radius: 60px;
-    -webkit-border-radius: 60px;
-    border-radius: 60px;
-}
-
-.legend-circle-translocation {
-    width: 20px;
-    height: 20px;
-    background: #C49C94;
-    -moz-border-radius: 60px;
-    -webkit-border-radius: 60px;
-    border-radius: 60px;
-}
-
-.legend-circle-secretion {
-    width: 20px;
-    height: 20px;
-    background: #843C39;
-    -moz-border-radius: 60px;
-    -webkit-border-radius: 60px;
-    border-radius: 60px;
-}
-
-.legend-circle-surface {
-    width: 20px;
-    height: 20px;
-    background: #CE6DBD;
-    -moz-border-radius: 60px;
-    -webkit-border-radius: 60px;
-    border-radius: 60px;
-}
-
-.legend-circle-list {
-    width: 20px;
-    height: 20px;
-    background: #FF69B4;
-    -moz-border-radius: 60px;
-    -webkit-border-radius: 60px;
-    border-radius: 60px;
-}
-
-.legend-circle-mol-activity {
-    width: 20px;
-    height: 20px;
-    background: #E377C2;
-    -moz-border-radius: 60px;
-    -webkit-border-radius: 60px;
-    border-radius: 60px;
-}
-
-.legend-circle-gtp {
-    width: 20px;
-    height: 20px;
-    background: #17BECF;
-    -moz-border-radius: 60px;
-    -webkit-border-radius: 60px;
-    border-radius: 60px;
-}
-
-.legend-circle-catalytic {
-    width: 20px;
-    height: 20px;
-    background: #F7B6D2;
-    -moz-border-radius: 60px;
-    -webkit-border-radius: 60px;
-    border-radius: 60px;
-}
-
-.legend-circle-chaperone {
-    width: 20px;
-    height: 20px;
-    background: #7F7F7F;
-    -moz-border-radius: 60px;
-    -webkit-border-radius: 60px;
-    border-radius: 60px;
-}
-
-.legend-circle-kinase {
-    width: 20px;
-    height: 20px;
-    background: #BCBD22;
-    -moz-border-radius: 60px;
-    -webkit-border-radius: 60px;
-    border-radius: 60px;
-}
-
-.legend-circle-peptidase {
-    width: 20px;
-    height: 20px;
-    background: #C7C7C7;
-    -moz-border-radius: 60px;
-    -webkit-border-radius: 60px;
-    border-radius: 60px;
-}
-
-.legend-circle-phosphatase {
-    width: 20px;
-    height: 20px;
-    background: #B5CF6B;
-    -moz-border-radius: 60px;
-    -webkit-border-radius: 60px;
-    border-radius: 60px;
-}
-
-.legend-circle-ribo {
-    width: 20px;
-    height: 20px;
-    background: #8C6D31;
-    -moz-border-radius: 60px;
-    -webkit-border-radius: 60px;
-    border-radius: 60px;
-}
-
-.legend-circle-transcriptional {
-    width: 20px;
-    height: 20px;
-    background: #9EDAE5;
-    -moz-border-radius: 60px;
-    -webkit-border-radius: 60px;
-    border-radius: 60px;
-}
-
-.legend-circle-transport {
-    width: 20px;
-    height: 20px;
-    background: #DBDB8D;
     -moz-border-radius: 60px;
     -webkit-border-radius: 60px;
     border-radius: 60px;

@@ -172,43 +172,43 @@ td.bigger-rows {
 
 }
 
-.pathology{
-    stroke:'#FF7F0E';
+.Pathology{
+    fill:#FF7F0E;
 }
 
 .Abundance{
-    stroke:'#AEC7E8';
+    fill:#AEC7E8;
 }
 
 .Gene{
-    color:'#FFBB78';
+    fill:#FFBB78;
 }
 
 .miRNA{
-    stroke:'#D62728';
+    fill:#D62728;
 }
 
 .Protein{
-    stroke:'#1F77B4';
+    fill:#1F77B4;
 }
 
 .RNA{
-    stroke:'#FF9896';
+    fill:#FF9896;
 }
 
 .BiologicalProcess{
-    stroke:'#2CA02C';
+    fill:#2CA02C;
 }
 
 .Pathology{
-    stroke:'#FF7F0E';
+    fill:#FF7F0E;
 }
 
 .Complex{
-    stroke:'#98DF8A';
+    fill:#98DF8A;
 }
 
 .Composite{
-    stroke:'#9467BD';
+    fill:#9467BD;
 }
 

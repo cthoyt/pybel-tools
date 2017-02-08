@@ -5,6 +5,8 @@ function init_d3_force(graph) {
     // Main graph visualization //
     //////////////////////////////
 
+    console.log(graph);
+
     d = document;
     e = d.documentElement;
     g = d.getElementsByTagName('body')[0];
@@ -218,9 +220,7 @@ function init_d3_force(graph) {
     var node = g.selectAll(".nodes")
         .data(graph.nodes)
         .enter().append("g")
-        .attr("class", function (d) {
-                return "node"+" "+d.function
-        })
+        .attr("class", "node")
         // Next two lines -> Pin down functionality
         .on('dblclick', releasenode)
         .call(node_drag);
@@ -231,8 +231,8 @@ function init_d3_force(graph) {
                 return Math.PI * Math.pow(size(d.size) || nominal_base_node_size, 2);
             })
         )
-        .style("fill", function (d) {
-            return d.node_color;
+        .attr("class", function (d) {
+                return d.function
         })
         .style("stroke-width", nominal_stroke)
         .style("stroke", color_circunferencia);
@@ -291,6 +291,19 @@ function init_d3_force(graph) {
             simulation.stop();
         }
     }
+    // Search functionality to check if array exists in an array of arrays
+    function searchForArray(haystack, needle){
+  var i, j, current;
+  for(i = 0; i < haystack.length; ++i){
+    if(needle.length === haystack[i].length){
+      current = haystack[i];
+      for(j = 0; j < needle.length && needle[j] === current[j]; ++j);
+      if(j === needle.length)
+        return i;
+    }
+  }
+  return -1;
+}
 
     function reset_attributes_on_double_click() {
 
@@ -397,19 +410,20 @@ function init_d3_force(graph) {
     function selected_nodes_highlight(node_list) {
 
         hide_select_nodes_text(node_list, false);
+        console.log('Node list')
+        console.log(node_list)
+
 
         // Filter not mapped nodes to change opacity
         var not_mapped_nodes_objects = svg.selectAll(".node").filter(function (el) {
-            return node_list.indexOf(el.id) < 0;
+            return searchForArray(node_list,el.id) < 0;
         });
-
-        console.log(not_mapped_nodes_objects);
 
         // Not mapped links
         var links_not_mapped = g.selectAll(".link").filter(function (el) {
-
             // Source and target should be present in the edge
-            return !((node_list.indexOf(el.source.id) >= 0 || node_list.indexOf(el.target.id) >= 0));
+
+            return !((searchForArray(node_list,el.source.id) >= 0 || searchForArray(node_list,el.target.id) >= 0));
         });
 
         not_mapped_nodes_objects.style("opacity", "0.1");
@@ -524,14 +538,6 @@ function init_d3_force(graph) {
         document.body.removeChild(element);
     }
 
-    // Show all mapped nodes for x seconds
-    $("#mapped-nodes-button").click(function () {
-        reset_attributes();
-        //noinspection JSUnresolvedVariable
-        selected_nodes_highlight(mapped_nodes);
-        reset_attributes_on_double_click();
-    });
-
     // Build the node multi-level dropdown
     $('#node-list').append("<ul id='node-list-ul' class='dropdown-menu node-dropdown' role='menu' aria-labelledby='dropdownMenu' " +
         "class='no-bullets min-padding-left'></ul>");
@@ -541,10 +547,10 @@ function init_d3_force(graph) {
 
     $.each(graph.nodes, function (key, value_array) {
 
-        node_names.push(value_array.label);
+        node_names.push(value_array.id);
 
-        $("#node-list-ul").append("<li class='dropdown-submenu node_selector node-dropdown'><a id='value'>" + value_array.label +
-            "</a><ul class='dropdown-menu no-bullets min-padding-left'><li>Name: " + value_array.value + "</li><li>Namespace: " + value_array.namespace + "</li><li>BEL function: " + value_array.bel_function_type
+        $("#node-list-ul").append("<li class='dropdown-submenu node_selector node-dropdown'><a id='"+value_array.id+"'>" + value_array.name +
+            "<ul class='dropdown-menu no-bullets min-padding-left'><li>Name: " + value_array.name + "</li><li>Namespace: " + value_array.namespace + "</li><li>BEL function: " + value_array.function
             + "</li></ul></li>");
     });
 
@@ -556,15 +562,16 @@ function init_d3_force(graph) {
         "class='no-bullets min-padding-left'></ul>");
 
     $.each(graph.links, function (key, value_array) {
-        var pubmed_hyperlink = 'https://www.ncbi.nlm.nih.gov/pubmed/' + value_array.citation.pubmed_id;
 
-        $("#edge-list-ul").append("<li class='dropdown-submenu edge_selector '><a id='value'>" + value_array.label +
+        var pubmed_hyperlink = 'https://www.ncbi.nlm.nih.gov/pubmed/' + value_array.citation.reference;
+
+        $("#edge-list-ul").append("<li class='dropdown-submenu edge_selector '><a id='value'>" + value_array.source.name +' '+value_array.relation+' '+value_array.target.name +
             "</a><ul class='dropdown-menu no-bullets min-padding-left edge-info'><li><span class='color_red'>From: </span>"
-            + value_array.source.id + "</li><li><span class='color_red'>To: </span>" + value_array.target.id +
+            + value_array.source.name + "</li><li><span class='color_red'>To: </span>" + value_array.target.name +
             "</li><li><span class='color_red'>Relationship </span>" + value_array.relation +
             "</li><li><span class='color_red'>PubmedID: </span><a href='" + pubmed_hyperlink + "' target='_blank'>" +
-            value_array.citation.pubmed_id + "</a></li><li><span class='color_red'>Journal: </span>" + value_array.citation.journal_ref +
-            "</li><<li><span class='color_red'>Evidence: </span>" + value_array.evidence +
+            value_array.citation.reference + "</a></li><li><span class='color_red'>Journal: </span>" + value_array.citation.name +
+            "</li><li><span class='color_red'>Evidence: </span>" + value_array.SupportingText +
             "+</li><li><span class='color_red'>Context: </span>" + value_array.context + "</li></ul></li>");
 
     });
@@ -583,15 +590,14 @@ function init_d3_force(graph) {
     });
 
     // Select node in the graph from selector
-    $(".node_selector").on("click", "#value", function () {
+    $(".node_selector").click(function () {
 
         reset_attributes();
 
-        // textContent or innerHTML
-        var node_array = [$(this)[0].innerHTML];
-
+        // $this=li, first element is the a with the id of the node
+        var node_array = [$(this)[0].childNodes[0].id.split(',')];
         selected_nodes_highlight(node_array);
-        reset_attributes_on_double_click()
+        reset_attributes_on_double_click();
 
     });
 
@@ -628,6 +634,7 @@ function init_d3_force(graph) {
 
     // Select node in the graph from selector
     $(".edge_selector").on("click", "#value", function () {
+        console.log($(this)[0])
 
         reset_attributes();
 
