@@ -1,6 +1,8 @@
-import pybel
 import unittest
-from pybel_tools.graph_diff import graph_difference
+
+import pybel
+from pybel import constants as pbc
+from pybel_tools.graph_diff import *
 
 test_bel_1 = """
 SET DOCUMENT Name = "PyBEL Test Document 1"
@@ -59,11 +61,11 @@ p(HGNC:FADD) -> p(HGNC:CASP8)
 p(HGNC:AKT1) -- p(HGNC:CASP8)
 """
 
-MIA = ('Protein', 'HGNC', 'MIA')
-FADD = ('Protein', 'HGNC', 'FADD')
-CASP8 = ('Protein', 'HGNC', 'CASP8')
-AKT1 = 'Protein', 'HGNC', 'AKT1'
-AKT1_Ph = ('ProteinVariant', 'HGNC', 'AKT1', ('ProteinModification', 'Ph'))
+MIA = pbc.PROTEIN, 'HGNC', 'MIA'
+FADD = pbc.PROTEIN, 'HGNC', 'FADD'
+CASP8 = pbc.PROTEIN, 'HGNC', 'CASP8'
+AKT1 = pbc.PROTEIN, 'HGNC', 'AKT1'
+AKT1_Ph = pbc.PROTEIN, 'HGNC', 'AKT1', (pbc.PMOD, (pbc.BEL_DEFAULT_NAMESPACE, 'Ph'))
 
 
 class TestGraphDiff(unittest.TestCase):
@@ -73,14 +75,16 @@ class TestGraphDiff(unittest.TestCase):
         a = pybel.from_lines(test_bel_1.split('\n'))
         b = pybel.from_lines(test_bel_2.split('\n'))
 
-        d = graph_difference(b, a)
+        self.assertFalse(graph_edges_equal(a, b))
 
+        '''
         d_nodes = {
             MIA,
             AKT1_Ph
         }
 
         self.assertEqual(d_nodes, set(d.nodes()))
+        '''
 
         d_edges = {
             (MIA, AKT1_Ph): {
@@ -105,4 +109,6 @@ class TestGraphDiff(unittest.TestCase):
             }
         }
 
-        self.assertEqual(d_edges, set(d.edges_iter(data=True)))
+        difference = graph_edges_subtract(b, a)
+
+        self.assertEqual({(AKT1, AKT1_Ph), (MIA, AKT1_Ph)}, difference)
