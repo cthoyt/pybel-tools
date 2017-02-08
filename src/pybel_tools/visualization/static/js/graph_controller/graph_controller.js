@@ -12,7 +12,8 @@ function init_d3_force(graph) {
     g = d.getElementsByTagName('body')[0];
 
     // Graph uses 0.85 x 0.85 of the window size
-    var w = 0.85 * window.innerWidth || 0.85 * e.clientWidth || 0.85 * g.clientWidth, h = 0.72 * w.innerHeight || 0.72 * e.clientHeight || 0.72 * g.clientHeight;
+    var w = 0.85 * window.innerWidth || 0.85 * e.clientWidth || 0.85 * g.clientWidth, h = 0.72 * w.innerHeight ||
+        0.72 * e.clientHeight || 0.72 * g.clientHeight;
 
     var focus_node = null, highlight_node = null;
 
@@ -187,7 +188,8 @@ function init_d3_force(graph) {
         .style("stroke-width", nominal_stroke)
         .style("stroke", default_link_color)
         .attr("class", function (d) {
-            if (['decreases', 'directlyDecreases', 'increases', 'directlyIncreases', 'negativeCorrelation', 'positiveCorrelation'].indexOf(d.relation) >= 0) {
+            if (['decreases', 'directlyDecreases', 'increases', 'directlyIncreases', 'negativeCorrelation',
+                    'positiveCorrelation'].indexOf(d.relation) >= 0) {
                 return "link link_continuous"
             }
             else {
@@ -232,7 +234,7 @@ function init_d3_force(graph) {
             })
         )
         .attr("class", function (d) {
-                return d.function
+            return d.function
         })
         .style("stroke-width", nominal_stroke)
         .style("stroke", color_circunferencia);
@@ -291,19 +293,20 @@ function init_d3_force(graph) {
             simulation.stop();
         }
     }
+
     // Search functionality to check if array exists in an array of arrays
-    function searchForArray(haystack, needle){
-  var i, j, current;
-  for(i = 0; i < haystack.length; ++i){
-    if(needle.length === haystack[i].length){
-      current = haystack[i];
-      for(j = 0; j < needle.length && needle[j] === current[j]; ++j);
-      if(j === needle.length)
-        return i;
+    function searchForArray(haystack, needle) {
+        var i, j, current;
+        for (i = 0; i < haystack.length; ++i) {
+            if (needle.length === haystack[i].length) {
+                current = haystack[i];
+                for (j = 0; j < needle.length && needle[j] === current[j]; ++j);
+                if (j === needle.length)
+                    return i;
+            }
+        }
+        return -1;
     }
-  }
-  return -1;
-}
 
     function reset_attributes_on_double_click() {
 
@@ -410,20 +413,19 @@ function init_d3_force(graph) {
     function selected_nodes_highlight(node_list) {
 
         hide_select_nodes_text(node_list, false);
-        console.log('Node list')
-        console.log(node_list)
-
+        console.log('Node list');
+        console.log(node_list);
 
         // Filter not mapped nodes to change opacity
         var not_mapped_nodes_objects = svg.selectAll(".node").filter(function (el) {
-            return searchForArray(node_list,el.id) < 0;
+            return searchForArray(node_list, el.id) < 0;
         });
 
         // Not mapped links
         var links_not_mapped = g.selectAll(".link").filter(function (el) {
             // Source and target should be present in the edge
 
-            return !((searchForArray(node_list,el.source.id) >= 0 || searchForArray(node_list,el.target.id) >= 0));
+            return !((searchForArray(node_list, el.source.id) >= 0 || searchForArray(node_list, el.target.id) >= 0));
         });
 
         not_mapped_nodes_objects.style("opacity", "0.1");
@@ -473,7 +475,11 @@ function init_d3_force(graph) {
         ///////// Colour links in each path differently and hide others ////////
 
         // Colour the links ( Max 21 paths )
-        var color_list = ['#ff2200', ' #282040', ' #a68d7c', ' #332b1a', ' #435916', ' #00add9', ' #bfd0ff', ' #f200c2', ' #990014', ' #d97b6c', ' #ff8800', ' #f2ffbf', ' #e5c339', ' #5ba629', ' #005947', ' #005580', ' #090040', ' #8d36d9', ' #e5005c', ' #733941', ' #993d00', ' #80ffb2', ' #66421a', ' #e2f200', ' #20f200', ' #80fff6', ' #002b40', ' #6e698c', ' #802079', ' #330014', ' #331400', ' #ffc480', ' #7ca682', ' #264a4d', ' #0074d9', ' #220080', ' #d9a3d5', ' #f279aa'];
+        var color_list = ['#ff2200', ' #282040', ' #a68d7c', ' #332b1a', ' #435916', ' #00add9', ' #bfd0ff', ' #f200c2',
+            ' #990014', ' #d97b6c', ' #ff8800', ' #f2ffbf', ' #e5c339', ' #5ba629', ' #005947', ' #005580', ' #090040',
+            ' #8d36d9', ' #e5005c', ' #733941', ' #993d00', ' #80ffb2', ' #66421a', ' #e2f200', ' #20f200', ' #80fff6',
+            ' #002b40', ' #6e698c', ' #802079', ' #330014', ' #331400', ' #ffc480', ' #7ca682', ' #264a4d', ' #0074d9',
+            ' #220080', ' #d9a3d5', ' #f279aa'];
 
         // iter = number of paths ( Max 21 paths )
         if (data.length > color_list.length) {
@@ -539,8 +545,8 @@ function init_d3_force(graph) {
     }
 
     // Build the node multi-level dropdown
-    $('#node-list').append("<ul id='node-list-ul' class='dropdown-menu node-dropdown' role='menu' aria-labelledby='dropdownMenu' " +
-        "class='no-bullets min-padding-left'></ul>");
+    $('#node-list').append("<ul id='node-list-ul' class='dropdown-menu node-dropdown' role='menu' " +
+        "aria-labelledby='dropdownMenu' " + "class='no-bullets min-padding-left'></ul>");
 
     // Variable with all node names for shortest path autocompletion input
     var node_names = [];
@@ -549,30 +555,33 @@ function init_d3_force(graph) {
 
         node_names.push(value_array.id);
 
-        $("#node-list-ul").append("<li class='dropdown-submenu node_selector node-dropdown'><a id='"+value_array.id+"'>" + value_array.name +
-            "<ul class='dropdown-menu no-bullets min-padding-left'><li>Name: " + value_array.name + "</li><li>Namespace: " + value_array.namespace + "</li><li>BEL function: " + value_array.function
-            + "</li></ul></li>");
+        $("#node-list-ul").append("<li class='dropdown-submenu node_selector node-dropdown'><a id='" +
+            value_array.id + "'>" + value_array.name + "<ul class='dropdown-menu no-bullets min-padding-left'>" +
+            "<li>Name: " + value_array.name + "" + "</li><li>Namespace: " + value_array.namespace + "</li>" +
+            "<li>BEL function: " + value_array.function + "</li></ul></li>");
     });
 
     ///////////////////////////////////////
     // Build the edge multi-level dropdown
     ///////////////////////////////////////
 
-    $('#edge-list').append("<ul id='edge-list-ul' class='dropdown-menu edge-dropdown' role='menu' aria-labelledby='dropdownMenu' " +
-        "class='no-bullets min-padding-left'></ul>");
+    $('#edge-list').append("<ul id='edge-list-ul' class='dropdown-menu edge-dropdown' role='menu' " +
+        "aria-labelledby='dropdownMenu' " + "class='no-bullets min-padding-left'></ul>");
 
     $.each(graph.links, function (key, value_array) {
 
         var pubmed_hyperlink = 'https://www.ncbi.nlm.nih.gov/pubmed/' + value_array.citation.reference;
 
-        $("#edge-list-ul").append("<li class='dropdown-submenu edge_selector '><a id='value'>" + value_array.source.name +' '+value_array.relation+' '+value_array.target.name +
-            "</a><ul class='dropdown-menu no-bullets min-padding-left edge-info'><li><span class='color_red'>From: </span>"
-            + value_array.source.name + "</li><li><span class='color_red'>To: </span>" + value_array.target.name +
-            "</li><li><span class='color_red'>Relationship </span>" + value_array.relation +
+        $("#edge-list-ul").append("<li class='dropdown-submenu edge_selector '><a id='value'>" +
+            value_array.source.name + ' ' + value_array.relation + ' ' + value_array.target.name +
+            "</a><ul class='dropdown-menu no-bullets min-padding-left edge-info'><li><span class='color_red'>" +
+            "From: </span>" + value_array.source.name + "</li><li><span class='color_red'>To: </span>" +
+            value_array.target.name + "</li><li><span class='color_red'>Relationship </span>" + value_array.relation +
             "</li><li><span class='color_red'>PubmedID: </span><a href='" + pubmed_hyperlink + "' target='_blank'>" +
-            value_array.citation.reference + "</a></li><li><span class='color_red'>Journal: </span>" + value_array.citation.name +
-            "</li><li><span class='color_red'>Evidence: </span>" + value_array.SupportingText +
-            "+</li><li><span class='color_red'>Context: </span>" + value_array.context + "</li></ul></li>");
+            value_array.citation.reference + "</a></li><li><span class='color_red'>Journal: </span>" +
+            value_array.citation.name + "</li><li><span class='color_red'>Evidence: </span>" +
+            value_array.SupportingText + "+</li><li><span class='color_red'>Context: </span>" + value_array.context
+            + "" + "</li></ul></li>");
 
     });
 

@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="{{ STATIC_PREFIX }}css/legend.css"/>
     <link type="image/x-icon" href="{{ STATIC_PREFIX }}images/icons/favicon.ico" rel="shortcut icon"/>
     <script type="text/javascript">
-    window.graph = {{ json }}
+        window.graph = {{ json }};
     </script>
     <script type="text/javascript"
             src="{{ STATIC_PREFIX }}js/jquery/jquery.min.js"></script>
@@ -32,11 +32,10 @@
     <script type="text/javascript"
             src="{{ STATIC_PREFIX }}js/graph_controller/graph_controller.js"></script>
     <script type="text/javascript">
-    $( document ).ready(function() {
-        init_d3_force(window.graph);
-    });
+        $(document).ready(function () {
+            init_d3_force(window.graph);
+        });
     </script>
-
 
 </head>
 <body>
