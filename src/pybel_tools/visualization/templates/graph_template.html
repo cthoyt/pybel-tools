@@ -12,6 +12,7 @@
     <link type="image/x-icon" href="{{ STATIC_PREFIX }}images/icons/favicon.ico" rel="shortcut icon"/>
     <script type="text/javascript">
         window.graph = {{ json }};
+        window.node_hashes = {{ node_hashes }};
     </script>
     <script type="text/javascript"
             src="{{ STATIC_PREFIX }}js/jquery/jquery.min.js"></script>
@@ -100,7 +101,7 @@
 
     <div class="container align_row">
         <div class="col-md-12">
-            <h2 class="title text-center"> Network </h2>
+            <h2 class="title text-center"> Biological Network Explorer</h2>
             <!-- / Force -->
             <div id="graph-chart">
             </div>

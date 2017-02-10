@@ -241,6 +241,7 @@ function init_d3_force(graph) {
 
     var text = node.append("text")
         .attr("class", "node-name")
+        .attr("id", nodehashes[d])
         .attr("fill", "black")
         .attr("dx", 12)
         .attr("dy", ".35em")
@@ -577,11 +578,11 @@ function init_d3_force(graph) {
             "</a><ul class='dropdown-menu no-bullets min-padding-left edge-info'><li><span class='color_red'>" +
             "From: </span>" + value_array.source.name + "</li><li><span class='color_red'>To: </span>" +
             value_array.target.name + "</li><li><span class='color_red'>Relationship </span>" + value_array.relation +
-            "</li><li><span class='color_red'>PubmedID: </span><a href='" + pubmed_hyperlink + "' target='_blank'>" +
-            value_array.citation.reference + "</a></li><li><span class='color_red'>Journal: </span>" +
-            value_array.citation.name + "</li><li><span class='color_red'>Evidence: </span>" +
-            value_array.SupportingText + "+</li><li><span class='color_red'>Context: </span>" + value_array.context
-            + "" + "</li></ul></li>");
+            "</li><li><span class='color_red'>PubMed: </span><a href='" + pubmed_hyperlink + "' target='_blank' " +
+            "style='color: blue; text-decoration: underline'>" + value_array.citation.reference + "</a></li><li>" +
+            "<span class='color_red'>Journal: </span>" + value_array.citation.name + "</li><li>" +
+            "<span class='color_red'>Evidence: </span>" + value_array.SupportingText + "+</li><li>" +
+            "<span class='color_red'>Context: </span>" + value_array.context + "" + "</li></ul></li>");
 
     });
 

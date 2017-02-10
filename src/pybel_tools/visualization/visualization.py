@@ -35,8 +35,13 @@ def build_graph_context(graph):
     """
     graph_json_str = pybel.io.to_jsons(graph)
 
+    node_dict = {node: hash(node) for node in graph}
+
+
+
     return {
         'json': graph_json_str,
+        'node_hashes': node_dict,
         'number_nodes': '10',
         'number_edges': '32434'
     }
