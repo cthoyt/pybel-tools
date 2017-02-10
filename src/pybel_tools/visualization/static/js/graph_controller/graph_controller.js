@@ -240,7 +240,7 @@ function init_d3_force(graph) {
 
     var text = node.append("text")
         .attr("class", "node-name")
-        .attr("id", nodehashes[d])
+        // .attr("id", nodehashes[d])
         .attr("fill", "black")
         .attr("dx", 12)
         .attr("dy", ".35em")
