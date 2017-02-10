@@ -5,14 +5,13 @@ function init_d3_force(graph) {
     // Main graph visualization //
     //////////////////////////////
 
-    console.log(graph);
-
     d = document;
     e = d.documentElement;
     g = d.getElementsByTagName('body')[0];
 
+
     // Graph uses 0.85 x 0.85 of the window size
-    var w = 0.85 * window.innerWidth || 0.85 * e.clientWidth || 0.85 * g.clientWidth, h = 0.72 * w.innerHeight ||
+    var w = $('.col-lg-12').width(), h = 0.72 * w.innerHeight ||
         0.72 * e.clientHeight || 0.72 * g.clientHeight;
 
     var focus_node = null, highlight_node = null;
