@@ -75,7 +75,9 @@ class TestGraphDiff(unittest.TestCase):
         a = pybel.from_lines(test_bel_1.split('\n'))
         b = pybel.from_lines(test_bel_2.split('\n'))
 
-        self.assertFalse(graph_edges_equal(a, b))
+        self.assertFalse(graph_entities_equal(a, b))
+        self.assertFalse(graph_topologically_equal(a, b))
+        self.assertFalse(graph_provenance_equal(a, b))
 
         '''
         d_nodes = {
