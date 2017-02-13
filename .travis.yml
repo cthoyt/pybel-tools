@@ -33,8 +33,6 @@ notifications:
 deploy:
     provider: pypi
     user: cthoyt
-    password:
-        secure: INAoxv5shReIXi+eUiAZOoAZS0NKd65skFrLm8CDswb80s4+GJyjrE0TXHTl83MptGbpLzrJqVplrVpwXPrnB8JjxU2qS6604INKDc7Mz6yWVnmAPmWasJWNVVuno/yHF8KAsBfuH1yc3yUX2eXOeRbrFBJBa9LMqXrHHl58JsrZOZ1Ufuyl/8EpcN0O2XImCwsUVzIQKsmvVG+uUWDooAKnWIc0xBfthiqxSQ7OOImFGqpyhD1+TBChqu0YEf65V9dAdgQchJeXs0uCQ0LcRl2tPtpoNr4u5wbbX3JmkW43tGonCm5Br3pbDShokZZoyZBLbndNSTzB6OUb2f5Cn3mp7leWIYnnI7wE+F6uT9fW5rWoxVsLEO0z33Lps8q3z1XyMLj+RVk5N9e8grcLX3+NLTaWqa59cqde2wjNKy7diHGtXvfvovZSAkf9zoi0aOLS3k270oOQ70OScnpTl3UV/ikm4SKGAY2BEyxLeZEgbjeqnAQHKTdPBZopm1ryoLbSrmuhu/5lJ5R38w8rBMrXrY+6Wd75KQuBmnnEzpdukCLbfLJ0j1EexC7qQdOGvW3R/2jAR+mfzI8/UkiSeasS1uMkz1re1BrFalUi3DshmSBtjhyqbWVp/8AEaQzJEN2Y3ureW+W+nNvtqVIozmBAaZom6kRVJSNIZ0NEmjE=
     on:
         tags: true
         distributions: "sdist bdist_wheel"

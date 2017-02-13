@@ -3,11 +3,14 @@ PyBEL Tools Documentation
 
 .. toctree::
    :maxdepth: 2
+   :caption: Contents:
 
    lexer
 
-Indices and Tables
-------------------
+
+
+Indices and tables
+==================
 
 * :ref:`genindex`
 * :ref:`modindex`
