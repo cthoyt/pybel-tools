@@ -159,7 +159,7 @@ def build_namespace(namespace_name, namespace_keyword, namespace_domain, author_
         print(line, file=output)
     print(file=output)
 
-    function_values = ''.join(sorted(functions if functions is not None else language.value_map.keys()))
+    function_values = ''.join(sorted(functions if functions is not None else language.belns_encodings.keys()))
 
     print('[Values]', file=output)
     for value in values:

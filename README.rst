@@ -5,7 +5,7 @@ Cool tools for using BEL. Install with:
 
 .. code-block:: sh
 
-    pip install git+https://github.com/cthoyt/pybel-tools.git@master
+    pip install git+https://github.com/pybel/pybel-tools.git@master
 
 Setting up with Docker
 ----------------------

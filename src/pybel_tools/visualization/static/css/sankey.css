@@ -1,0 +1,26 @@
+#sankey {
+    display: block;
+    margin: auto;
+    margin-top: 75px;
+}
+
+.node rect {
+    cursor: move;
+    fill-opacity: .9;
+    shape-rendering: crispEdges;
+}
+
+.node text {
+    pointer-events: none;
+    text-shadow: 0 1px 0 #fff;
+}
+
+.sankey_link {
+    fill: none;
+    stroke: #000;
+    stroke-opacity: .2;
+}
+
+.sankey_link:hover {
+    stroke-opacity: .5;
+}
