@@ -1,8 +1,8 @@
 import unittest
 
 import pybel
-from pybel import constants as pbc
-from pybel_tools.graph_diff import *
+from pybel.constants import *
+from pybel_tools.graph_operations import *
 
 test_bel_1 = """
 SET DOCUMENT Name = "PyBEL Test Document 1"
@@ -61,11 +61,11 @@ p(HGNC:FADD) -> p(HGNC:CASP8)
 p(HGNC:AKT1) -- p(HGNC:CASP8)
 """
 
-MIA = pbc.PROTEIN, 'HGNC', 'MIA'
-FADD = pbc.PROTEIN, 'HGNC', 'FADD'
-CASP8 = pbc.PROTEIN, 'HGNC', 'CASP8'
-AKT1 = pbc.PROTEIN, 'HGNC', 'AKT1'
-AKT1_Ph = pbc.PROTEIN, 'HGNC', 'AKT1', (pbc.PMOD, (pbc.BEL_DEFAULT_NAMESPACE, 'Ph'))
+MIA = PROTEIN, 'HGNC', 'MIA'
+FADD = PROTEIN, 'HGNC', 'FADD'
+CASP8 = PROTEIN, 'HGNC', 'CASP8'
+AKT1 = PROTEIN, 'HGNC', 'AKT1'
+AKT1_Ph = PROTEIN, 'HGNC', 'AKT1', (PMOD, (BEL_DEFAULT_NAMESPACE, 'Ph'))
 
 
 class TestGraphDiff(unittest.TestCase):

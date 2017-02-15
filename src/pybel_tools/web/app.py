@@ -9,11 +9,11 @@ from requests.utils import quote
 from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import secure_filename
 
-import pybel
-import pybel.parser
+from pybel import BELGraph, to_database, from_database, to_bytes, to_bel
 from pybel.manager import models
 from pybel.manager.cache import CacheManager
 from pybel.manager.graph_cache import GraphCacheManager
+from pybel.parser import BelParser
 
 ALLOWED_BEL_EXTENSIONS = {'bel'}
 PARSER_RESOURCE_KEY = 'parser_resource_key'
@@ -36,8 +36,7 @@ manager.create_api(models.Namespace, methods=['GET', 'POST'],
                    collection_name='namespace',
                    exclude_columns=['entries'])
 
-app.config[PARSER_RESOURCE_KEY] = pybel.parser.BelParser()
-app.config[PARSER_RESOURCE_KEY].statement.streamline()
+app.config[PARSER_RESOURCE_KEY] = BelParser(autostreamline=True)
 
 
 def allowed_file(filename, allowed_extensions):
@@ -68,10 +67,10 @@ def upload_bel():
 
             log_stream = io.StringIO()
 
-            g = pybel.BELGraph(lines=(line.decode('utf-8') for line in file.stream), log_stream=log_stream)
+            g = BELGraph(lines=(line.decode('utf-8') for line in file.stream), log_stream=log_stream)
 
             try:
-                pybel.to_database(g)
+                to_database(g)
             except IntegrityError as e:
                 return 'Integrity Error: {}'.format(e)
 
@@ -106,8 +105,8 @@ def list_bel():
 
 @app.route('/bel/<ns>', methods=['GET'])
 def get_bel(ns):
-    g = pybel.from_database(ns)
-    return flask.Response(pybel.to_bel(g), mimetype='text/plain')
+    g = from_database(ns)
+    return flask.Response(to_bel(g), mimetype='text/plain')
 
 
 @app.route('/parser/parse/<statement>', methods=['GET', 'POST'])
@@ -130,7 +129,7 @@ def parse_bel(statement):
 
 @app.route('/parser/dump')
 def dump_bel():
-    return flask.Response(pybel.to_bytes(app.config[PARSER_RESOURCE_KEY].graph), mimetype='text/plain')
+    return flask.Response(to_bytes(app.config[PARSER_RESOURCE_KEY].graph), mimetype='text/plain')
 
 
 @app.route('/parser/clear')

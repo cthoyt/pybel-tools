@@ -1,7 +1,27 @@
 import itertools as itt
-from collections import defaultdict
+from collections import defaultdict, Counter
 
-from pybel.constants import RELATION
+from pybel.constants import RELATION, FUNCTION
+
+
+def count_nodes(g):
+    """Returns a histogram of the different functions present in a graph"""
+    return Counter(data[FUNCTION] for _, data in g.nodes_iter(data=True))
+
+
+def graph_content_transform(g):
+    edge_relations = defaultdict(set)
+    for u, v, d in g.edges_iter(data=True):
+        edge_relations[u, v].add(d[RELATION])
+    return edge_relations
+
+
+def count_edges(g):
+    """Returns a histogram of the different types of relations present in a graph.
+
+    Note: this operation only counts each type of edge once for each pair of nodes
+    """
+    return Counter(relation for _, relations in graph_content_transform(g).items() for relation in relations)
 
 
 def graph_entities_equal(g, h):
@@ -23,13 +43,6 @@ def graph_topologically_equal(g, h):
         return False
 
     return set(g.edges_iter()) == set(h.edges_iter())
-
-
-def graph_content_transform(g):
-    dd = defaultdict(set)
-    for u, v, d in g.edges_iter(data=True):
-        dd[u, v].add(d[RELATION])
-    return dd
 
 
 def graph_relations_equal(g, h):
@@ -88,7 +101,7 @@ def graph_edges_subtract(g, h):
     :type h: :class:`pybel.BELGraph`
     :rtype: :class:`pybel.BELGraph`
     """
-    return set(g.edges()) - set(h.edges())
+    return set(g.edges()).difference(set(h.edges()))
 
 
 def graph_edges_xor(g, h):
