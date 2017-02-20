@@ -9,6 +9,7 @@ from collections import Counter, defaultdict
 
 from fuzzywuzzy import process, fuzz
 
+from pybel.constants import RELATION, FUNCTION
 from pybel.parser.parse_exceptions import MissingNamespaceNameWarning, NakedNameWarning
 
 
@@ -62,6 +63,14 @@ def calculate_suggestions(incorrect_name_dict, namespace_dict):
 
 def calculate_size_by_annotation(graph, annotation):
     return Counter(data[annotation] for _, _, data in graph.edges_iter(data=True) if annotation in data)
+
+
+def count_edges(graph):
+    return calculate_size_by_annotation(graph, RELATION)
+
+
+def calculate_node_type_counts(graph):
+    return Counter(data[FUNCTION] for _, data in graph.nodes_iter(data=True))
 
 
 def calculate_error_by_annotation(graph, annotation):
