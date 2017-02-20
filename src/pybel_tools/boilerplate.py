@@ -77,7 +77,7 @@ default_annotations = {
 
 
 # TODO merge with code from pybel to_bel
-def make_document_metadata(document_name, contact, description, version=None, copyright=None, authors=None,
+def make_document_metadata(document_name, contact, description, version='1.0', copyright=None, authors=None,
                            licenses=None):
     """Builds a document metadata section for a BEL document
 
@@ -101,7 +101,7 @@ def make_document_metadata(document_name, contact, description, version=None, co
     s = list()
 
     s.append('SET DOCUMENT Name = "{}'.format(document_name))
-    s.append('SET DOCUMENT Version = "{}"'.format(version if version else '1.0'))
+    s.append('SET DOCUMENT Version = "{}"'.format(version))
 
     if licenses is not None:
         s.append('SET DOCUMENT License = "{}"'.format(licenses))
