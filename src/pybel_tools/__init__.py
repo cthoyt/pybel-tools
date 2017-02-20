@@ -1,6 +1,8 @@
 """Tools for using BEL documents in python"""
 
-__version__ = '0.1.1-dev'
+from .summary import *
+
+__version__ = '0.1.1'
 
 __title__ = 'pybel_tools'
 __description__ = 'Tools for using BEL documents in python'

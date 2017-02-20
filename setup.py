@@ -27,9 +27,13 @@ INSTALL_REQUIRES = [
     'flask-restless-swagger',
     'networkx',
     'pybel',
-    'click'
+    'click',
+    'pandas',
+    'fuzzywuzzy'
 ]
-EXTRAS_REQUIRE = {}
+EXTRAS_REQUIRE = {
+    'speed': ['python-Levenshtein', ]  # Activates c-based speed improvements for fuzzywuzzy
+}
 TESTS_REQUIRE = []
 ENTRY_POINTS = {
     'console_scripts': [

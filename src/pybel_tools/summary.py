@@ -7,6 +7,7 @@ and provide some suggestions for fixes.
 
 from collections import Counter, defaultdict
 
+import pandas as pd
 from fuzzywuzzy import process, fuzz
 
 from pybel.constants import RELATION, FUNCTION
@@ -89,3 +90,20 @@ def calculate_error_by_annotation(graph, annotation):
                 results[value].append(e.__class__.__name__)
 
     return results
+
+
+def plot_summary(graph, plt, figsize=(11, 4), **kwargs):
+    """Plots your graph summary statistics. You need to run plt.show() yourself after."""
+    fig, axes = plt.subplots(1, 2, figsize=figsize, **kwargs)
+    ntc = calculate_node_type_counts(graph)
+    etc = count_edges(graph)
+    df = pd.DataFrame.from_dict(ntc, orient='index')
+    df_ec = pd.DataFrame.from_dict(etc, orient='index')
+
+    df.sort_values(0, ascending=True).plot(kind='barh', logx=True, ax=axes[0])
+    axes[0].set_title('Number Nodes: {}'.format(graph.number_of_nodes()))
+
+    df_ec.sort_values(0, ascending=True).plot(kind='barh', logx=True, ax=axes[1])
+    axes[1].set_title('Number Edges: {}'.format(graph.number_of_edges()))
+
+    plt.tight_layout()

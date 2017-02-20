@@ -7,3 +7,6 @@ networkx
 pybel
 click
 pygments
+pandas
+fuzzywuzzy
+
