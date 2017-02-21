@@ -1,13 +1,30 @@
 """
-This module contains ll of the services necessary through the PyBEL API Definition, backed by a network
+This module contains all of the services necessary through the PyBEL API Definition, backed by a network
 dictionary
 """
 
+import logging
+
+from pybel import from_bytes
 from pybel.constants import *
+from pybel.manager.graph_cache import GraphCacheManager
+from pybel.manager.models import Network
 from pybel.parser.utils import subdict_matches
+
+log = logging.getLogger(__name__)
 
 #: dictionary of {id : BELGraph}
 networks = {}
+
+
+def load_networks(connection=None):
+    """This function needs to get all networks from the graph cache manager and make a dictionary"""
+    gcm = GraphCacheManager(connection=connection)
+
+    for nid, blob in gcm.session.query(Network.id, Network.blob).all():
+        log.info('loading network %s')
+        graph = from_bytes(blob)
+        networks[nid] = graph
 
 
 def get_networks():
