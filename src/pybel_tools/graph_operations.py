@@ -171,10 +171,14 @@ def overlay_data(graph, data, label, overwrite=False):
 
 
 def overlay_type_data(graph, data, label, function, namespace, overwrite=False):
-    """Overlays tabular data on the network
+    """Overlays tabular data on the network for data that comes from an un-namespaced data set
+
+    For example, if you want to overlay differential gene expression data from a table, that table
+    probably has HGNC identifiers, but no specific annotations that they are in the HGNC namespace or
+    that the entities to which they refer are RNA.
 
     :type graph: BELGraph
-    :param data: A dictionary of {pybel node: data for that node}
+    :param data: A dictionary of {name: data}
     :type data: dict
     :param label: The annotation label to put in the node dictionary
     :type label: str
