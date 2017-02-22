@@ -1,11 +1,4 @@
-"""Utilities to merge multiple BEL documents on the same topic
-
-Steps:
-
-1. load all documents
-2. identify document metadata information and ns/annot defs
-3. postpend all statement groups with "- {author email}" and add comments with document information
-"""
+"""Utilities to merge multiple BEL documents on the same topic"""
 
 from __future__ import print_function
 
@@ -15,6 +8,7 @@ from itertools import islice
 from .boilerplate import make_document_metadata
 
 
+# TODO can the pybel function be used instead?
 def split_document(lines):
     lines = list(lines)
     end_document_section = 1 + max(i for i, line in enumerate(lines) if line.startswith('SET DOCUMENT'))
@@ -29,15 +23,21 @@ def split_document(lines):
     return documents, definitions, statements
 
 
-def merge(output_path, *input_paths, merge_document_name=None, merge_document_contact=None,merge_document_description=None):
-    """
+def merge(output_path, *input_paths, merge_document_name=None, merge_document_contact=None,
+          merge_document_description=None):
+    """Merges multiple BEL documents and maintains author information in comments
+
+    Steps:
+
+    1. Load all documents
+    2. Identify document metadata information and ns/annot defs
+    3. Postpend all statement groups with "- {author email}" and add comments with document information
 
     :param output_path: Path to file to write merged BEL document
     :param input_paths: List of paths to input BEL document files
     :param merge_document_name: name for combined document
     :param merge_document_contact: contact information for combine document
     :param merge_document_description: description of combine document
-    :return:
     """
     metadata, defs, statements = [], [], []
 

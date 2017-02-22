@@ -2,7 +2,7 @@ import unittest
 
 import pybel
 from pybel.constants import *
-from pybel_tools.graph_operations import *
+from pybel_tools.comparisons import *
 
 test_bel_1 = """
 SET DOCUMENT Name = "PyBEL Test Document 1"

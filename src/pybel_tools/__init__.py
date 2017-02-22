@@ -1,6 +1,9 @@
 """Tools for using BEL documents in python"""
 
-from .summary import *
+from . import merger
+from . import operations
+from . import processing
+from . import summary
 
 __version__ = '0.1.1'
 
