@@ -97,5 +97,6 @@ def group_subgraphs(graph, annotation):
 def filter_edge_properties(edges, annotations_filter=None, relation=None):
     pass
 
+
 def filter_node_properties(edges, function_keep=None, namespace_keep=None, function_delete=None, namespace_delete=None):
     pass

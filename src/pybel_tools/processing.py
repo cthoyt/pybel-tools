@@ -47,7 +47,8 @@ def add_inferred_edges(graph, relations):
 
     :param graph: a BEL network
     :type graph: BELGraph
-    :param relation: single or iterable of relation names to add their inverse inferred edges
+    :param relations: single or iterable of relation names to add their inverse inferred edges
+    :type relations: str or list
     """
 
     if isinstance(relations, str):
