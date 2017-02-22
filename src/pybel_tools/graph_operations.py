@@ -1,7 +1,11 @@
 import itertools as itt
+import logging
 from collections import defaultdict, Counter
 
+from pybel import BELGraph
 from pybel.constants import RELATION, FUNCTION
+
+log = logging.getLogger(__name__)
 
 
 def count_nodes(g):
@@ -114,3 +118,33 @@ def graph_edges_xor(g, h):
     :rtype: :class:`pybel.BELGraph`
     """
     return set(g.edges()).symmetric_difference(h.edges())
+
+
+def left_merge(g, h):
+    """Performs an in-place operation, adding nodes and edges in H that aren't already in G
+
+    :param g:
+    :type g: BELGraph
+    :param h:
+    :type h: BELGraph
+    :rtype: BELGraph
+    """
+
+    for node, data in h.nodes_iter(data=True):
+        if node not in g:
+            g.add_node(node, data)
+
+    for u, v, k, d in h.edges_iter(keys=True, data=True):
+        if 0 <= k:  # not an unqualified edge
+            found = False
+
+            for gd in g.edge[u][v].values():
+                if d == gd:
+                    found = True
+
+            if not found:
+                g.add_edge(u, v, attr_dict=d)
+
+        elif k not in g.edge[u][v]:  # unqualified edge that's not in G yet
+            g.add_edge(u, v, key=k, attr_dict=d)
+
