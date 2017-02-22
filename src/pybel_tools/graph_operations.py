@@ -148,3 +148,42 @@ def left_merge(g, h):
         elif k not in g.edge[u][v]:  # unqualified edge that's not in G yet
             g.add_edge(u, v, key=k, attr_dict=d)
 
+
+def overlay_data(graph, data, label, overwrite=False):
+    """Overlays tabular data on the network
+
+    :type graph: BELGraph
+    :param data: A dictionary of {pybel node: data for that node}
+    :type data: dict
+    :param label: The annotation label to put in the node dictionary
+    :type label: str
+    :param overwrite: Should old annotations be overwritten?
+    :type overwrite: bool
+    """
+    for node, annotation in data.items():
+        if node not in graph:
+            log.debug('%s not in graph', node)
+            continue
+        elif label in graph.node[node] and not overwrite:
+            log.debug('%s already on %s', label, node)
+            continue
+        graph.node[node][label] = annotation
+
+
+def overlay_type_data(graph, data, label, function, namespace, overwrite=False):
+    """Overlays tabular data on the network
+
+    :type graph: BELGraph
+    :param data: A dictionary of {pybel node: data for that node}
+    :type data: dict
+    :param label: The annotation label to put in the node dictionary
+    :type label: str
+    :param function: The function of the keys in the data dictionary
+    :type function: str
+    :param namespace: The namespace of the keys in the data dictionary
+    :type namespace: str
+    :param overwrite: Should old annotations be overwritten?
+    :type overwrite: bool
+    """
+    new_data = {(function, namespace, name): value for name, value in data.items()}
+    overlay_data(graph, new_data, label, overwrite=overwrite)
