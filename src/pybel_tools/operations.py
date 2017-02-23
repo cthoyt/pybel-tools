@@ -100,3 +100,23 @@ def filter_edge_properties(edges, annotations_filter=None, relation=None):
 
 def filter_node_properties(edges, function_keep=None, namespace_keep=None, function_delete=None, namespace_delete=None):
     pass
+
+
+def get_subgraph_by_annotation(graph, key, value):
+    bg = BELGraph()
+
+    for u, v, k, d in graph.edges_iter(keys=True, data=True):
+        if ANNOTATIONS not in d or key not in d[ANNOTATIONS]:
+            continue
+
+        if d[ANNOTATIONS][key] == value:
+
+            if u not in bg:
+                bg.add_node(u, graph.node[u])
+
+            if v not in bg:
+                bg.add_node(v, graph.node[v])
+
+            bg.add_edge(u, v, key=key, attr_dict=d)
+
+    return bg
