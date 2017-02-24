@@ -5,15 +5,24 @@ and provide some suggestions for fixes.
 
 """
 
+import itertools as itt
 from collections import Counter, defaultdict
 
 import pandas as pd
 from fuzzywuzzy import process, fuzz
 
 from pybel import BELGraph
-from pybel.constants import RELATION, FUNCTION, ANNOTATIONS, NAMESPACE
+from pybel.constants import RELATION, FUNCTION, ANNOTATIONS, NAMESPACE, NAME
 from pybel.parser.parse_exceptions import MissingNamespaceNameWarning, NakedNameWarning
 from .utils import graph_content_transform
+
+
+def _check_has_data(d, sd, key):
+    return sd in d and key in d[sd]
+
+
+def _check_has_annotation(d, key):
+    return _check_has_data(d, ANNOTATIONS, key)
 
 
 # NODE HISTOGRAMS
@@ -38,6 +47,20 @@ def count_namespaces(graph):
     return Counter(data[NAMESPACE] for _, data in graph.nodes_iter(data=True) if NAMESPACE in data)
 
 
+def get_names(graph, namespace):
+    """Get the set of all of the names in a given namespace that are in the graph
+
+    :param graph: A BEL graph
+    :type graph: BELGraph
+    :param namespace: A namespace
+    :type namespace: str
+    :return: A set of names belonging to the given namespace that are in the given graph
+    :rtype: set of str
+    """
+
+    return {data[NAME] for _, data in graph.nodes_iter(data=True) if NAMESPACE in data and data[NAMESPACE] == namespace}
+
+
 # EDGE HISTOGRAMS
 
 def count_relations(graph):
@@ -59,7 +82,7 @@ def count_unique_relations(graph):
     :type graph: BELGraph
     :rtype: Counter
     """
-    return Counter(relation for _, relations in graph_content_transform(graph).items() for relation in relations)
+    return Counter(itt.chain.from_iterable(graph_content_transform(graph).values()))
 
 
 def count_annotations(graph):
@@ -69,7 +92,7 @@ def count_annotations(graph):
     :type graph: BELGraph
     :rtype: Counter
     """
-    return Counter(key for _, _, d in graph.edges_iter(data=True) for key in d[ANNOTATIONS])
+    return Counter(key for _, _, d in graph.edges_iter(data=True) if ANNOTATIONS in d for key in d[ANNOTATIONS])
 
 
 def count_annotation_instances(graph, key):
@@ -81,7 +104,7 @@ def count_annotation_instances(graph, key):
     :type key: str
     :rtype: Counter
     """
-    return Counter(d[ANNOTATIONS][key] for _, _, d in graph.edges_iter(data=True) if key in d[ANNOTATIONS])
+    return Counter(d[ANNOTATIONS][key] for _, _, d in graph.edges_iter(data=True) if _check_has_annotation(d, key))
 
 
 # ERROR HISTOGRAMS
@@ -161,6 +184,8 @@ def calculate_error_by_annotation(graph, annotation):
 def plot_summary(graph, plt, figsize=(11, 4), **kwargs):
     """Plots your graph summary statistics. You need to run plt.show() yourself after.
 
+    1. Count of nodes, grouped by function type
+    2. Count of edges, grouped by relation type
 
     :param graph: A BEL graph
     :type graph: BELGraph
