@@ -6,7 +6,7 @@ from . import processing
 from . import subgraph_expansion
 from . import summary
 
-__version__ = '0.1.1'
+__version__ = '0.1.2-dev'
 
 __title__ = 'pybel_tools'
 __description__ = 'Tools for using BEL documents in python'
