@@ -12,7 +12,7 @@ import pandas as pd
 from fuzzywuzzy import process, fuzz
 
 from pybel import BELGraph
-from pybel.constants import RELATION, FUNCTION, ANNOTATIONS, NAMESPACE, NAME
+from pybel.constants import RELATION, FUNCTION, ANNOTATIONS, NAMESPACE, NAME, PATHOLOGY
 from pybel.parser.parse_exceptions import MissingNamespaceNameWarning, NakedNameWarning
 from .utils import graph_content_transform
 
@@ -21,8 +21,20 @@ def _check_has_data(d, sd, key):
     return sd in d and key in d[sd]
 
 
-def _check_has_annotation(d, key):
+def check_has_annotation(d, key):
     return _check_has_data(d, ANNOTATIONS, key)
+
+
+def keep_node(graph, node, super_nodes=None):
+    super_nodes = [] if super_nodes is None else super_nodes
+
+    if node in super_nodes:
+        return False
+
+    if graph.node[node][FUNCTION] == PATHOLOGY:
+        return False
+
+    return True
 
 
 # NODE HISTOGRAMS
@@ -104,7 +116,22 @@ def count_annotation_instances(graph, key):
     :type key: str
     :rtype: Counter
     """
-    return Counter(d[ANNOTATIONS][key] for _, _, d in graph.edges_iter(data=True) if _check_has_annotation(d, key))
+    return Counter(d[ANNOTATIONS][key] for _, _, d in graph.edges_iter(data=True) if check_has_annotation(d, key))
+
+
+def count_annotation_instances_filtered(graph, key, source_filter=keep_node, target_filter=keep_node):
+    """Counts in how many edges each annotation appears in a graph, but filter out source nodes and target nodes
+
+    Default filters get rid of PATHOLOGY nodes. These functions take graph, node as arguments.
+
+    :param graph: A BEL graph
+    :type graph: BELGraph
+    :param key: An annotation to count
+    :type key: str
+    :rtype: Counter
+    """
+    return Counter(d[ANNOTATIONS][key] for u, v, d in graph.edges_iter(data=True) if
+                   check_has_annotation(d, key) and source_filter(graph, u) and target_filter(graph, v))
 
 
 # ERROR HISTOGRAMS

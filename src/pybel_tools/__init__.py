@@ -3,6 +3,7 @@
 from . import merger
 from . import operations
 from . import processing
+from . import subgraph_expansion
 from . import summary
 
 __version__ = '0.1.1'
