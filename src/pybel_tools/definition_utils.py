@@ -117,7 +117,7 @@ def build_namespace(namespace_name, namespace_keyword, namespace_domain, author_
                     namespace_description=None, namespace_species=None, namespace_version=None,
                     namespace_query_url=None, namespace_created=None, author_contact=None, author_copyright=None,
                     citation_description=None, citation_url=None, citation_version=None, citation_date=None,
-                    functions=None, output=None, value_prefix=''):
+                    functions=None, file=None, value_prefix=''):
     """Writes a BEL namespace (BELNS) to a file
 
     :param namespace_name: The namespace name
@@ -156,35 +156,39 @@ def build_namespace(namespace_name, namespace_keyword, namespace_domain, author_
     :type citation_date: str
     :param functions: The encoding for the elements in this namespace
     :type functions: iterable of characters
-    :param output: the stream to print to
-    :type output: file or file-like
+    :param file: the stream to print to
+    :type file: file or file-like
     :param value_prefix: a prefix for each name
     :type value_prefix: str
     """
-    output = sys.stdout if output is None else output
+    file = sys.stdout if file is None else file
 
     for line in make_namespace_header(namespace_name, namespace_keyword, namespace_domain,
                                       query_url=namespace_query_url, description=namespace_description,
                                       species=namespace_species, version=namespace_version, created=namespace_created):
-        print(line, file=output)
+        print(line, file=file)
+    print(file=file)
 
     for line in make_author_header(author_name, contact=author_contact, copyright_str=author_copyright):
-        print(line, file=output)
+        print(line, file=file)
+    print(file=file)
 
     for line in make_citation_header(citation_name, description=citation_description, url=citation_url,
                                      version=citation_version, date=citation_date):
-        print(line, file=output)
+        print(line, file=file)
+    print(file=file)
 
     for line in make_properties_header():
-        print(line, file=output)
+        print(line, file=file)
+    print(file=file)
 
     function_values = ''.join(sorted(functions if functions is not None else language.belns_encodings.keys()))
 
-    print('[Values]', file=output)
-    for value in values:
+    print('[Values]', file=file)
+    for value in sorted(values):
         if not value.strip():
             continue
-        print('{}{}|{}'.format(value_prefix, value.strip(), function_values), file=output)
+        print('{}{}|{}'.format(value_prefix, value.strip(), function_values), file=file)
 
 
 def build_namespace_from_owl(url, output=None):
@@ -204,7 +208,7 @@ def build_namespace_from_owl(url, output=None):
                     owl['email'],
                     url,
                     owl.graph.nodes(),
-                    output=output)
+                    file=output)
 
 
 def make_annotation_header(keyword, description=None, usage=None, version=None, created=None):
@@ -239,8 +243,8 @@ def make_annotation_header(keyword, description=None, usage=None, version=None, 
     return lines
 
 
-def build_annotation(keyword, name, values, description=None, usage=None, version=None, created=None, author_name=None,
-                     author_copyright=None, author_contact=None, file=None, value_prefix=''):
+def build_annotation(keyword, values, name=None, description=None, usage=None, version=None, created=None,
+                     author_name=None, author_copyright=None, author_contact=None, file=None, value_prefix=''):
     """Writes a BEL annotation (BELANNO) to a file
 
     :param keyword:
@@ -261,18 +265,22 @@ def build_annotation(keyword, name, values, description=None, usage=None, versio
 
     for line in make_annotation_header(keyword, description=description, usage=usage, version=version, created=created):
         print(line, file=file)
+    print(file=file)
 
-    for line in make_author_header(author_name, contact=author_contact, copyright_str=author_copyright):
+    for line in make_author_header(name=author_name, contact=author_contact, copyright_str=author_copyright):
         print(line, file=file)
+    print(file=file)
 
     print('[Citation]', file=file)
     print('NameString={}'.format(name), file=file)
+    print(file=file)
 
     for line in make_properties_header():
         print(line, file=file)
+    print(file=file)
 
     print('[Values]', file=file)
-    for key, value in values.items():
-        if not value.strip():
+    for key, value in sorted(values.items()):
+        if not key.strip():
             continue
         print('{}{}|{}'.format(value_prefix, key.strip(), value.strip()), file=file)
