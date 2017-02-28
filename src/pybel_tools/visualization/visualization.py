@@ -1,12 +1,11 @@
 from __future__ import print_function
 
-import json
 import os
 
 import jinja2
 
-import pybel
-
+from pybel import BELGraph
+from pybel.io import to_jsons
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -16,7 +15,7 @@ TEMPLATE_ENVIRONMENT = jinja2.Environment(
     trim_blocks=False
 )
 
-TEMPLATE_ENVIRONMENT.globals['STATIC_PREFIX'] =  HERE + '/static/'
+TEMPLATE_ENVIRONMENT.globals['STATIC_PREFIX'] = HERE + '/static/'
 
 
 def render_template(template_filename, context):
@@ -24,22 +23,25 @@ def render_template(template_filename, context):
 
 
 def render_graph_template(context):
+    """Renders the graph template as an HTML string
+
+    :param context: The data dictionary to pass to the Jinja templating engine
+    :type context: dict
+    :rtype: str
+    """
     return render_template('graph_template.html', context)
 
 
 def build_graph_context(graph):
-    """
-    :param graph:
-    :type graph: pybel.BELGraph
-    :return:
-    """
-    graph_json_str = pybel.io.to_jsons(graph)
+    """Builds the data dictionary to be used by the Jinja templating engine in :py:func:`to_html`
 
-    node_dict = {node: hash(node) for node in graph}
+    :param graph: A BEL Graph
+    :type graph: BELGraph
+    """
+    graph_json_str = to_jsons(graph)
 
     return {
         'json': graph_json_str,
-        # 'node_hashes': json.dumps(node_dict),
         'number_nodes': '10',
         'number_edges': '32434'
     }
@@ -48,24 +50,27 @@ def build_graph_context(graph):
 def to_html(graph):
     """Creates an HTML visualization for the given JSON representation of a BEL graph
 
-    :param graph:
-    :type graph:
-    :return:
+    :param graph: A BEL Graph
+    :type graph: BELGraph
+    :rtype: str
     """
     return render_graph_template(build_graph_context(graph))
 
 
-# def main():
-#     with open(os.path.expanduser('~/Desktop/graph.json')) as f:
-#         data = json.load(f)
-#
-#     with open(os.path.expanduser('~/Desktop/test.html'), 'w') as f:
-#         print(render_graph_template({
-#             'json': json.dumps(data),
-#             'number_nodes': '10',
-#             'number_edges': '32434'
-#         }), file=f)
+def to_html_file(graph, file):
+    """Writes the HTML visualization to a file or file-like
+
+    :param graph: A BEL Graph
+    :param file: A file or file-like
+    """
+    print(to_html(graph), file=file)
 
 
-if __name__ == "__main__":
-    main()
+def to_html_path(graph, path):
+    """Writes the HTML visualization to a file specified by the file path
+
+    :param graph: A BEL Graph
+    :param path: The file path
+    """
+    with open(os.path.expanduser(path), 'w') as f:
+        to_html_file(graph, f)

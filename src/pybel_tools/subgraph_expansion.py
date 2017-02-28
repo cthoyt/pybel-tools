@@ -1,7 +1,8 @@
 from collections import Counter, defaultdict
 
 from pybel.constants import ANNOTATIONS
-from .summary import keep_node, check_has_annotation, count_annotation_instances
+from .summary import keep_node, count_annotation_instances
+from pybel_tools.utils import check_has_annotation, keep_node
 
 
 def get_possible_successor_edges(graph, subgraph):
@@ -20,22 +21,22 @@ def count_possible_predecessors(graph, subgraph):
     return Counter(v for u, v in get_possible_predecessor_edges(graph, subgraph))
 
 
-def get_subgraph_edges(graph, subgraph_name, subgraph_key='Subgraph'):
+def get_subgraph_edges(graph, subgraph_name, subgraph_key='Subgraph', node_filter=keep_node):
     for u, v, k, d in graph.edges_iter(keys=True, data=True):
         if not check_has_annotation(d, subgraph_key):
             continue
-        if d[ANNOTATIONS][subgraph_key] == subgraph_name and keep_node(graph, u) and keep_node(graph, v):
+        if d[ANNOTATIONS][subgraph_key] == subgraph_name and node_filter(graph, u) and node_filter(graph, v):
             yield u, v, k, d
 
 
-def get_subgraph_fill_edges(graph, subgraph):
+def get_subgraph_fill_edges(graph, subgraph, node_filter=keep_node):
     possible_succ = get_possible_successor_edges(graph, subgraph)
     succ_counter = Counter(v for u, v in possible_succ)
 
     possible_pred = get_possible_predecessor_edges(graph, subgraph)
     pred_counter = Counter(v for u, v in possible_pred)
 
-    gaps = {node for node, freq in (succ_counter + pred_counter).items() if 2 <= freq and keep_node(graph, node)}
+    gaps = {node for node, freq in (succ_counter + pred_counter).items() if 2 <= freq and node_filter(graph, node)}
 
     for already_in_graph, new_node in possible_succ:
         if new_node in gaps:

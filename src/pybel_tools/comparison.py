@@ -14,7 +14,7 @@ def graph_entities_equal(g, h):
     :type g: BELGraph
     :param h: Another BEL Graph
     :type h: BELGraph
-    :returns: Do the two graphs share the same set of nodes?
+    :return: Do the two graphs share the same set of nodes?
     :rtype: bool
     """
     return set(g.nodes_iter()) == set(h.nodes_iter())
@@ -27,7 +27,7 @@ def graph_topologically_equal(g, h):
     :type g: BELGraph
     :param h: Another BEL Graph
     :type h: BELGraph
-    :returns: Do the graphs share the same set of nodes, and the same connectivity?
+    :return: Do the graphs share the same set of nodes, and the same connectivity?
     :rtype: bool
     """
     if not graph_entities_equal(g, h):
@@ -44,7 +44,7 @@ def graph_relations_equal(g, h):
     :type g: BELGraph
     :param h: Another BEL Graph
     :type h: BELGraph
-    :returns: Do the two graphs share the same set of nodes, same connectivity, and types of connections?
+    :return: Do the two graphs share the same set of nodes, same connectivity, and types of connections?
     :rtype: bool
     """
     if not graph_topologically_equal(g, h):
@@ -64,7 +64,7 @@ def graph_provenance_equal(g, h):
     :type g: BELGraph
     :param h: Another BEL Graph
     :type h: BELGraph
-    :returns: Do the two graphs share the same set of nodes, same connectivity, types of connections, evidences, and
+    :return: Do the two graphs share the same set of nodes, same connectivity, types of connections, evidences, and
               annotations?
     :rtype: bool
     """
@@ -99,7 +99,7 @@ def graph_edges_subtract(g, h):
     :type g: BELGraph
     :param h: Another BEL Graph
     :type h: BELGraph
-    :returns: The asymmetric difference between the edges in g and h
+    :return: The asymmetric difference between the edges in g and h
     :rtype: set
     """
     return set(g.edges()).difference(set(h.edges()))
@@ -112,7 +112,7 @@ def graph_edges_xor(g, h):
     :type g: BELGraph
     :param h: Another BEL Graph
     :type h: BELGraph
-    :returns: The symmetric difference between the edges in g and h
+    :return: The symmetric difference between the edges in g and h
     :rtype: set
     """
     return set(g.edges()).symmetric_difference(h.edges())

@@ -12,29 +12,9 @@ import pandas as pd
 from fuzzywuzzy import process, fuzz
 
 from pybel import BELGraph
-from pybel.constants import RELATION, FUNCTION, ANNOTATIONS, NAMESPACE, NAME, PATHOLOGY
+from pybel.constants import RELATION, FUNCTION, ANNOTATIONS, NAMESPACE, NAME
 from pybel.parser.parse_exceptions import MissingNamespaceNameWarning, NakedNameWarning
-from .utils import graph_content_transform
-
-
-def _check_has_data(d, sd, key):
-    return sd in d and key in d[sd]
-
-
-def check_has_annotation(d, key):
-    return _check_has_data(d, ANNOTATIONS, key)
-
-
-def keep_node(graph, node, super_nodes=None):
-    super_nodes = [] if super_nodes is None else super_nodes
-
-    if node in super_nodes:
-        return False
-
-    if graph.node[node][FUNCTION] == PATHOLOGY:
-        return False
-
-    return True
+from .utils import graph_content_transform, check_has_annotation, keep_node
 
 
 # NODE HISTOGRAMS
@@ -136,7 +116,7 @@ def count_annotation_instances_filtered(graph, key, source_filter=keep_node, tar
 
 # ERROR HISTOGRAMS
 
-def calculate_error_counter(graph):
+def count_error_types(graph):
     """Counts the occurrence of each type of error in a graph
 
     :param graph: A BEL graph
@@ -146,8 +126,8 @@ def calculate_error_counter(graph):
     return Counter(e.__class__.__name__ for _, _, e, _ in graph.warnings)
 
 
-def calculate_naked_names(graph):
-    """
+def count_naked_names(graph):
+    """Counts the frequency of each naked name (names without namespaces)
 
     :param graph: A BEL graph
     :type graph: BELGraph
@@ -209,14 +189,14 @@ def calculate_error_by_annotation(graph, annotation):
 # Visualization with Matplotlib
 
 def plot_summary(graph, plt, figsize=(11, 4), **kwargs):
-    """Plots your graph summary statistics. You need to run plt.show() yourself after.
+    """Plots your graph summary statistics. After, you need to run :code:`plt.show()`.
 
     1. Count of nodes, grouped by function type
     2. Count of edges, grouped by relation type
 
     :param graph: A BEL graph
     :type graph: BELGraph
-    :param plt: Give matplotlib.pyplot to this parameter
+    :param plt: Give :code:`matplotlib.pyplot` to this parameter
     """
     fig, axes = plt.subplots(1, 2, figsize=figsize, **kwargs)
 

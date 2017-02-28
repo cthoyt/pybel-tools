@@ -1,5 +1,5 @@
 Comparison Functions
 ====================
 
-.. automodule:: pybel_tools.comparisons
+.. automodule:: pybel_tools.comparison
     :members:

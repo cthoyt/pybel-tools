@@ -2,7 +2,8 @@ import unittest
 
 import pybel
 from pybel.constants import *
-from pybel_tools.comparisons import *
+from pybel_tools.comparison import graph_edges_subtract, graph_entities_equal
+from pybel_tools.comparison import graph_provenance_equal, graph_topologically_equal
 
 test_bel_1 = """
 SET DOCUMENT Name = "PyBEL Test Document 1"

@@ -8,8 +8,10 @@ PyBEL Tools Documentation
    :caption: Contents:
 
    summary
-   comparisons
-   processing
+   comparison
+   selection
+   integration
+   mutation
    lexer
 
 

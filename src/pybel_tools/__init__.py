@@ -1,8 +1,9 @@
 """Tools for using BEL documents in python"""
 
+from . import comparison
+from . import integration
 from . import merger
-from . import operations
-from . import processing
+from . import mutation
 from . import subgraph_expansion
 from . import summary
 
