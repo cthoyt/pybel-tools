@@ -24,7 +24,7 @@ def make_namespace_header(name, keyword, domain, query_url=None, description=Non
     :param query_url: HTTP URL to query for details on namespace values (must be valid URL)
     :param description: Namespace description
     :param species: Comma-separated list of species taxonomy id's
-    :param version: Namespace version
+    :param version: Namespace version. Defaults to '1.0.0'
     :param created: Namespace public timestamp, ISO 8601 datetime
     :type created: str
     """
@@ -36,7 +36,7 @@ def make_namespace_header(name, keyword, domain, query_url=None, description=Non
         'Keyword={}'.format(keyword),
         'NameString={}'.format(name),
         'DomainString={}'.format(domain),
-        'VersionString={}'.format(version if version else '1.0'),
+        'VersionString={}'.format(version if version else '1.0.0'),
         'CreatedDateTime={}'.format(created if created else time.strftime(DATETIME_FMT))
     ]
 
@@ -220,7 +220,7 @@ def make_annotation_header(keyword, description=None, usage=None, version=None, 
     :type description: str
     :param usage: How to use this annotation
     :type usage: str
-    :param version: Namespace version
+    :param version: Namespace version. Defaults to '1.0.0'
     :type version: str
     :param created: Namespace public timestamp, ISO 8601 datetime
     :type created: str
@@ -230,7 +230,7 @@ def make_annotation_header(keyword, description=None, usage=None, version=None, 
         '[AnnotationDefinition]',
         'Keyword={}'.format(keyword),
         'TypeString={}'.format('list'),
-        'VersionString={}'.format(version if version else '1.0'),
+        'VersionString={}'.format(version if version else '1.0.0'),
         'CreatedDateTime={}'.format(created if created else time.strftime(DATETIME_FMT))
     ]
 
@@ -243,23 +243,22 @@ def make_annotation_header(keyword, description=None, usage=None, version=None, 
     return lines
 
 
-def build_annotation(keyword, values, name=None, description=None, usage=None, version=None, created=None,
+def build_annotation(keyword, values, citation_name, description=None, usage=None, version=None, created=None,
                      author_name=None, author_copyright=None, author_contact=None, file=None, value_prefix=''):
     """Writes a BEL annotation (BELANNO) to a file
 
-    :param keyword:
-    :param name:
-    :param values:
-    :param description:
-    :param usage:
-    :param version:
-    :param created:
-    :param author_name:
-    :param author_copyright:
-    :param author_contact:
-    :param file:
-    :param value_prefix:
-    :return:
+    :param keyword: The annotation keyword
+    :param citation_name: The citation name
+    :param values: A dictionary of {value: description}
+    :param description: A description of this annotation
+    :param usage: How to use this annotation
+    :param version: The version of this annotation (defaults to 1.0.0)
+    :param created: The annotation's public timestamp, ISO 8601 datetime
+    :param author_name: The author's name
+    :param author_copyright: The copyright information for this annotation. Defaults to 'Other/Proprietary'
+    :param author_contact: The contact information for the author of this annotation.
+    :param file: A file or file-like
+    :param value_prefix: An optional prefix for all values
     """
     file = sys.stdout if file is None else file
 
@@ -272,7 +271,7 @@ def build_annotation(keyword, values, name=None, description=None, usage=None, v
     print(file=file)
 
     print('[Citation]', file=file)
-    print('NameString={}'.format(name), file=file)
+    print('NameString={}'.format(citation_name), file=file)
     print(file=file)
 
     for line in make_properties_header():
