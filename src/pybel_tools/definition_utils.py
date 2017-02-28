@@ -2,10 +2,11 @@
 
 from __future__ import print_function
 
+import getpass
 import sys
 import time
 
-from pybel.manager.models import NAMESPACE_DOMAIN_TYPES
+from pybel.constants import NAMESPACE_DOMAIN_TYPES
 from pybel.manager.utils import parse_owl
 from pybel.parser import language
 
@@ -51,7 +52,7 @@ def make_namespace_header(name, keyword, domain, query_url=None, description=Non
     return lines
 
 
-def make_author_header(name, contact=None, copyright_str=None):
+def make_author_header(name=None, contact=None, copyright_str=None):
     """Makes the [Author] section of a BELNS file
 
     :param name: Namespace's authors
@@ -61,7 +62,7 @@ def make_author_header(name, contact=None, copyright_str=None):
     """
     lines = [
         '[Author]',
-        'NameString={}'.format(name),
+        'NameString={}'.format(name if name is not None else getpass.getuser()),
         'CopyrightString={}'.format('Other/Proprietary' if copyright_str is None else copyright_str)
     ]
 
@@ -116,48 +117,66 @@ def build_namespace(namespace_name, namespace_keyword, namespace_domain, author_
                     namespace_description=None, namespace_species=None, namespace_version=None,
                     namespace_query_url=None, namespace_created=None, author_contact=None, author_copyright=None,
                     citation_description=None, citation_url=None, citation_version=None, citation_date=None,
-                    functions=None, output=sys.stdout, value_prefix=''):
-    """Builds a namespace
+                    functions=None, output=None, value_prefix=''):
+    """Writes a BEL namespace (BELNS) to a file
 
     :param namespace_name: The namespace name
+    :type namespace_name: str
     :param namespace_keyword: Preferred BEL Keyword, maximum length of 8
+    :type namespace_keyword: str
     :param namespace_domain: One of: “BiologicalProcess”, “Chemical”, “Gene and Gene Products”, “Other”
+    :type namespace_domain: str
     :param author_name: Namespace's authors
+    :type author_name: str
     :param citation_name: Citation name
+    :type citation_name: str
     :param values: A dictionary of {values: encodings}
     :type values: dict
     :param namespace_query_url: HTTP URL to query for details on namespace values (must be valid URL)
+    :type namespace_query_url: str
     :param namespace_description: Namespace description
+    :type namespace_description: str
     :param namespace_species: Comma-separated list of species taxonomy id's
+    :type namespace_species: str
     :param namespace_version: Namespace version
+    :type namespace_version: str
     :param namespace_created: Namespace public timestamp, ISO 8601 datetime
+    :type namespace_created: str
     :param author_contact: Namespace author's contact info/email address
+    :type author_contact: str
     :param author_copyright: Namespace's copyright/license information
+    :type author_copyright: str
     :param citation_description: Citation description
+    :type citation_description: str
     :param citation_url: URL to more citation information
+    :type citation_url: str
     :param citation_version: Citation version
+    :type citation_version: str
     :param citation_date: Citation publish timestamp, ISO 8601 Date
+    :type citation_date: str
     :param functions: The encoding for the elements in this namespace
+    :type functions: iterable of characters
     :param output: the stream to print to
-    :param value_prefix: a prefix for each name"""
+    :type output: file or file-like
+    :param value_prefix: a prefix for each name
+    :type value_prefix: str
+    """
+    output = sys.stdout if output is None else output
+
     for line in make_namespace_header(namespace_name, namespace_keyword, namespace_domain,
                                       query_url=namespace_query_url, description=namespace_description,
                                       species=namespace_species, version=namespace_version, created=namespace_created):
         print(line, file=output)
-    print(file=output)
 
     for line in make_author_header(author_name, contact=author_contact, copyright_str=author_copyright):
         print(line, file=output)
-    print(file=output)
 
     for line in make_citation_header(citation_name, description=citation_description, url=citation_url,
                                      version=citation_version, date=citation_date):
         print(line, file=output)
-    print(file=output)
 
     for line in make_properties_header():
         print(line, file=output)
-    print(file=output)
 
     function_values = ''.join(sorted(functions if functions is not None else language.belns_encodings.keys()))
 
@@ -168,7 +187,7 @@ def build_namespace(namespace_name, namespace_keyword, namespace_domain, author_
         print('{}{}|{}'.format(value_prefix, value.strip(), function_values), file=output)
 
 
-def build_namespace_from_owl(url, output=sys.stdout):
+def build_namespace_from_owl(url, output=None):
     """
 
     :param url: Path to OWL file or filelike object
@@ -180,9 +199,80 @@ def build_namespace_from_owl(url, output=sys.stdout):
 
     build_namespace(owl['title'],
                     owl['subject'],
-                    owl['desription'],
+                    owl['description'],
                     owl['creator'],
                     owl['email'],
                     url,
                     owl.graph.nodes(),
                     output=output)
+
+
+def make_annotation_header(keyword, description=None, usage=None, version=None, created=None):
+    """Makes the [AnnotationDefinition] section of a BELANNO file
+
+    :param keyword: Preferred BEL Keyword, maximum length of 8
+    :type keyword: str
+    :param description: A description of this annotation
+    :type description: str
+    :param usage: How to use this annotation
+    :type usage: str
+    :param version: Namespace version
+    :type version: str
+    :param created: Namespace public timestamp, ISO 8601 datetime
+    :type created: str
+    """
+
+    lines = [
+        '[AnnotationDefinition]',
+        'Keyword={}'.format(keyword),
+        'TypeString={}'.format('list'),
+        'VersionString={}'.format(version if version else '1.0'),
+        'CreatedDateTime={}'.format(created if created else time.strftime(DATETIME_FMT))
+    ]
+
+    if description is not None:
+        lines.append('DescriptionString={}'.format(description))
+
+    if usage is not None:
+        lines.append('UsageString={}'.format(usage))
+
+    return lines
+
+
+def build_annotation(keyword, name, values, description=None, usage=None, version=None, created=None, author_name=None,
+                     author_copyright=None, author_contact=None, file=None, value_prefix=''):
+    """Writes a BEL annotation (BELANNO) to a file
+
+    :param keyword:
+    :param name:
+    :param values:
+    :param description:
+    :param usage:
+    :param version:
+    :param created:
+    :param author_name:
+    :param author_copyright:
+    :param author_contact:
+    :param file:
+    :param value_prefix:
+    :return:
+    """
+    file = sys.stdout if file is None else file
+
+    for line in make_annotation_header(keyword, description=description, usage=usage, version=version, created=created):
+        print(line, file=file)
+
+    for line in make_author_header(author_name, contact=author_contact, copyright_str=author_copyright):
+        print(line, file=file)
+
+    print('[Citation]', file=file)
+    print('NameString={}'.format(name), file=file)
+
+    for line in make_properties_header():
+        print(line, file=file)
+
+    print('[Values]', file=file)
+    for key, value in values.items():
+        if not value.strip():
+            continue
+        print('{}{}|{}'.format(value_prefix, key.strip(), value.strip()), file=file)

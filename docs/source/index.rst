@@ -12,6 +12,7 @@ PyBEL Tools Documentation
    selection
    integration
    mutation
+   definitions
    lexer
 
 
