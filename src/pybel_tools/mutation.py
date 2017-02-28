@@ -8,8 +8,8 @@ import logging
 from collections import defaultdict
 
 from pybel import BELGraph
-from pybel.constants import RELATION, TRANSLATED_TO, FUNCTION, GENE, RNA
-from pybel.parser.language import unqualified_edge_code
+from pybel.constants import RELATION, TRANSLATED_TO, FUNCTION, GENE, RNA, NAMESPACE
+from pybel.parser.language import unqualified_edge_code, unqualified_edges
 from .constants import INFERRED_INVERSE
 
 log = logging.getLogger(__name__)
@@ -53,11 +53,17 @@ def collapse_nodes(graph, dict_of_sets_of_nodes):
         for value_node in value_nodes:
             for successor in graph.successors_iter(value_node):
                 for key, data in graph.edge[value_node][successor].items():
-                    graph.add_edge(key_node, successor, key=key, attr_dict=data)
+                    if key >= 0:
+                        graph.add_edge(key_node, successor, attr_dict=data)
+                    elif key not in graph.edges[key_node][successor]:
+                        graph.add_edge(key_node, successor, key=key, **{RELATION: unqualified_edges[-1 - key]})
 
             for predecessor in graph.predecessors_iter(value_node):
                 for key, data in graph.edge[predecessor][value_node].items():
-                    graph.add_edge(predecessor, key_node, key=key, attr_dict=data)
+                    if key >= 0:
+                        graph.add_edge(predecessor, key_node, attr_dict=data)
+                    elif key not in graph.edges[predecessor][key_node]:
+                        graph.add_edge(predecessor, key_node, key=key, **{RELATION: unqualified_edges[-1 - key]})
 
             graph.remove_node(value_node)
 
@@ -78,9 +84,31 @@ def collapse_by_central_dogma(graph):
             if unqualified_edge_code[TRANSLATED_TO] in graph.edge[successor][rna_node]:
                 collapse_dict[protein_node].add(successor)
 
+
+
     log.info('Collapsing %d groups', len(collapse_dict))
 
     collapse_nodes(graph, collapse_dict)
+
+
+def prune_by_namespace(graph, function, namespace):
+    """Prunes all nodes of a given namespace
+
+    This might be useful to exclude information learned about distant species, such as excluding all information
+    from MGI and RGD in diseases where mice and rats don't give much insight to the human disease mechanism.
+
+    :param graph:
+    :param function:
+    :param namespace:
+    :return:
+    """
+    to_prune = []
+
+    for node, data in graph.nodes_iter(data=True):
+        if function == data[FUNCTION] and NAMESPACE in data and namespace == data[NAMESPACE]:
+            to_prune.append(node)
+
+    graph.remove_nodes_from(to_prune)
 
 
 def prune_by_type(graph, function, prune_threshold=2):
