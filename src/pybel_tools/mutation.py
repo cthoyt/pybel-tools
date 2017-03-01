@@ -8,7 +8,7 @@ import logging
 from collections import defaultdict
 
 from pybel import BELGraph
-from pybel.constants import RELATION, TRANSLATED_TO, FUNCTION, GENE, RNA, NAMESPACE, TRANSCRIBED_TO
+from pybel.constants import *
 from pybel.parser.language import unqualified_edge_code, unqualified_edges
 from .constants import INFERRED_INVERSE
 
@@ -110,20 +110,55 @@ def collapse_by_central_dogma(graph):
     :param graph: A BEL Graph
     :type graph: BELGraph
     """
-
     collapse_dict = build_central_dogma_collapse_dict(graph)
     log.info('Collapsing %d groups', len(collapse_dict))
     collapse_nodes(graph, collapse_dict)
 
 
-# TODO implement
-def infer_central_dogma(graph):
-    """Adds all RNA-Protein and Gene-RNA central dogma edges
+def _infer_converter_helper(node, data, new_function):
+    new_tup = list(node)
+    new_tup[0] = new_function
+    new_tup = tuple(new_tup)
+    new_dict = data.copy()
+    new_dict[FUNCTION] = new_function
+    return new_tup, new_dict
 
-    :param graph:
-    :return:
+
+def infer_central_dogmatic_translations(graph):
+    """For all Protein entities, adds the missing origin RNA and RNA-Protein translation edge
+
+    :param graph: A BEL Graph
+    :type graph: BELGraph
     """
-    raise NotImplementedError
+    for node, data in graph.nodes(data=True):
+        if data[FUNCTION] == PROTEIN and NAME in data and VARIANTS not in data:
+            new_tup, new_dict = _infer_converter_helper(node, data, RNA)
+            graph.add_node(new_tup, attr_dict=new_dict)
+            graph.add_edge(new_tup, node, key=unqualified_edge_code[TRANSLATED_TO], **{RELATION: TRANSLATED_TO})
+
+
+def infer_central_dogmatic_transcriptions(graph):
+    """For all RNA entities, adds the missing origin Gene and Gene-RNA transcription edge
+
+    :param graph: A BEL Graph
+    :type graph: BELGraph
+    """
+    for node, data in graph.nodes(data=True):
+        if data[FUNCTION] == RNA and NAME in data and VARIANTS not in data:
+            new_tup, new_dict = _infer_converter_helper(node, data, GENE)
+            graph.add_node(new_tup, attr_dict=new_dict)
+            graph.add_edge(new_tup, node, key=unqualified_edge_code[TRANSCRIBED_TO], **{RELATION: TRANSCRIBED_TO})
+
+
+def infer_central_dogma(graph):
+    """Adds all RNA-Protein translations then all Gene-RNA transcriptions by applying
+    :code:`infer_central_dogmatic_translations` then :code:`infer_central_dogmatic_transcriptions`
+
+    :param graph: A BEL Graph
+    :type graph: BELGraph
+    """
+    infer_central_dogmatic_translations(graph)
+    infer_central_dogmatic_transcriptions(graph)
 
 
 def prune_by_namespace(graph, function, namespace):
@@ -132,10 +167,12 @@ def prune_by_namespace(graph, function, namespace):
     This might be useful to exclude information learned about distant species, such as excluding all information
     from MGI and RGD in diseases where mice and rats don't give much insight to the human disease mechanism.
 
-    :param graph:
+    :param graph: A BEL Graph
+    :type graph: BELGraph
     :param function:
+    :type function: str
     :param namespace:
-    :return:
+    :type namespace: str
     """
     to_prune = []
 
@@ -206,6 +243,8 @@ def add_inferred_two_way_edge(graph, u, v):
     :param graph: A BEL Graph
     :type graph: BELGraph
     :param u: the source node
+    :type u: tuple
     :param v: the target node
+    :type u: tuple
     """
     raise NotImplementedError
