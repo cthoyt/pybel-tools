@@ -8,7 +8,7 @@ import logging
 from collections import defaultdict
 
 from pybel import BELGraph
-from pybel.constants import RELATION, TRANSLATED_TO, FUNCTION, GENE, RNA, NAMESPACE
+from pybel.constants import RELATION, TRANSLATED_TO, FUNCTION, GENE, RNA, NAMESPACE, TRANSCRIBED_TO
 from pybel.parser.language import unqualified_edge_code, unqualified_edges
 from .constants import INFERRED_INVERSE
 
@@ -55,17 +55,53 @@ def collapse_nodes(graph, dict_of_sets_of_nodes):
                 for key, data in graph.edge[value_node][successor].items():
                     if key >= 0:
                         graph.add_edge(key_node, successor, attr_dict=data)
-                    elif key not in graph.edges[key_node][successor]:
+                    elif successor not in graph.edge[key_node] or key not in graph.edge[key_node][successor]:
                         graph.add_edge(key_node, successor, key=key, **{RELATION: unqualified_edges[-1 - key]})
 
             for predecessor in graph.predecessors_iter(value_node):
                 for key, data in graph.edge[predecessor][value_node].items():
                     if key >= 0:
                         graph.add_edge(predecessor, key_node, attr_dict=data)
-                    elif key not in graph.edges[predecessor][key_node]:
+                    elif predecessor not in graph.pred[key_node] or key not in graph.edge[predecessor][key_node]:
                         graph.add_edge(predecessor, key_node, key=key, **{RELATION: unqualified_edges[-1 - key]})
 
             graph.remove_node(value_node)
+
+    # Remove self edges
+    for u, v, k in graph.edges(keys=True):
+        if u == v:
+            graph.remove_edge(u, v, k)
+
+
+# TODO improve edge traversal efficiency from 2|E| to |E| with something like a disjoint union agglomeration
+def build_central_dogma_collapse_dict(graph):
+    """Builds a dictionary to direct the collapsing on the central dogma
+
+    :param graph: A BEL Graph
+    :type graph: BELGraph
+    :return:
+    """
+    collapse_dict = defaultdict(set)
+
+    r2p = {}
+
+    for rna_node, protein_node, d in graph.edges_iter(data=True):
+        if d[RELATION] != TRANSLATED_TO:
+            continue
+
+        collapse_dict[protein_node].add(rna_node)
+        r2p[rna_node] = protein_node
+
+    for gene_node, rna_node, d in graph.edges_iter(data=True):
+        if d[RELATION] != TRANSCRIBED_TO:
+            continue
+
+        if rna_node in r2p:
+            collapse_dict[r2p[rna_node]].add(gene_node)
+        else:
+            collapse_dict[rna_node].add(gene_node)
+
+    return collapse_dict
 
 
 def collapse_by_central_dogma(graph):
@@ -75,19 +111,8 @@ def collapse_by_central_dogma(graph):
     :type graph: BELGraph
     """
 
-    collapse_dict = defaultdict(set)
-
-    for rna_node, protein_node in graph.edges_iter(**{RELATION: TRANSLATED_TO}):
-        collapse_dict[protein_node].add(rna_node)
-
-        for successor in graph.successors_iter(rna_node):
-            if unqualified_edge_code[TRANSLATED_TO] in graph.edge[successor][rna_node]:
-                collapse_dict[protein_node].add(successor)
-
-
-
+    collapse_dict = build_central_dogma_collapse_dict(graph)
     log.info('Collapsing %d groups', len(collapse_dict))
-
     collapse_nodes(graph, collapse_dict)
 
 

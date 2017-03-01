@@ -3,8 +3,11 @@ import unittest
 from pybel import BELGraph
 from pybel.constants import *
 from pybel.parser.language import unqualified_edge_code
-from pybel_tools.mutation import collapse_by_central_dogma, collapse_nodes
+from pybel_tools.mutation import collapse_by_central_dogma, collapse_nodes, build_central_dogma_collapse_dict
+import logging
 
+
+logging.basicConfig(level=20)
 HGNC = 'HGNC'
 
 g1 = GENE, HGNC, '1'
@@ -22,7 +25,6 @@ p3 = PROTEIN, HGNC, '3'
 
 def add_simple(graph, function, namespace, name):
     graph.add_node((function, namespace, name), **{FUNCTION: function, NAMESPACE: namespace, NAME: name})
-
 
 
 class TestCollapse(unittest.TestCase):
@@ -54,10 +56,14 @@ class TestCollapse(unittest.TestCase):
         add_simple(g, *p1)
         add_simple(g, *r1)
 
-        g.add_edge(r1, p1, key=unqualified_edge_code[TRANSLATED_TO])
+        g.add_edge(r1, p1, key=unqualified_edge_code[TRANSLATED_TO], **{RELATION: TRANSLATED_TO})
 
         self.assertEqual(2, g.number_of_nodes())
         self.assertEqual(1, g.number_of_edges())
+
+        cd = build_central_dogma_collapse_dict(g)
+
+        print(cd)
 
         collapse_by_central_dogma(g)
 
@@ -71,8 +77,8 @@ class TestCollapse(unittest.TestCase):
         add_simple(g, *r1)
         add_simple(g, *g1)
 
-        g.add_edge(r1, p1, key=unqualified_edge_code[TRANSLATED_TO])
-        g.add_edge(g1, r1, key=unqualified_edge_code[TRANSCRIBED_TO])
+        g.add_edge(r1, p1, key=unqualified_edge_code[TRANSLATED_TO], **{RELATION: TRANSLATED_TO})
+        g.add_edge(g1, r1, key=unqualified_edge_code[TRANSCRIBED_TO], **{RELATION: TRANSCRIBED_TO})
 
         self.assertEqual(3, g.number_of_nodes())
         self.assertEqual(2, g.number_of_edges())
@@ -88,7 +94,7 @@ class TestCollapse(unittest.TestCase):
         add_simple(g, *r1)
         add_simple(g, *g1)
 
-        g.add_edge(g1, r1, key=unqualified_edge_code[TRANSCRIBED_TO])
+        g.add_edge(g1, r1, key=unqualified_edge_code[TRANSCRIBED_TO], **{RELATION: TRANSCRIBED_TO})
 
         self.assertEqual(2, g.number_of_nodes())
         self.assertEqual(1, g.number_of_edges())
