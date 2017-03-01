@@ -99,7 +99,7 @@ def count_annotation_instances(graph, key):
     return Counter(d[ANNOTATIONS][key] for _, _, d in graph.edges_iter(data=True) if check_has_annotation(d, key))
 
 
-def count_annotation_instances_filtered(graph, key, source_filter=keep_node, target_filter=keep_node):
+def count_annotation_instances_filtered(graph, key, source_filter=None, target_filter=None):
     """Counts in how many edges each annotation appears in a graph, but filter out source nodes and target nodes
 
     Default filters get rid of PATHOLOGY nodes. These functions take graph, node as arguments.
@@ -110,6 +110,9 @@ def count_annotation_instances_filtered(graph, key, source_filter=keep_node, tar
     :type key: str
     :rtype: Counter
     """
+    source_filter = keep_node if source_filter is None else source_filter
+    target_filter = keep_node if target_filter is None else target_filter
+
     return Counter(d[ANNOTATIONS][key] for u, v, d in graph.edges_iter(data=True) if
                    check_has_annotation(d, key) and source_filter(graph, u) and target_filter(graph, v))
 
@@ -137,7 +140,7 @@ def count_naked_names(graph):
 
 
 def calculate_incorrect_name_dict(graph):
-    """
+    """Groups all of the incorrect identifiers in a dict of {namespace: list of wrong names}
 
     :param graph: A BEL graph
     :type graph: BELGraph
@@ -154,6 +157,13 @@ def calculate_incorrect_name_dict(graph):
 
 
 def calculate_suggestions(incorrect_name_dict, namespace_dict):
+    """Uses fuzzy string matching to try and find the appropriate names for each of the incorrectly identified names
+
+    :param incorrect_name_dict: A dictionary of {namespace: list of wrong names}
+    :param namespace_dict: A dictinary of {namespace: list of allowed names}
+    :return: A dictionary of suggestions for each wrong namespace, name pair
+    :rtype: dict
+    """
     suggestions_cache = defaultdict(list)
 
     for namespace in incorrect_name_dict:
@@ -169,6 +179,15 @@ def calculate_suggestions(incorrect_name_dict, namespace_dict):
 
 
 def calculate_error_by_annotation(graph, annotation):
+    """Groups the graph by a given annotation and builds lists of errors for each
+
+    :param graph:
+    :type graph: BELGraph
+    :param annotation:
+    :type annotation: str
+    :return:
+    :rtype: dict
+    """
     results = defaultdict(list)
 
     for line_number, line, e, context in graph.warnings:

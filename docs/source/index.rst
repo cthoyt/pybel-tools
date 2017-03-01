@@ -13,6 +13,7 @@ PyBEL Tools Documentation
    integration
    mutation
    definitions
+   utilities
    lexer
 
 
