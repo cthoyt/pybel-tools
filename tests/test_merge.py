@@ -2,8 +2,7 @@ import os
 import tempfile
 import unittest
 
-from pybel_tools.document_utils import write_boilerplate
-from pybel_tools.merger import merge
+from pybel_tools.document_utils import write_boilerplate, merge
 
 
 class TestBoilerplate(unittest.TestCase):
