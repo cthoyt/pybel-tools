@@ -1,13 +1,11 @@
-import logging
 import unittest
 
 from pybel import BELGraph
 from pybel.constants import *
-from pybel.parser.language import unqualified_edge_code
-from pybel_tools.mutation import collapse_by_central_dogma, collapse_nodes, build_central_dogma_collapse_dict
+from pybel.constants import unqualified_edge_code
+from pybel_tools.mutation import collapse_by_central_dogma, collapse_nodes
 from pybel_tools.mutation import infer_central_dogmatic_transcriptions, infer_central_dogmatic_translations
 
-logging.basicConfig(level=20)
 HGNC = 'HGNC'
 
 g1 = GENE, HGNC, '1'
@@ -72,10 +70,6 @@ class TestCollapse(unittest.TestCase):
         self.assertEqual(2, graph.number_of_nodes())
         self.assertEqual(1, graph.number_of_edges())
 
-        cd = build_central_dogma_collapse_dict(graph)
-
-        print(cd)
-
         collapse_by_central_dogma(graph)
 
         self.assertEqual(1, graph.number_of_nodes())
@@ -115,6 +109,8 @@ class TestCollapse(unittest.TestCase):
         self.assertEqual(1, graph.number_of_nodes())
         self.assertEqual(0, graph.number_of_edges())
 
+
+class TestInference(unittest.TestCase):
     def test_infer_1(self):
         graph = BELGraph()
 

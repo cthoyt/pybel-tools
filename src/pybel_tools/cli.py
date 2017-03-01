@@ -3,8 +3,8 @@ from getpass import getuser
 
 import click
 
-from .definition_utils import build_namespace
-from .document_utils import make_boilerplate
+from .definition_utils import write_namespace
+from .document_utils import write_boilerplate
 
 
 @click.group(help="PyBEL-Tools Command Line Utilities on {}".format(sys.executable))
@@ -38,7 +38,7 @@ def web(host, debug):
 @click.option('--value-prefix', default='')
 def buildns(name, keyword, domain, citation, author, description, species, version, contact, license, values, functions,
             output, value_prefix):
-    build_namespace(name, keyword, domain, author, citation, values, namespace_description=description,
+    write_namespace(name, keyword, domain, author, citation, values, namespace_description=description,
                     namespace_species=species, namespace_version=version, author_contact=contact,
                     author_copyright=license, functions=functions, file=output, value_prefix=value_prefix)
 
@@ -54,8 +54,8 @@ def buildns(name, keyword, domain, citation, author, description, species, versi
 @click.option('--licenses')
 @click.option('--output', type=click.File('wb'), default=sys.stdout)
 def boilerplate(document_name, contact, description, pmids, version, copyright, authors, licenses, output):
-    make_boilerplate(document_name, contact, description, version, copyright, authors, licenses, pmids=pmids,
-                     file=output)
+    write_boilerplate(document_name, contact, description, version, copyright, authors, licenses, pmids=pmids,
+                      file=output)
 
 
 if __name__ == '__main__':

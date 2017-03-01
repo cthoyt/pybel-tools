@@ -9,7 +9,7 @@ from collections import defaultdict
 
 from pybel import BELGraph
 from pybel.constants import *
-from pybel.parser.language import unqualified_edge_code, unqualified_edges
+from pybel.constants import unqualified_edges, unqualified_edge_code
 from .constants import INFERRED_INVERSE
 
 log = logging.getLogger(__name__)
@@ -161,6 +161,12 @@ def infer_central_dogma(graph):
     infer_central_dogmatic_transcriptions(graph)
 
 
+# TODO implement
+def convert_dogma(graph):
+    """Converts all genes and rna to proteins (should only be done after appropriately collapsing)"""
+    raise NotImplementedError
+
+
 def prune_by_namespace(graph, function, namespace):
     """Prunes all nodes of a given namespace
 
@@ -169,9 +175,9 @@ def prune_by_namespace(graph, function, namespace):
 
     :param graph: A BEL Graph
     :type graph: BELGraph
-    :param function:
+    :param function: The function to filter
     :type function: str
-    :param namespace:
+    :param namespace: The namespace to filter
     :type namespace: str
     """
     to_prune = []
@@ -183,14 +189,14 @@ def prune_by_namespace(graph, function, namespace):
     graph.remove_nodes_from(to_prune)
 
 
-def prune_by_type(graph, function, prune_threshold=2):
+def prune_by_type(graph, function, prune_threshold=1):
     """Removes all nodes in graph (in-place) with only a connection to one node. Useful for gene and RNA.
 
     :param graph: a BEL network
     :type graph: BELGraph
     :param function: The node's function from :code:`pybel.constants` like GENE, RNA, PROTEIN, or BIOPROCESS
     :type function: str
-    :param prune_threshold: Defaults to 2
+    :param prune_threshold: Removes nodes with less than or equal to this number of connections. Defaults to 1
     :type prune_threshold: int
     :return: The number of nodes pruned
     :rtype: int
@@ -198,7 +204,7 @@ def prune_by_type(graph, function, prune_threshold=2):
     to_prune = []
 
     for gene, data in graph.nodes_iter(data=True):
-        if len(graph.adj[gene]) < prune_threshold and function == data.get(FUNCTION):
+        if len(graph.adj[gene]) <= prune_threshold and function == data.get(FUNCTION):
             to_prune.append(gene)
 
     graph.remove_nodes_from(to_prune)
@@ -245,6 +251,6 @@ def add_inferred_two_way_edge(graph, u, v):
     :param u: the source node
     :type u: tuple
     :param v: the target node
-    :type u: tuple
+    :type v: tuple
     """
     raise NotImplementedError

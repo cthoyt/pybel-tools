@@ -20,11 +20,12 @@ def make_namespace_header(name, keyword, domain, query_url=None, description=Non
 
     :param name: The namespace name
     :param keyword: Preferred BEL Keyword, maximum length of 8
-    :param domain: One of: “BiologicalProcess”, “Chemical”, “Gene and Gene Products”, “Other”
+    :param domain: One of: :code:`BiologicalProcess`, :code:`Chemical`, :code:`Gene and Gene Products`,
+                   or :code:`Other`
     :param query_url: HTTP URL to query for details on namespace values (must be valid URL)
     :param description: Namespace description
     :param species: Comma-separated list of species taxonomy id's
-    :param version: Namespace version. Defaults to '1.0.0'
+    :param version: Namespace version. Defaults to :code:`1.0.0`
     :param created: Namespace public timestamp, ISO 8601 datetime
     :type created: str
     """
@@ -57,7 +58,7 @@ def make_author_header(name=None, contact=None, copyright_str=None):
 
     :param name: Namespace's authors
     :param contact: Namespace author's contact info/email address
-    :param copyright_str: Namespace's copyright/license information
+    :param copyright_str: Namespace's copyright/license information. Defaults to :code:`Other/Proprietary`
     :return:
     """
     lines = [
@@ -113,7 +114,7 @@ def make_properties_header():
     ]
 
 
-def build_namespace(namespace_name, namespace_keyword, namespace_domain, author_name, citation_name, values,
+def write_namespace(namespace_name, namespace_keyword, namespace_domain, author_name, citation_name, values,
                     namespace_description=None, namespace_species=None, namespace_version=None,
                     namespace_query_url=None, namespace_created=None, author_contact=None, author_copyright=None,
                     citation_description=None, citation_url=None, citation_version=None, citation_date=None,
@@ -124,11 +125,12 @@ def build_namespace(namespace_name, namespace_keyword, namespace_domain, author_
     :type namespace_name: str
     :param namespace_keyword: Preferred BEL Keyword, maximum length of 8
     :type namespace_keyword: str
-    :param namespace_domain: One of: “BiologicalProcess”, “Chemical”, “Gene and Gene Products”, “Other”
+    :param namespace_domain: One of: :code:`BiologicalProcess`, :code:`Chemical`, :code:`Gene and Gene Products`,
+                             or :code:`Other`
     :type namespace_domain: str
-    :param author_name: Namespace's authors
+    :param author_name: The namespace's authors
     :type author_name: str
-    :param citation_name: Citation name
+    :param citation_name: The name of the citation
     :type citation_name: str
     :param values: A dictionary of {values: encodings}
     :type values: dict
@@ -191,24 +193,25 @@ def build_namespace(namespace_name, namespace_keyword, namespace_domain, author_
         print('{}{}|{}'.format(value_prefix, value.strip(), function_values), file=file)
 
 
-def build_namespace_from_owl(url, output=None):
+def write_namespace_from_owl(url, file=None):
     """
 
     :param url: Path to OWL file or filelike object
-    :param output: output stream. Defaults to sys.stdout
-    :return:
+    :type url: str
+    :param file: output stream. Defaults to :code:`sys.stdout` if None
+    :type file: file or file-like
     """
 
     owl = parse_owl(url)
 
-    build_namespace(owl['title'],
+    write_namespace(owl['title'],
                     owl['subject'],
                     owl['description'],
                     owl['creator'],
                     owl['email'],
                     url,
                     owl.graph.nodes(),
-                    file=output)
+                    file=file)
 
 
 def make_annotation_header(keyword, description=None, usage=None, version=None, created=None):
@@ -224,6 +227,8 @@ def make_annotation_header(keyword, description=None, usage=None, version=None, 
     :type version: str
     :param created: Namespace public timestamp, ISO 8601 datetime
     :type created: str
+    :return: A list of lines for the annotation definition section
+    :rtype: list of str
     """
 
     lines = [
@@ -243,7 +248,7 @@ def make_annotation_header(keyword, description=None, usage=None, version=None, 
     return lines
 
 
-def build_annotation(keyword, values, citation_name, description=None, usage=None, version=None, created=None,
+def write_annotation(keyword, values, citation_name, description=None, usage=None, version=None, created=None,
                      author_name=None, author_copyright=None, author_contact=None, file=None, value_prefix=''):
     """Writes a BEL annotation (BELANNO) to a file
 

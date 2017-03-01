@@ -84,7 +84,7 @@ def merge(output_path, *input_paths, merge_document_name=None, merge_document_co
 
 def make_document_metadata(document_name, contact, description, version='1.0.0', copyright=None, authors=None,
                            licenses=None):
-    """Builds a document metadata section for a BEL document
+    """Builds a list of lines for the document metadata section of a BEL document
 
     :param document_name: The unique name for this BEL document
     :param contact: The email address of the maintainer
@@ -100,7 +100,8 @@ def make_document_metadata(document_name, contact, description, version='1.0.0',
     :type copyright: str
     :type authors: str
     :type licenses: str
-    :return:
+    :return: A list of lines for the document metadata section
+    :rtype: list of str
     """
     lines = []
 
@@ -124,10 +125,12 @@ def make_document_metadata(document_name, contact, description, version='1.0.0',
 
 
 def make_document_namespaces(namespace_dict=None):
-    """
+    """Builds a list of lines for the namespace definitions
+
     :param namespace_dict: dictionary of {str name: str URL} of namespaces
     :type namespace_dict: dict
-    :return:
+    :return: List of lines for the namespace definitions
+    :rtype: list of str
     """
 
     namespace_dict = default_namespaces if namespace_dict is None else namespace_dict
@@ -136,10 +139,12 @@ def make_document_namespaces(namespace_dict=None):
 
 
 def make_document_annotations(annotation_dict=None):
-    """
-    :param annotation_dict: dictionary of {str name: str URL} of annotations
+    """Builds a list of lines for the annotation definitions
+
+    :param annotation_dict: A dictionary of {str name: str URL} of annotations
     :type annotation_dict: dict
-    :return:
+    :return: A list of lines for the annotation definitions
+    :rtype: list of str
     """
 
     annotation_dict = default_annotations if annotation_dict is None else annotation_dict
@@ -166,31 +171,33 @@ def make_document_statement_group(pmids):
     return lines
 
 
-def make_boilerplate(document_name, contact, description, version=None, copyright=None, authors=None,
-                     licenses=None, namespace_dict=None, annotations_dict=None, pmids=None, file=None):
-    """
+def write_boilerplate(document_name, contact, description, version=None, copyright=None, authors=None,
+                      licenses=None, namespace_dict=None, annotations_dict=None, pmids=None, file=None):
+    """Writes a boilerplate BEL document, with standard document metadata, definitions. Optionally, if a
+    list of PubMed identifiers are given, the citations and abstracts will be written for each.
+
+
     :param document_name: The unique name for this BEL document
-    :param contact: The email address of the maintainer
-    :param description: A description of the contents of this document
-    :param version: The version. Defaults to 1.0.0
-    :param copyright: Copyright information about this document
-    :param authors: The authors of this document
-    :param licenses: The license applied to this document
-    :param file: output stream. If None, defaults to :code:`sys.stdout`
     :type document_name: str
+    :param contact: The email address of the maintainer
     :type contact: str
+    :param description: A description of the contents of this document
     :type description: str
+    :param version: The version. Defaults to :code:`1.0.0`
     :type version: str
+    :param copyright: Copyright information about this document
     :type copyright: str
+    :param authors: The authors of this document
     :type authors: str
+    :param licenses: The license applied to this document
     :type licenses: str
+    :param file: output stream. If None, defaults to :code:`sys.stdout`
     :param namespace_dict: an optional dictionary of {str name: str URL} of namespaces
     :type namespace_dict: dict
     :param annotations_dict: an optional dictionary of {str name: str URL} of annotations
     :type annotations_dict: dict
     :param pmids: an optional list of PMID's to autopopulate with citation and abstract
     :type pmids: iterable
-    :return:
     """
 
     file = sys.stdout if file is None else file

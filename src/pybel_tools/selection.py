@@ -4,6 +4,7 @@ This module contains functions to help select data from networks
 
 """
 from collections import defaultdict
+from itertools import combinations
 
 from pybel import BELGraph
 from pybel.constants import ANNOTATIONS
@@ -70,3 +71,18 @@ def filter_edge_properties(edges, annotations_filter=None, relation=None):
 # TODO implement
 def filter_node_properties(edges, function_keep=None, namespace_keep=None, function_delete=None, namespace_delete=None):
     raise NotImplementedError
+
+
+def get_triangles(graph, node):
+    """Yields all triangles pointed by the given node
+
+    :param graph: A BEL Graph
+    :type graph: BELGraph
+    :param node: The source node
+    :type node: tuple
+    """
+    for a, b in combinations(graph.edge[node], 2):
+        if graph.edge[a][b]:
+            yield a, b
+        if graph.edge[b][a]:
+            yield b, a
