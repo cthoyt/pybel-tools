@@ -161,10 +161,10 @@ def infer_central_dogma(graph):
     infer_central_dogmatic_transcriptions(graph)
 
 
-# TODO implement
-def convert_dogma(graph):
-    """Converts all genes and rna to proteins (should only be done after appropriately collapsing)"""
-    raise NotImplementedError
+def opening_by_central_dogma(graph):
+    """Performs origin completion then collapsing to protein"""
+    infer_central_dogma(graph)
+    collapse_by_central_dogma(graph)
 
 
 def prune_by_namespace(graph, function, namespace):
