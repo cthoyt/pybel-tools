@@ -1,8 +1,8 @@
-from pygments.lexer import RegexLexer, words, bygroups
+from pygments.lexer import RegexLexer, words
 from pygments.token import Name, Comment, Text, String, Keyword, Operator, Punctuation
-import re
 
 __all__ = ['BELLexer']
+
 
 class BELLexer(RegexLexer):
     """
@@ -17,7 +17,7 @@ class BELLexer(RegexLexer):
     aliases = ['bel']
     filenames = ['*.bel']
 
-    #flags = re.DOTALL
+    # flags = re.DOTALL
 
     _keywords_values = (
         'a', 'abundance', 'act', 'analogous', 'association', 'biologicalProcess', 'biomarkerFor', 'bp', 'cat',
@@ -29,18 +29,19 @@ class BELLexer(RegexLexer):
         'pep', 'peptidaseActivity', 'phos', 'phosphataseActivity', 'pmod', 'positiveCorrelation', 'products',
         'prognosticBiomarkerFor', 'proteinAbundance', 'proteinModification', 'r', 'rateLimitingStepOf',
         'reactants', 'reaction', 'ribo', 'ribosylationActivity', 'rnaAbundance', 'rxn', 'sec', 'sub', 'subProcessOf',
-        'substitution', 'surf', 'tloc', 'tprot', 'transcriedTo','transcriptionalActivity',
-        'translatedTo', 'translocation', 'transportActivity', 'trunc', 'truncation', 'tscript','variant','var','fragment','frag'
-        'location','loc','molecularActivity','ma','regulates','activity','cnc','neg','pos'
+        'substitution', 'surf', 'tloc', 'tprot', 'transcriedTo', 'transcriptionalActivity',
+        'translatedTo', 'translocation', 'transportActivity', 'trunc', 'truncation', 'tscript', 'variant', 'var',
+        'fragment', 'frag' 'location', 'loc', 'molecularActivity', 'ma', 'regulates', 'activity', 'cnc', 'neg', 'pos'
     )
     tokens = {
         'root': [
-            (words(('SET','AS URL','STATEMENT_GROUP','DOCUMENT','DEFINE','NAMSPACE','UNSET'),suffix=r'\b'),Keyword.Constant),
-            (words(_keywords_values,suffix=r'\b'),Name.Builtin),
+            (words(('SET', 'AS URL', 'STATEMENT_GROUP', 'DOCUMENT', 'DEFINE', 'NAMSPACE', 'UNSET'), suffix=r'\b'),
+             Keyword.Constant),
+            (words(_keywords_values, suffix=r'\b'), Name.Builtin),
             (r'\w+', Name),
-            (r'--',Name.Builtin),
-            (r'->',Name.Builtin),
-            (r'-\|',Name.Builtin),
+            (r'--', Name.Builtin),
+            (r'->', Name.Builtin),
+            (r'-\|', Name.Builtin),
             (r'=>', Name.Builtin),
             (r'=\|', Name.Builtin),
             (r'=', Operator),
@@ -49,7 +50,7 @@ class BELLexer(RegexLexer):
             (r'\s+', Text),
             ('"[\S\s]*?\s*"', String),
             ("'[\S\s]*?'\s*", String),
-            ('[(){},:]',Punctuation),
+            ('[(){},:]', Punctuation),
 
         ],
 

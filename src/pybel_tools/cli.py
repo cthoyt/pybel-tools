@@ -3,8 +3,8 @@ from getpass import getuser
 
 import click
 
-from .boilerplate import make_boilerplate
-from .namespace_utils import build_namespace
+from .definition_utils import build_namespace
+from .document_utils import make_boilerplate
 
 
 @click.group(help="PyBEL-Tools Command Line Utilities on {}".format(sys.executable))
@@ -40,7 +40,7 @@ def buildns(name, keyword, domain, citation, author, description, species, versi
             output, value_prefix):
     build_namespace(name, keyword, domain, author, citation, values, namespace_description=description,
                     namespace_species=species, namespace_version=version, author_contact=contact,
-                    author_copyright=license, functions=functions, output=output, value_prefix=value_prefix)
+                    author_copyright=license, functions=functions, file=output, value_prefix=value_prefix)
 
 
 @main.command()

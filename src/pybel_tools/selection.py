@@ -45,11 +45,11 @@ def get_subgraph_by_annotation(graph, key, value):
     """
     bg = BELGraph()
 
-    for u, v, k, d in graph.edges_iter(keys=True, data=True):
-        if not check_has_annotation(d, key):
+    for u, v, key, attr_dict in graph.edges_iter(keys=True, data=True):
+        if not check_has_annotation(attr_dict, key):
             continue
 
-        if d[ANNOTATIONS][key] == value:
+        if attr_dict[ANNOTATIONS][key] == value:
 
             if u not in bg:
                 bg.add_node(u, graph.node[u])
@@ -57,16 +57,16 @@ def get_subgraph_by_annotation(graph, key, value):
             if v not in bg:
                 bg.add_node(v, graph.node[v])
 
-            bg.add_edge(u, v, key=key, attr_dict=d)
+            bg.add_edge(u, v, key=key, attr_dict=attr_dict)
 
     return bg
 
 
 # TODO implement
 def filter_edge_properties(edges, annotations_filter=None, relation=None):
-    pass
+    raise NotImplementedError
 
 
 # TODO implement
 def filter_node_properties(edges, function_keep=None, namespace_keep=None, function_delete=None, namespace_delete=None):
-    pass
+    raise NotImplementedError

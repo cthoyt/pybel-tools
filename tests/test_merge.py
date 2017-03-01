@@ -2,7 +2,7 @@ import os
 import tempfile
 import unittest
 
-from pybel_tools.boilerplate import make_boilerplate
+from pybel_tools.document_utils import make_boilerplate
 from pybel_tools.merger import merge
 
 

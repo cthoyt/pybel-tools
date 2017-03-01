@@ -116,6 +116,16 @@ def collapse_by_central_dogma(graph):
     collapse_nodes(graph, collapse_dict)
 
 
+# TODO implement
+def infer_central_dogma(graph):
+    """Adds all RNA-Protein and Gene-RNA central dogma edges
+
+    :param graph:
+    :return:
+    """
+    raise NotImplementedError
+
+
 def prune_by_namespace(graph, function, namespace):
     """Prunes all nodes of a given namespace
 
@@ -198,3 +208,4 @@ def add_inferred_two_way_edge(graph, u, v):
     :param u: the source node
     :param v: the target node
     """
+    raise NotImplementedError
