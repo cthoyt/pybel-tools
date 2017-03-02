@@ -33,13 +33,13 @@ def group_subgraphs(graph, annotation):
     return result
 
 
-def get_subgraph_by_annotation(graph, key, value):
+def get_subgraph_by_annotation(graph, annotation, value):
     """Builds a new subgraph induced over all edges whose annotations match the given key and value
 
     :param graph: A BEL Graph
     :type graph: BELGraph
-    :param key: An annotation
-    :type key: str
+    :param annotation: An annotation
+    :type annotation: str
     :param value: The value for the annotation
     :type value: str
     :rtype: BELGraph
@@ -47,10 +47,10 @@ def get_subgraph_by_annotation(graph, key, value):
     bg = BELGraph()
 
     for u, v, key, attr_dict in graph.edges_iter(keys=True, data=True):
-        if not check_has_annotation(attr_dict, key):
+        if not check_has_annotation(attr_dict, annotation):
             continue
 
-        if attr_dict[ANNOTATIONS][key] == value:
+        if attr_dict[ANNOTATIONS][annotation] == value:
 
             if u not in bg:
                 bg.add_node(u, graph.node[u])
