@@ -191,10 +191,10 @@ def calculate_error_by_annotation(graph, annotation):
     results = defaultdict(list)
 
     for line_number, line, e, context in graph.warnings:
-        if not context or annotation not in context:
+        if not context or not check_has_annotation(context, annotation):
             continue
 
-        values = context[annotation]
+        values = context[ANNOTATIONS][annotation]
 
         if isinstance(values, str):
             results[values].append(e.__class__.__name__)
