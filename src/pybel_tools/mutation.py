@@ -104,13 +104,54 @@ def build_central_dogma_collapse_dict(graph):
     return collapse_dict
 
 
+def build_central_dogma_collapse_gene_dict(graph):
+    """Builds a dictionary to direct the collapsing on the central dogma
+
+    :param graph: A BEL Graph
+    :type graph: BELGraph
+    :return:
+    """
+    collapse_dict = defaultdict(set)
+
+    r2g = {}
+    for gene_node, rna_node, d in graph.edges_iter(data=True):
+        if d[RELATION] != TRANSCRIBED_TO:
+            continue
+
+        collapse_dict[gene_node].add(rna_node)
+        r2g[rna_node] = gene_node
+
+    for rna_node, protein_node, d in graph.edges_iter(data=True):
+        if d[RELATION] != TRANSLATED_TO:
+            continue
+
+        if rna_node not in r2g:
+            raise ValueError('Should complete origin before running this function')
+
+        collapse_dict[r2g[rna_node]].add(protein_node)
+
+    return collapse_dict
+
+
 def collapse_by_central_dogma(graph):
-    """Collapses all nodes from the central dogma (GENE, RNA, PROTEIN) to PROTEIN in place
+    """Collapses all nodes from the central dogma (GENE, RNA, PROTEIN) to PROTEIN, or most downstream possible
+     entity, in place
 
     :param graph: A BEL Graph
     :type graph: BELGraph
     """
     collapse_dict = build_central_dogma_collapse_dict(graph)
+    log.info('Collapsing %d groups', len(collapse_dict))
+    collapse_nodes(graph, collapse_dict)
+
+
+def collapse_by_central_dogma_to_gene(graph):
+    """Collapses all nodes from the central dogma (GENE, RNA, PROTEIN) to GENE in place
+
+    :param graph: A BEL Graph
+    :type graph: BELGraph
+    """
+    collapse_dict = build_central_dogma_collapse_gene_dict(graph)
     log.info('Collapsing %d groups', len(collapse_dict))
     collapse_nodes(graph, collapse_dict)
 
@@ -162,9 +203,15 @@ def infer_central_dogma(graph):
 
 
 def opening_by_central_dogma(graph):
-    """Performs origin completion then collapsing to protein"""
+    """Performs origin completion then collapsing to furthest downstream"""
     infer_central_dogma(graph)
     collapse_by_central_dogma(graph)
+
+
+def opening_by_central_dogma_to_gene(graph):
+    """Performs origin completion then collapsing to gene"""
+    infer_central_dogma(graph)
+    collapse_by_central_dogma_to_gene(graph)
 
 
 def prune_by_namespace(graph, function, namespace):
@@ -189,14 +236,17 @@ def prune_by_namespace(graph, function, namespace):
     graph.remove_nodes_from(to_prune)
 
 
-def prune_by_type(graph, function, prune_threshold=1):
+def prune_by_type(graph, function=None, prune_threshold=1):
     """Removes all nodes in graph (in-place) with only a connection to one node. Useful for gene and RNA.
+    Allows for optional filter by function type.
+
 
     :param graph: a BEL network
     :type graph: BELGraph
-    :param function: The node's function from :code:`pybel.constants` like GENE, RNA, PROTEIN, or BIOPROCESS
+    :param function: If set, filters by the node's function from :code:`pybel.constants` like :code:`GENE`, :code:`RNA`,
+                     :code:`PROTEIN`, or :code:`BIOPROCESS`
     :type function: str
-    :param prune_threshold: Removes nodes with less than or equal to this number of connections. Defaults to 1
+    :param prune_threshold: Removes nodes with less than or equal to this number of connections. Defaults to :code:`1`
     :type prune_threshold: int
     :return: The number of nodes pruned
     :rtype: int
@@ -204,7 +254,7 @@ def prune_by_type(graph, function, prune_threshold=1):
     to_prune = []
 
     for gene, data in graph.nodes_iter(data=True):
-        if len(graph.adj[gene]) <= prune_threshold and function == data.get(FUNCTION):
+        if len(graph.adj[gene]) <= prune_threshold and (not function or function == data.get(FUNCTION)):
             to_prune.append(gene)
 
     graph.remove_nodes_from(to_prune)
