@@ -145,7 +145,7 @@ def collapse_by_central_dogma(graph):
     collapse_nodes(graph, collapse_dict)
 
 
-def collapse_by_central_dogma_to_gene(graph):
+def collapse_by_central_dogma_to_genes(graph):
     """Collapses all nodes from the central dogma (GENE, RNA, PROTEIN) to GENE in place
 
     :param graph: A BEL Graph
@@ -154,6 +154,21 @@ def collapse_by_central_dogma_to_gene(graph):
     collapse_dict = build_central_dogma_collapse_gene_dict(graph)
     log.info('Collapsing %d groups', len(collapse_dict))
     collapse_nodes(graph, collapse_dict)
+
+
+def collapse_variants_to_genes(graph):
+    """Finds all protein variants that are pointing to a gene and not a protein and fixes them
+
+    :param graph: A BEL Graph
+    :type graph: BELGraph
+    """
+    for node, data in graph.nodes(data=True):
+        if data[FUNCTION] != PROTEIN:
+            continue
+        if VARIANTS not in data:
+            continue
+        if any(d[RELATION] == TRANSCRIBED_TO for u, v, d in graph.in_edges_iter(keys=True)):
+            graph.node[node][FUNCTION] = GENE
 
 
 def _infer_converter_helper(node, data, new_function):
@@ -208,10 +223,10 @@ def opening_by_central_dogma(graph):
     collapse_by_central_dogma(graph)
 
 
-def opening_by_central_dogma_to_gene(graph):
+def opening_by_central_dogma_to_genes(graph):
     """Performs origin completion then collapsing to gene"""
     infer_central_dogma(graph)
-    collapse_by_central_dogma_to_gene(graph)
+    collapse_by_central_dogma_to_genes(graph)
 
 
 def prune_by_namespace(graph, function, namespace):
