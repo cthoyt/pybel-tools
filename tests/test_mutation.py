@@ -36,7 +36,7 @@ def add_simple(graph, function, namespace, name):
     graph.add_node((function, namespace, name), **{FUNCTION: function, NAMESPACE: namespace, NAME: name})
 
 
-class TestCollapse(unittest.TestCase):
+class TestCollapseDownstream(unittest.TestCase):
     def test_collapse_1(self):
         graph = BELGraph()
 
