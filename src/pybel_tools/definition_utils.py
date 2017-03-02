@@ -118,7 +118,7 @@ def write_namespace(namespace_name, namespace_keyword, namespace_domain, author_
                     namespace_description=None, namespace_species=None, namespace_version=None,
                     namespace_query_url=None, namespace_created=None, author_contact=None, author_copyright=None,
                     citation_description=None, citation_url=None, citation_version=None, citation_date=None,
-                    functions=None, file=None, value_prefix=''):
+                    functions=None, file=None, value_prefix='', sort_key=None):
     """Writes a BEL namespace (BELNS) to a file
 
     :param namespace_name: The namespace name
@@ -162,6 +162,7 @@ def write_namespace(namespace_name, namespace_keyword, namespace_domain, author_
     :type file: file or file-like
     :param value_prefix: a prefix for each name
     :type value_prefix: str
+    :param sort_key: A function to sort the values with :code:`sorted`
     """
     file = sys.stdout if file is None else file
 
@@ -187,7 +188,9 @@ def write_namespace(namespace_name, namespace_keyword, namespace_domain, author_
     function_values = ''.join(sorted(functions if functions is not None else language.belns_encodings.keys()))
 
     print('[Values]', file=file)
-    for value in sorted(values):
+
+    values = sorted(values) if sort_key is None else sorted(values, key=sort_key)
+    for value in values:
         if not value.strip():
             continue
         print('{}{}|{}'.format(value_prefix, value.strip(), function_values), file=file)
