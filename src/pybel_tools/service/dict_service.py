@@ -1,88 +1,50 @@
-"""
-This module contains all of the services necessary through the PyBEL API Definition, backed by a network
-dictionary
-"""
-
 import logging
 
-from pybel import from_bytes
-from pybel.constants import *
-from pybel.manager.graph_cache import GraphCacheManager
-from pybel.manager.models import Network
-from pybel.parser.utils import subdict_matches
+from flask import Flask, request, jsonify
+
+from .dict_service_utils import query_builder, hash_node, get_network_ids, to_node_link, load_networks
 
 log = logging.getLogger(__name__)
 
-#: dictionary of {id : BELGraph}
-networks = {}
+app = Flask(__name__)
 
 
-def load_networks(connection=None):
-    """This function needs to get all networks from the graph cache manager and make a dictionary"""
-    gcm = GraphCacheManager(connection=connection)
+@app.route('/')
+def list_networks():
+    html = ''
 
-    for nid, blob in gcm.session.query(Network.id, Network.blob).all():
-        log.info('loading network %s')
-        graph = from_bytes(blob)
-        networks[nid] = graph
+    for network in get_network_ids():
+        html += '<a href="/network/{}">Network {}</a>'.format(network, network)
 
-
-def get_networks():
-    return list(networks)
+    return '<html><body>{}</body></html>'.format(html)
 
 
-def _validate_network_id(network_id):
-    if network_id not in networks:
-        raise ValueError()
+@app.route('/network/<int:network_id>', methods=['GET'])
+def get_network(network_id):
+    # Convert from list of hashes (as integers) to node tuples
+    expand_nodes = [hash_node[int(h)] for h in request.args.getlist('append')]
+    remove_nodes = [hash_node[int(h)] for h in request.args.getlist('remove')]
+
+    annotations = {k: request.args.getlist(k) for k in request.args if k not in {'append', 'remove'}}
+    # annotations = {k: v[0] if 1 == len(v) else v for k, v in annotations.items()}
+
+    graph = query_builder(network_id, expand_nodes, remove_nodes, **annotations)
+
+    graph_json = to_node_link(graph)
+
+    return jsonify(graph_json)
 
 
-def get_network_by_id(network_id):
-    return networks[network_id]
+@app.route('/nid/')
+def get_node_hashes():
+    return jsonify(hash_node)
 
 
-def get_namespaces_in_network(network_id):
-    return list(get_network_by_id(network_id).namespace_url.values())
+@app.route('/nid/<nid>')
+def get_node_hash(nid):
+    return hash_node[nid]
 
 
-def get_annotations_in_network(network_id):
-    return list(get_network_by_id(network_id).annotations_url.values())
-
-
-def _citation_to_tuple(citation):
-    return tuple([
-        citation.get(CITATION_TYPE),
-        citation.get(CITATION_NAME),
-        citation.get(CITATION_REFERENCE),
-        citation.get(CITATION_DATE),
-        citation.get(CITATION_AUTHORS),
-        citation.get(CITATION_COMMENTS)
-    ])
-
-
-def get_citations_in_network(network_id):
-    g = get_network_by_id(network_id)
-    citations = set(data[CITATION] for _, _, data in g.edges_iter(data=True))
-    return list(sorted(citations, key=_citation_to_tuple))
-
-
-def _node_to_identifier(node, graph):
-    return hash(graph.nodes[node])
-
-
-def _build_edge_json(u, v, d):
-    return {
-        'source': u,
-        'target': v,
-        'data': d
-    }
-
-
-def get_edges_in_network(network_id):
-    g = get_network_by_id(network_id)
-    return list(_build_edge_json(*x) for x in g.edges_iter(data=True))
-
-
-def get_edges_in_network_filtered(network_id, **kwargs):
-    g = get_network_by_id(network_id)
-    return list(
-        _build_edge_json(u, v, d) for u, v, d in g.edges_iter(data=True) if subdict_matches(d[ANNOTATIONS], kwargs))
+@app.route('/reload')
+def reload():
+    load_networks()

@@ -3,6 +3,8 @@ from getpass import getuser
 
 import click
 
+from pybel import from_pickle, to_database
+from pybel.constants import DEFAULT_CACHE_LOCATION
 from .definition_utils import write_namespace
 from .document_utils import write_boilerplate
 
@@ -14,14 +16,41 @@ def main():
 
 
 @main.command()
+@click.argument('path')
+@click.option('--connection', help='Input cache location. Defaults to {}'.format(DEFAULT_CACHE_LOCATION))
+def upload(path, connection):
+    """Sketchy uploader that doesn't respect database edge store"""
+    graph = from_pickle(path)
+    to_database(graph, connection=connection)
+
+
+@main.command()
 @click.option('--host')
 @click.option('--debug', is_flag=True)
 def web(host, debug):
+    """Runs the PyBEL web tools"""
     from .web.app import app
     app.run(debug=debug, host=host)
 
 
 @main.command()
+@click.option('--connection', help='Input cache location. Defaults to {}'.format(DEFAULT_CACHE_LOCATION))
+@click.option('--debug', is_flag=True)
+def service(connection, debug):
+    """Runs the PyBEL API RESTful web service"""
+    from .service.dict_service import app
+    from .service.dict_service_utils import load_networks
+
+    load_networks(connection=connection)
+    app.run(debug=debug)
+
+
+@main.group()
+def definition():
+    """Definition file utilities"""
+
+
+@definition.command()
 @click.argument('name')
 @click.argument('keyword')
 @click.argument('domain')
@@ -32,18 +61,32 @@ def web(host, debug):
 @click.option('--version')
 @click.option('--contact')
 @click.option('--license')
-@click.option('--values', default=sys.stdin)
+@click.option('--values', default=sys.stdin, help="A file containing the list of names")
 @click.option('--functions')
 @click.option('--output', type=click.File('w'), default=sys.stdout)
 @click.option('--value-prefix', default='')
-def buildns(name, keyword, domain, citation, author, description, species, version, contact, license, values, functions,
-            output, value_prefix):
-    write_namespace(name, keyword, domain, author, citation, values, namespace_description=description,
-                    namespace_species=species, namespace_version=version, author_contact=contact,
-                    author_copyright=license, functions=functions, file=output, value_prefix=value_prefix)
+def namespace(name, keyword, domain, citation, author, description, species, version, contact, license, values,
+              functions, output, value_prefix):
+    """Builds a namespace from items"""
+    write_namespace(
+        name, keyword, domain, author, citation, values,
+        namespace_description=description,
+        namespace_species=species,
+        namespace_version=version,
+        author_contact=contact,
+        author_copyright=license,
+        functions=functions,
+        file=output,
+        value_prefix=value_prefix
+    )
 
 
-@main.command()
+@main.group()
+def document():
+    """BEL document utilities"""
+
+
+@document.command()
 @click.argument('document-name')
 @click.argument('contact')
 @click.argument('description')
@@ -54,8 +97,18 @@ def buildns(name, keyword, domain, citation, author, description, species, versi
 @click.option('--licenses')
 @click.option('--output', type=click.File('wb'), default=sys.stdout)
 def boilerplate(document_name, contact, description, pmids, version, copyright, authors, licenses, output):
-    write_boilerplate(document_name, contact, description, version, copyright, authors, licenses, pmids=pmids,
-                      file=output)
+    """Builds a template BEL document with the given PMID's"""
+    write_boilerplate(
+        document_name,
+        contact,
+        description,
+        version,
+        copyright,
+        authors,
+        licenses,
+        pmids=pmids,
+        file=output
+    )
 
 
 if __name__ == '__main__':

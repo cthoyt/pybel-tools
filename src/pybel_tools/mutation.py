@@ -167,7 +167,7 @@ def collapse_variants_to_genes(graph):
             continue
         if VARIANTS not in data:
             continue
-        if any(d[RELATION] == TRANSCRIBED_TO for u, v, d in graph.in_edges_iter(keys=True)):
+        if any(d[RELATION] == TRANSCRIBED_TO for u, v, d in graph.in_edges_iter(data=True)):
             graph.node[node][FUNCTION] = GENE
 
 
@@ -187,7 +187,7 @@ def infer_central_dogmatic_translations(graph):
     :type graph: BELGraph
     """
     for node, data in graph.nodes(data=True):
-        if data[FUNCTION] == PROTEIN and NAME in data and VARIANTS not in data:
+        if data[FUNCTION] == PROTEIN and NAMESPACE in data and VARIANTS not in data:
             new_tup, new_dict = _infer_converter_helper(node, data, RNA)
             graph.add_node(new_tup, attr_dict=new_dict)
             graph.add_edge(new_tup, node, key=unqualified_edge_code[TRANSLATED_TO], **{RELATION: TRANSLATED_TO})
@@ -200,7 +200,7 @@ def infer_central_dogmatic_transcriptions(graph):
     :type graph: BELGraph
     """
     for node, data in graph.nodes(data=True):
-        if data[FUNCTION] == RNA and NAME in data and VARIANTS not in data:
+        if data[FUNCTION] == RNA and NAMESPACE in data and VARIANTS not in data:
             new_tup, new_dict = _infer_converter_helper(node, data, GENE)
             graph.add_node(new_tup, attr_dict=new_dict)
             graph.add_edge(new_tup, node, key=unqualified_edge_code[TRANSCRIBED_TO], **{RELATION: TRANSCRIBED_TO})
