@@ -18,14 +18,14 @@ log = logging.getLogger(__name__)
 
 CNAME = 'cname'
 
-#: dictionary of {id : BELGraph}
+#: dictionary of {int id: BELGraph graph}
 networks = {}
 
-#: dictionary of {node: hash}
-node_hash = {}
+#: dictionary of {tuple node: int id}
+node_id = {}
 
-#: dictionary of {hash: node}
-hash_node = {}
+#: dictionary of {int id: tuple node}
+id_node = {}
 
 
 # Helper functions
@@ -69,28 +69,29 @@ def load_networks(connection=None):
         graph = from_bytes(blob)
         networks[nid] = graph
 
-    update_all_hashes()
+    update_node_indexes()
 
 
 # Graph mutation functions
 
-def update_all_hashes():
+def update_node_indexes():
     for network_id in get_network_ids():
         network = get_network_by_id(network_id)
-        update_hashes(network)
+        update_node_indexes_by_graph(network)
 
 
-def update_hashes(graph):
-    """Updates hashes in the hash dicts based on the given graph
+def update_node_indexes_by_graph(graph):
+    """Updates identifiers for nodes based on addition order
 
     :param graph: A BEL Graph
     :type graph: BELGraph
     """
     for node in graph.nodes_iter():
-        h = hash(node)
+        if node in node_id:
+            continue
 
-        node_hash[node] = h
-        hash_node[h] = node
+        node_id[node] = len(node_id)
+        id_node[node_id[node]] = node
 
 
 def add_canonical_names(graph):
@@ -112,7 +113,7 @@ def add_canonical_names(graph):
 
 def relabel_nodes_to_hashes(graph):
     """Relabels all nodes by their hashes, in place"""
-    nx.relabel.relabel_nodes(graph, node_hash, copy=False)
+    nx.relabel.relabel_nodes(graph, node_id, copy=False)
 
 
 # Graph selection functions
@@ -216,12 +217,15 @@ def query_builder(network_id, expand_nodes=None, remove_nodes=None, **kwargs):
     2. Add nodes
     3. Remove nodes
 
-    :param network_id:
+    :param network_id: The identifier of the network in the database
     :type network_id: int
     :param expand_nodes: Add the neighborhoods around all of these nodes
+    :type expand_nodes: list
     :param remove_nodes: Remove these nodes and all of their in/out edges
+    :type remove_nodes: list
     :param kwargs: Annotation filters (match all with :code:`pybel.utils.subdict_matches`)
-    :return:
+    :type kwargs: dict
+    :return: A BEL Graph
     :rtype: BELGraph
     """
 
