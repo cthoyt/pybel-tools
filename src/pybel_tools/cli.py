@@ -37,11 +37,7 @@ def main():
 @click.option('--skip-check-version', is_flag=True, help='Skip checking the PyBEL version of the gpickle')
 def upload(path, connection, skip_check_version):
     """Sketchy uploader that doesn't respect database edge store"""
-<<<<<<< Updated upstream
     graph = from_pickle(path, check_version=(not skip_check_version))
-=======
-    graph = from_pickle(path, check_version=check_version)
->>>>>>> Stashed changes
     to_database(graph, connection=connection)
 
 
