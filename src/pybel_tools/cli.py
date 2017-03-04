@@ -34,16 +34,15 @@ def main():
 @main.command()
 @click.argument('path')
 @click.option('--connection', help='Input cache location. Defaults to {}'.format(DEFAULT_CACHE_LOCATION))
-@click.option('--check_version', default=True)
-
-def upload(path, connection, check_version):
+@click.option('--skip-check_version', is_flag=True)
+def upload(path, connection, skip_check_version):
     """Sketchy uploader that doesn't respect database edge store"""
-    graph = from_pickle(path)
+    graph = from_pickle(path, check_version=(not skip_check_version))
     to_database(graph, connection=connection)
 
 
 @main.command()
-@click.option('--host')
+@click.option('--host', help='Flask host')
 @click.option('--debug', is_flag=True)
 def web(host, debug):
     """Runs the PyBEL web tools"""
@@ -53,16 +52,16 @@ def web(host, debug):
 
 @main.command()
 @click.option('--connection', help='Input cache location. Defaults to {}'.format(DEFAULT_CACHE_LOCATION))
+@click.option('--host', help='Flask host')
 @click.option('--debug', is_flag=True)
-@click.option('--check_version', default=True)
-
-def service(connection, debug, check_version):
+@click.option('--skip-check-version', is_flag=True)
+def service(connection, host, debug, skip_check_version):
     """Runs the PyBEL API RESTful web service"""
     from .service.dict_service import app
     from .service.dict_service_utils import load_networks
 
-    load_networks(connection=connection, check_version=check_version)
-    app.run(debug=debug)
+    load_networks(connection=connection, check_version=(not skip_check_version))
+    app.run(debug=debug, host=host)
 
 
 @main.group()

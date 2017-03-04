@@ -60,7 +60,7 @@ def _node_to_identifier(node, graph):
 
 # Graph loading functions
 
-def load_networks(connection=None, check_version=None):
+def load_networks(connection=None, check_version=True):
     """This function needs to get all networks from the graph cache manager and make a dictionary"""
     gcm = GraphCacheManager(connection=connection)
 
@@ -258,6 +258,7 @@ def query_builder(network_id, expand_nodes=None, remove_nodes=None, **kwargs):
     relabel_nodes_to_hashes(result_graph)
 
     return result_graph
+
 
 # TODO create another view for rendering the filters only
 # TODO form with all filters and when submit only the ones selected pass to the view
