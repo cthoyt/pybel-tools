@@ -60,13 +60,13 @@ def _node_to_identifier(node, graph):
 
 # Graph loading functions
 
-def load_networks(connection=None):
+def load_networks(connection=None, check_version=None):
     """This function needs to get all networks from the graph cache manager and make a dictionary"""
     gcm = GraphCacheManager(connection=connection)
 
     for nid, blob in gcm.session.query(Network.id, Network.blob).all():
         log.info('loading network %s')
-        graph = from_bytes(blob)
+        graph = from_bytes(blob, check_version=check_version)
         networks[nid] = graph
 
     update_all_hashes()
@@ -106,6 +106,8 @@ def add_canonical_names(graph):
             graph.node[node][CNAME] = decanonicalize_node(graph, node)
         elif data[FUNCTION] in {REACTION, COMPOSITE, COMPLEX}:
             graph.node[node][CNAME] = decanonicalize_node(graph, node)
+        elif CNAME in graph.node[node]:
+            log.debug('cname already in dictionary')
         else:
             raise ValueError('Unexpected dict: {}'.format(data))
 
@@ -253,7 +255,8 @@ def query_builder(network_id, expand_nodes=None, remove_nodes=None, **kwargs):
 
     return result_graph
 
-
+# TODO create another view for rendering the filters only
+# TODO form with all filters and when submit only the ones selected pass to the view
 # TODO @ddomingof change this function to build appropriate JSON dictionary
 def to_node_link(graph):
     json_graph = to_json_dict(graph)

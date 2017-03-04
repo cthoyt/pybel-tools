@@ -36,12 +36,14 @@ def web(host, debug):
 @main.command()
 @click.option('--connection', help='Input cache location. Defaults to {}'.format(DEFAULT_CACHE_LOCATION))
 @click.option('--debug', is_flag=True)
-def service(connection, debug):
+@click.option('--check_version', default=True)
+
+def service(connection, debug, check_version):
     """Runs the PyBEL API RESTful web service"""
     from .service.dict_service import app
     from .service.dict_service_utils import load_networks
 
-    load_networks(connection=connection)
+    load_networks(connection=connection, check_version=check_version)
     app.run(debug=debug)
 
 
