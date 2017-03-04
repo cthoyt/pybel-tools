@@ -13,7 +13,7 @@ from pybel.constants import *
 from pybel.io import to_json_dict
 from pybel.manager.graph_cache import GraphCacheManager
 from pybel.manager.models import Network
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 
 log = logging.getLogger(__name__)
 
@@ -260,16 +260,22 @@ def query_builder(network_id, expand_nodes=None, remove_nodes=None, **kwargs):
 
     return result_graph
 
-<<<<<<< Updated upstream
 
-# TODO create another view for rendering the filters only
-# TODO form with all filters and when submit only the ones selected pass to the view
-# TODO @ddomingof change this function to build appropriate JSON dictionary
-=======
-# TODO @ddomingof create another view for rendering the filters only
-# TODO @ddomingof form with all filters and when submit only the ones selected pass to the view
-
->>>>>>> Stashed changes
 def to_node_link(graph):
     json_graph = to_json_dict(graph)
-    return json.dumps(OrderedDict([("nodes", json_graph['nodes']), ("links", json_graph['links'])]) , ensure_ascii=False)
+    return json.dumps(OrderedDict([("nodes", json_graph['nodes']), ("links", json_graph['links'])]), ensure_ascii=False)
+
+
+# Graph set all filters
+
+# TODO @ddomingof create view for rendering the filters only in multiple dropdowns wrapped in a form
+
+def graph_dict_filter(graph):
+    """ Creates a dictionary with annotation type as keys and set of annotations as values"""
+
+    graph_dict = defaultdict(set)
+    for _, _, data in graph.edges_iter(data=True):
+        for key, value in data['annotations'].items():
+            graph_dict[key].add(value)
+
+    return graph_dict
