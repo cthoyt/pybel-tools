@@ -4,7 +4,7 @@ dictionary
 """
 
 import logging
-
+import json
 import networkx as nx
 
 from pybel import from_bytes, BELGraph
@@ -13,6 +13,7 @@ from pybel.constants import *
 from pybel.io import to_json_dict
 from pybel.manager.graph_cache import GraphCacheManager
 from pybel.manager.models import Network
+from collections import OrderedDict
 
 log = logging.getLogger(__name__)
 
@@ -259,10 +260,16 @@ def query_builder(network_id, expand_nodes=None, remove_nodes=None, **kwargs):
 
     return result_graph
 
+<<<<<<< Updated upstream
 
 # TODO create another view for rendering the filters only
 # TODO form with all filters and when submit only the ones selected pass to the view
 # TODO @ddomingof change this function to build appropriate JSON dictionary
+=======
+# TODO @ddomingof create another view for rendering the filters only
+# TODO @ddomingof form with all filters and when submit only the ones selected pass to the view
+
+>>>>>>> Stashed changes
 def to_node_link(graph):
     json_graph = to_json_dict(graph)
-    return json_graph
+    return json.dumps(OrderedDict([("nodes", json_graph['nodes']), ("links", json_graph['links'])]) , ensure_ascii=False)
