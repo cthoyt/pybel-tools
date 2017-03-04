@@ -5,6 +5,7 @@ from pybel.constants import *
 from pybel.constants import unqualified_edge_code
 from pybel_tools.mutation import collapse_by_central_dogma, collapse_nodes
 from pybel_tools.mutation import infer_central_dogmatic_transcriptions, infer_central_dogmatic_translations
+from tests.constants import add_simple
 
 HGNC = 'HGNC'
 
@@ -19,21 +20,6 @@ p2 = PROTEIN, HGNC, '2'
 g3 = GENE, HGNC, '3'
 r3 = RNA, HGNC, '3'
 p3 = PROTEIN, HGNC, '3'
-
-
-def add_simple(graph, function, namespace, name):
-    """Adds a simple node to the graph that just has a function, namespace, and name
-
-    :param graph: A BEL Graph
-    :type graph: BELGraph
-    :param function: The function of the node from :code:`pybel.constants` (GENE, RNA, PROTEIN, etc)
-    :type function: str
-    :param namespace: The namespace for this node
-    :type namespace: str
-    :param name: The name for this node
-    :type name: str
-    """
-    graph.add_node((function, namespace, name), **{FUNCTION: function, NAMESPACE: namespace, NAME: name})
 
 
 class TestCollapseDownstream(unittest.TestCase):

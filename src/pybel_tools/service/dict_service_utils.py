@@ -3,17 +3,19 @@ This module contains all of the services necessary through the PyBEL API Definit
 dictionary
 """
 
-import logging
 import json
+import logging
+from collections import OrderedDict, defaultdict
+
 import networkx as nx
 
 from pybel import from_bytes, BELGraph
-from pybel.canonicalize import decanonicalize_node
 from pybel.constants import *
 from pybel.io import to_json_dict
 from pybel.manager.graph_cache import GraphCacheManager
 from pybel.manager.models import Network
-from collections import OrderedDict, defaultdict
+from ..mutation import add_canonical_names
+from ..selection import filter_graph
 
 log = logging.getLogger(__name__)
 
@@ -95,27 +97,12 @@ def update_node_indexes_by_graph(graph):
         id_node[node_id[node]] = node
 
 
-def add_canonical_names(graph):
-    """Keeps cute names for identifiers and uses BEL names for others"""
-    for node, data in graph.nodes_iter(data=True):
-        if data[FUNCTION] == COMPLEX and NAMESPACE in data:
-            graph.node[node][CNAME] = graph.node[node][NAME]
-        elif set(data) == {FUNCTION, NAMESPACE, NAME}:
-            graph.node[node][CNAME] = graph.node[node][NAME]
-        elif VARIANTS in data:
-            graph.node[node][CNAME] = decanonicalize_node(graph, node)
-        elif FUSION in data:
-            graph.node[node][CNAME] = decanonicalize_node(graph, node)
-        elif data[FUNCTION] in {REACTION, COMPOSITE, COMPLEX}:
-            graph.node[node][CNAME] = decanonicalize_node(graph, node)
-        elif CNAME in graph.node[node]:
-            log.debug('cname already in dictionary')
-        else:
-            raise ValueError('Unexpected dict: {}'.format(data))
-
-
 def relabel_nodes_to_hashes(graph):
-    """Relabels all nodes by their hashes, in place"""
+    """Relabels all nodes by their hashes, in place
+
+    :param graph: A BEL Graph
+    :type graph: BELGraph
+    """
     nx.relabel.relabel_nodes(graph, node_id, copy=False)
 
 
@@ -164,55 +151,6 @@ def get_edges_in_network_filtered(network_id, **kwargs):
     return list(_build_edge_json(u, v, d) for u, v, d in g.edges_iter(data=True, **kwargs))
 
 
-def expand_graph_around_node(graph, query_graph, node):
-    """Expands around the neighborhoods of the given nodes in the result graph by looking at the original_graph,
-    in place.
-
-    :param graph: The graph to add stuff to
-    :type graph: BELGraph
-    :param query_graph: The graph containing the stuff to add
-    :type query_graph: BELGraph
-    :param node: A node tuples from the query graph
-    :type node: tuple
-    """
-    if node not in query_graph:
-        raise ValueError('{} not in graph {}'.format(node, graph.name))
-
-    if node not in graph:
-        graph.add_node(node, attr_dict=query_graph.node[node])
-
-    skip_predecessors = set()
-    for predecessor in query_graph.predecessors_iter(node):
-        if predecessor in graph:
-            skip_predecessors.add(predecessor)
-            continue
-        graph.add_node(predecessor, attr_dict=query_graph.node[node])
-
-    for predecessor, _, k, d in query_graph.in_edges_iter(node, data=True, keys=True):
-        if predecessor in skip_predecessors:
-            continue
-
-        if k < 0:
-            graph.add_edge(predecessor, node, key=k, attr_dict=d)
-        else:
-            graph.add_edge(predecessor, node, attr_dict=d)
-
-    skip_successors = set()
-    for successor in query_graph.successors_iter(node):
-        if successor in graph:
-            continue
-        graph.add_node(successor, attr_dict=query_graph.node[node])
-
-    for _, successor, k, d in query_graph.out_edges_iter(node, data=True, keys=True):
-        if successor in skip_successors:
-            continue
-
-        if k < 0:
-            graph.add_edge(node, successor, key=k, attr_dict=d)
-        else:
-            graph.add_edge(node, successor, attr_dict=d)
-
-
 def query_builder(network_id, expand_nodes=None, remove_nodes=None, **kwargs):
     """
 
@@ -231,29 +169,8 @@ def query_builder(network_id, expand_nodes=None, remove_nodes=None, **kwargs):
     :return: A BEL Graph
     :rtype: BELGraph
     """
-
-    expand_nodes = [] if expand_nodes is None else expand_nodes
-    remove_nodes = [] if remove_nodes is None else remove_nodes
-
     original_graph = get_network_by_id(network_id)
-
-    result_graph = BELGraph()
-
-    for u, v, k, d in original_graph.edges_iter(keys=True, data=True, **{ANNOTATIONS: kwargs}):
-        result_graph.add_edge(u, v, key=k, attr_dict=d)
-
-    for node in result_graph.nodes_iter():
-        result_graph.node[node] = original_graph.node[node]
-
-    for node in expand_nodes:
-        expand_graph_around_node(result_graph, original_graph, node)
-
-    for node in remove_nodes:
-        if node not in result_graph:
-            log.warning('%s is not in graph %s', node, network_id)
-            continue
-
-        result_graph.remove_node(node)
+    result_graph = filter_graph(original_graph, expand_nodes=expand_nodes, remove_nodes=remove_nodes, **kwargs)
 
     add_canonical_names(result_graph)
     relabel_nodes_to_hashes(result_graph)
@@ -262,6 +179,15 @@ def query_builder(network_id, expand_nodes=None, remove_nodes=None, **kwargs):
 
 
 def to_node_link(graph):
+    """Converts the graph to a JSON object that is appropriate for the PyBEL API. This is not necessarily the same
+    as :code:`pybel.io.to_json_dict` because that function makes a standard node-link structure, and this function
+    auguments/improves on the standard structure.
+
+    :param graph: A BEL Graph
+    :type graph: BELGraph
+    :return: The JSON object representing this dictionary
+    :rtype: dict
+    """
     json_graph = to_json_dict(graph)
     return json.dumps(OrderedDict([("nodes", json_graph['nodes']), ("links", json_graph['links'])]), ensure_ascii=False)
 
@@ -269,7 +195,7 @@ def to_node_link(graph):
 # Graph set all filters
 
 # TODO @ddomingof create view for rendering the filters only in multiple dropdowns wrapped in a form
-
+# @ddomingof see pybel_utils.summary.get_unique_annotations
 def graph_dict_filter(graph):
     """ Creates a dictionary with annotation type as keys and set of annotations as values"""
 

@@ -8,8 +8,11 @@ import logging
 from collections import defaultdict
 
 from pybel import BELGraph
+from pybel.canonicalize import decanonicalize_node
 from pybel.constants import *
-from pybel.constants import unqualified_edges, unqualified_edge_code
+from pybel.constants import unqualified_edges, unqualified_edge_code, FUNCTION, COMPLEX, NAMESPACE, NAME, VARIANTS, \
+    FUSION, REACTION, COMPOSITE
+from pybel_tools.service.dict_service_utils import CNAME, log
 from .constants import INFERRED_INVERSE
 
 log = logging.getLogger(__name__)
@@ -319,3 +322,26 @@ def add_inferred_two_way_edge(graph, u, v):
     :type v: tuple
     """
     raise NotImplementedError
+
+
+def add_canonical_names(graph):
+    """Keeps cute names for identifiers and uses BEL names for others
+
+    :param graph: A BEL Graph
+    :type graph: BELGraph
+    """
+    for node, data in graph.nodes_iter(data=True):
+        if CNAME in graph.node[node]:
+            log.debug('cname already in dictionary')
+        elif data[FUNCTION] == COMPLEX and NAMESPACE in data:
+            graph.node[node][CNAME] = graph.node[node][NAME]
+        elif set(data) == {FUNCTION, NAMESPACE, NAME}:
+            graph.node[node][CNAME] = graph.node[node][NAME]
+        elif VARIANTS in data:
+            graph.node[node][CNAME] = decanonicalize_node(graph, node)
+        elif FUSION in data:
+            graph.node[node][CNAME] = decanonicalize_node(graph, node)
+        elif data[FUNCTION] in {REACTION, COMPOSITE, COMPLEX}:
+            graph.node[node][CNAME] = decanonicalize_node(graph, node)
+        else:
+            raise ValueError('Unexpected dict: {}'.format(data))

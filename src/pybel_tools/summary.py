@@ -87,34 +87,51 @@ def count_annotations(graph):
     return Counter(key for _, _, d in graph.edges_iter(data=True) if ANNOTATIONS in d for key in d[ANNOTATIONS])
 
 
-def count_annotation_instances(graph, key):
+def count_annotation_instances(graph, annotation):
     """Counts in how many edges each annotation appears in a graph
 
     :param graph: A BEL graph
     :type graph: BELGraph
-    :param key: An annotation to count
-    :type key: str
+    :param annotation: An annotation to count
+    :type annotation: str
     :rtype: Counter
     """
-    return Counter(d[ANNOTATIONS][key] for _, _, d in graph.edges_iter(data=True) if check_has_annotation(d, key))
+    return Counter(d[ANNOTATIONS][annotation] for _, _, d in graph.edges_iter(data=True) if check_has_annotation(d, annotation))
 
 
-def count_annotation_instances_filtered(graph, key, source_filter=None, target_filter=None):
+def count_annotation_instances_filtered(graph, annotation, source_filter=None, target_filter=None):
     """Counts in how many edges each annotation appears in a graph, but filter out source nodes and target nodes
 
     Default filters get rid of PATHOLOGY nodes. These functions take graph, node as arguments.
 
     :param graph: A BEL graph
     :type graph: BELGraph
-    :param key: An annotation to count
-    :type key: str
+    :param annotation: An annotation to count
+    :type annotation: str
     :rtype: Counter
     """
     source_filter = keep_node if source_filter is None else source_filter
     target_filter = keep_node if target_filter is None else target_filter
 
-    return Counter(d[ANNOTATIONS][key] for u, v, d in graph.edges_iter(data=True) if
-                   check_has_annotation(d, key) and source_filter(graph, u) and target_filter(graph, v))
+    return Counter(d[ANNOTATIONS][annotation] for u, v, d in graph.edges_iter(data=True) if
+                   check_has_annotation(d, annotation) and source_filter(graph, u) and target_filter(graph, v))
+
+
+def get_unique_annotations(graph):
+    """Gets the annotations used in a BEL Graph
+
+    :param graph: A BEL Graph
+    :type graph: BELGraph
+    :return: Dictionary of {annotation: set of values}
+    :rtype: dict
+    """
+    result = defaultdict(set)
+
+    for _, _, data in graph.edges_iter(data=True):
+        for key, value in data[ANNOTATIONS].items():
+            result[key].add(value)
+
+    return result
 
 
 # ERROR HISTOGRAMS
