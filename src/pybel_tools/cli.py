@@ -34,7 +34,9 @@ def main():
 @main.command()
 @click.argument('path')
 @click.option('--connection', help='Input cache location. Defaults to {}'.format(DEFAULT_CACHE_LOCATION))
-def upload(path, connection):
+@click.option('--check_version', default=True)
+
+def upload(path, connection, check_version):
     """Sketchy uploader that doesn't respect database edge store"""
     graph = from_pickle(path)
     to_database(graph, connection=connection)
