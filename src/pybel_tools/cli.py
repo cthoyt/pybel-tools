@@ -34,7 +34,7 @@ def main():
 @main.command()
 @click.argument('path')
 @click.option('--connection', help='Input cache location. Defaults to {}'.format(DEFAULT_CACHE_LOCATION))
-@click.option('--skip-check_version', is_flag=True)
+@click.option('--skip-check-version', is_flag=True, help='Skip checking the PyBEL version of the gpickle')
 def upload(path, connection, skip_check_version):
     """Sketchy uploader that doesn't respect database edge store"""
     graph = from_pickle(path, check_version=(not skip_check_version))
@@ -54,7 +54,7 @@ def web(host, debug):
 @click.option('--connection', help='Input cache location. Defaults to {}'.format(DEFAULT_CACHE_LOCATION))
 @click.option('--host', help='Flask host')
 @click.option('--debug', is_flag=True)
-@click.option('--skip-check-version', is_flag=True)
+@click.option('--skip-check-version', is_flag=True, help='Skip checking the PyBEL version of the gpickle')
 def service(connection, host, debug, skip_check_version):
     """Runs the PyBEL API RESTful web service"""
     from .service.dict_service import app
