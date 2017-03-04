@@ -1,8 +1,13 @@
+"""
+
+This module runs the
+
+"""
 import logging
 
 from flask import Flask, request, jsonify
 
-from .dict_service_utils import query_builder, hash_node, get_network_ids, to_node_link, load_networks
+from .dict_service_utils import query_builder, id_node, get_network_ids, to_node_link, load_networks
 
 log = logging.getLogger(__name__)
 
@@ -22,11 +27,9 @@ def list_networks():
 @app.route('/network/<int:network_id>', methods=['GET'])
 def get_network(network_id):
     # Convert from list of hashes (as integers) to node tuples
-    expand_nodes = [hash_node[int(h)] for h in request.args.getlist('append')]
-    remove_nodes = [hash_node[int(h)] for h in request.args.getlist('remove')]
-
+    expand_nodes = [id_node[int(h)] for h in request.args.getlist('append')]
+    remove_nodes = [id_node[int(h)] for h in request.args.getlist('remove')]
     annotations = {k: request.args.getlist(k) for k in request.args if k not in {'append', 'remove'}}
-    # annotations = {k: v[0] if 1 == len(v) else v for k, v in annotations.items()}
 
     graph = query_builder(network_id, expand_nodes, remove_nodes, **annotations)
 
@@ -37,12 +40,12 @@ def get_network(network_id):
 
 @app.route('/nid/')
 def get_node_hashes():
-    return jsonify(hash_node)
+    return jsonify(id_node)
 
 
 @app.route('/nid/<nid>')
 def get_node_hash(nid):
-    return hash_node[nid]
+    return id_node[nid]
 
 
 @app.route('/reload')
