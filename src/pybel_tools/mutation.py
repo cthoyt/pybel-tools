@@ -10,10 +10,7 @@ from collections import defaultdict
 from pybel import BELGraph
 from pybel.canonicalize import decanonicalize_node
 from pybel.constants import *
-from pybel.constants import unqualified_edges, unqualified_edge_code, FUNCTION, COMPLEX, NAMESPACE, NAME, VARIANTS, \
-    FUSION, REACTION, COMPOSITE
-from pybel_tools.service.dict_service_utils import CNAME, log
-from .constants import INFERRED_INVERSE
+from .constants import INFERRED_INVERSE, CNAME
 
 log = logging.getLogger(__name__)
 

@@ -91,3 +91,5 @@ title_url_fmt = "http://togows.dbcls.jp/entry/ncbi-pubmed/{}/title"
 so_url_fmt = "http://togows.dbcls.jp/entry/ncbi-pubmed/{}/so"
 citation_format = 'SET Citation = {{"PubMed","{}","{}"}}\n'
 evidence_format = 'SET Evidence = "{}"\n\n\n'
+
+CNAME = 'cname'

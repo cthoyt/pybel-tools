@@ -19,8 +19,6 @@ from ..selection import filter_graph
 
 log = logging.getLogger(__name__)
 
-CNAME = 'cname'
-
 #: dictionary of {int id: BELGraph graph}
 networks = {}
 
