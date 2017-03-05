@@ -216,18 +216,3 @@ def to_node_link(graph):
     """
     json_graph = to_json_dict(graph)
     return json_graph
-
-
-# Graph set all filters
-
-# TODO @ddomingof create view for rendering the filters only in multiple dropdowns wrapped in a form
-# TODO @ddomingof see pybel_utils.summary.get_unique_annotations
-def graph_dict_filter(graph):
-    """ Creates a dictionary with annotation type as keys and set of annotations as values"""
-
-    graph_dict = defaultdict(set)
-    for _, _, data in graph.edges_iter(data=True):
-        for key, value in data['annotations'].items():
-            graph_dict[key].add(value)
-
-    return graph_dict
