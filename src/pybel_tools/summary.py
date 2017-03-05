@@ -12,7 +12,7 @@ import pandas as pd
 from fuzzywuzzy import process, fuzz
 
 from pybel import BELGraph
-from pybel.constants import RELATION, FUNCTION, ANNOTATIONS, NAMESPACE, NAME
+from pybel.constants import RELATION, FUNCTION, ANNOTATIONS, NAMESPACE, NAME, ABUNDANCE
 from pybel.parser.parse_exceptions import MissingNamespaceNameWarning, NakedNameWarning
 from .utils import graph_content_transform, check_has_annotation, keep_node
 
@@ -51,6 +51,67 @@ def get_names(graph, namespace):
     """
 
     return {data[NAME] for _, data in graph.nodes_iter(data=True) if NAMESPACE in data and data[NAMESPACE] == namespace}
+
+
+def get_unique_names(graph):
+    """Get a dictionary of {namespace: set of names} present in the graph
+
+    :param graph:
+    :type graph: BELGraph
+    :return: A dictionary of {namespace: set of names}
+    :rtype: dict
+    """
+    result = defaultdict(set)
+
+    for node, data in graph.nodes_iter(data=True):
+        if NAMESPACE in data:
+            result[data[NAMESPACE]].add(data[NAME])
+
+    return result
+
+
+def get_source_abundances(graph):
+    """Returns a set of all ABUNDANCE nodes that have an in-degree of 0, which likely means that it is an external
+    perterbagen and is not known to have any causal origin from within the biological system.
+
+    These nodes are useful to identify because they generally don't provide any mechanistic insight.
+
+    :param graph: A BEL Graph
+    :type graph: BELGraph
+    :return: A set of source ABUNDANCE nodes
+    :rtype: set
+    """
+    return {n for n, d in graph.nodes_iter(data=True) if d[FUNCTION] == ABUNDANCE and graph.in_degree(n) == 0}
+
+
+def get_central_abundances(graph):
+    """Returns a set of all ABUNDANCE nodes that have both an in-degree > 0 and out-degree > 0. This means
+    that they are an integral part of a pathway, since they are both produced and consumed.
+
+    :param graph: A BEL Graph
+    :type graph: BELGraph
+    :return: A set of central ABUNDANCE nodes
+    :rtype: set
+    """
+    result = set()
+
+    for n, d in graph.nodes_iter(data=True):
+        if d[FUNCTION] == ABUNDANCE and graph.in_degree(n) > 0 and graph.out_degree(n) > 0:
+            result.add(n)
+
+    return result
+
+
+def get_sink_abundances(graph):
+    """Returns a set of all ABUNDANCE nodes that have an out-degree of 0, which likely means that the knowledge
+    assembly is incomplete, or there is a curation error.
+
+    :param graph: A BEL Graph
+    :type graph: BELGraph
+    :return: A set of sink ABUNDANCE nodes
+    :rtype: set
+    """
+    return {n for n, d in graph.nodes_iter(data=True) if d[FUNCTION] == ABUNDANCE and graph.out_degree(n) == 0}
 
 
 # EDGE HISTOGRAMS
@@ -96,7 +157,8 @@ def count_annotation_instances(graph, annotation):
     :type annotation: str
     :rtype: Counter
     """
-    return Counter(d[ANNOTATIONS][annotation] for _, _, d in graph.edges_iter(data=True) if check_has_annotation(d, annotation))
+    return Counter(
+        d[ANNOTATIONS][annotation] for _, _, d in graph.edges_iter(data=True) if check_has_annotation(d, annotation))
 
 
 def count_annotation_instances_filtered(graph, annotation, source_filter=None, target_filter=None):

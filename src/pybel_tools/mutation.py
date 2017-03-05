@@ -16,14 +16,12 @@ log = logging.getLogger(__name__)
 
 
 def left_merge(g, h):
-    """Performs an in-place operation, adding nodes and edges in H that aren't already in G
+    """Adds nodes and edges from H to G, in-place for G
 
     :param g: A BEL Graph
     :type g: BELGraph
     :param h: A BEL Graph
     :type h: BELGraph
-    :return: A merged BEL Graph, taking precedence from the left graph
-    :rtype: BELGraph
     """
 
     for node, data in h.nodes_iter(data=True):
@@ -79,7 +77,8 @@ def build_central_dogma_collapse_dict(graph):
 
     :param graph: A BEL Graph
     :type graph: BELGraph
-    :return:
+    :return: A dictionary of {node: set of nodes}
+    :rtype: dict
     """
     collapse_dict = defaultdict(set)
 
@@ -109,7 +108,8 @@ def build_central_dogma_collapse_gene_dict(graph):
 
     :param graph: A BEL Graph
     :type graph: BELGraph
-    :return:
+    :return: A dictionary of {node: set of nodes}
+    :rtype: dict
     """
     collapse_dict = defaultdict(set)
 
@@ -218,13 +218,21 @@ def infer_central_dogma(graph):
 
 
 def opening_by_central_dogma(graph):
-    """Performs origin completion then collapsing to furthest downstream"""
+    """Performs origin completion then collapsing to furthest downstream, in place
+
+    :param graph: A BEL Graph
+    :type graph: BELGraph
+    """
     infer_central_dogma(graph)
     collapse_by_central_dogma(graph)
 
 
 def opening_by_central_dogma_to_genes(graph):
-    """Performs origin completion then collapsing to gene"""
+    """Performs origin completion then collapsing to gene, in place
+
+    :param graph: A BEL Graph
+    :type graph: BELGraph
+    """
     infer_central_dogma(graph)
     collapse_by_central_dogma_to_genes(graph)
 
@@ -322,17 +330,18 @@ def add_inferred_two_way_edge(graph, u, v):
 
 
 def add_canonical_names(graph):
-    """Keeps cute names for identifiers and uses BEL names for others
+    """Adds a canonical name to each node's data dictionary. If it is a simple node, uses the already given name.
+    Otherwise, uses the BEL string.
 
     :param graph: A BEL Graph
     :type graph: BELGraph
     """
     for node, data in graph.nodes_iter(data=True):
-        if CNAME in graph.node[node]:
-            log.debug('cname already in dictionary')
+        if CNAME in data:
+            log.debug('Canonical name already in dictionary for %s', data[CNAME])
         elif data[FUNCTION] == COMPLEX and NAMESPACE in data:
             graph.node[node][CNAME] = graph.node[node][NAME]
-        elif set(data) == {FUNCTION, NAMESPACE, NAME}:
+        elif VARIANTS not in data and FUSION not in data:  # this is should be a simple node
             graph.node[node][CNAME] = graph.node[node][NAME]
         elif VARIANTS in data:
             graph.node[node][CNAME] = decanonicalize_node(graph, node)
@@ -341,4 +350,4 @@ def add_canonical_names(graph):
         elif data[FUNCTION] in {REACTION, COMPOSITE, COMPLEX}:
             graph.node[node][CNAME] = decanonicalize_node(graph, node)
         else:
-            raise ValueError('Unexpected dict: {}'.format(data))
+            raise ValueError('Unexpected node data: {}'.format(data))

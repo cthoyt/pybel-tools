@@ -61,27 +61,37 @@ def _node_to_identifier(node, graph):
 
 # Graph loading functions
 
+def add_network(network_id, graph):
+    """Adds a network to the module-level cache
+
+    :param network_id: The ID (from the database) to use
+    :type network_id: int
+    :param graph: A BEL Graph
+    :type graph: BELGraph
+    :return:
+    """
+    networks[network_id] = graph
+    update_node_indexes(graph)
+
+
 def load_networks(connection=None, check_version=True):
-    """This function needs to get all networks from the graph cache manager and make a dictionary"""
+    """This function needs to get all networks from the graph cache manager and make a dictionary
+
+    :param connection: The database connection string. Default location described in
+                       :code:`pybel.manager.cache.BaseCacheManager`
+    :type connection: str
+    :param check_version: Should the version of the BELGraphs be checked from the database? Defaults to :code`True`.
+    :type check_version: bool
+    """
     gcm = GraphCacheManager(connection=connection)
 
     for nid, blob in gcm.session.query(Network.id, Network.blob).all():
-        log.info('loading network %s')
+        log.info('loading network %s', nid)
         graph = from_bytes(blob, check_version=check_version)
-        networks[nid] = graph
-
-    update_node_indexes()
+        add_network(nid, graph)
 
 
-# Graph mutation functions
-
-def update_node_indexes():
-    for network_id in get_network_ids():
-        network = get_network_by_id(network_id)
-        update_node_indexes_by_graph(network)
-
-
-def update_node_indexes_by_graph(graph):
+def update_node_indexes(graph):
     """Updates identifiers for nodes based on addition order
 
     :param graph: A BEL Graph
@@ -95,8 +105,11 @@ def update_node_indexes_by_graph(graph):
         id_node[node_id[node]] = node
 
 
-def relabel_nodes_to_hashes(graph):
-    """Relabels all nodes by their hashes, in place
+# Graph mutation functions
+
+def relabel_nodes_to_identifiers(graph):
+    """Relabels all nodes by their identifiers, in place. This function is a thin wrapper around
+    :code:`relabel.relabel_nodes` with the module level variable :code:`node_id` used as the mapping.
 
     :param graph: A BEL Graph
     :type graph: BELGraph
@@ -149,12 +162,15 @@ def get_edges_in_network_filtered(network_id, **kwargs):
     return list(_build_edge_json(u, v, d) for u, v, d in g.edges_iter(data=True, **kwargs))
 
 
-def query_builder(network_id, expand_nodes=None, remove_nodes=None, **kwargs):
-    """
+def query_builder(network_id, expand_nodes=None, remove_nodes=None, **annotations):
+    """Filters a dictionary from the module level cache.
 
-    1. Match by annotations
-    2. Add nodes
-    3. Remove nodes
+    1. Thin wrapper around :code:`pybel_tools.selection.filter_graph`:
+        1. Filter edges by annotations
+        2. Add nodes
+        3. Remove nodes
+    2. Add canonical names
+    3. Relabel nodes to identifiers
 
     :param network_id: The identifier of the network in the database
     :type network_id: int
@@ -162,16 +178,16 @@ def query_builder(network_id, expand_nodes=None, remove_nodes=None, **kwargs):
     :type expand_nodes: list
     :param remove_nodes: Remove these nodes and all of their in/out edges
     :type remove_nodes: list
-    :param kwargs: Annotation filters (match all with :code:`pybel.utils.subdict_matches`)
-    :type kwargs: dict
+    :param annotations: Annotation filters (match all with :code:`pybel.utils.subdict_matches`)
+    :type annotations: dict
     :return: A BEL Graph
     :rtype: BELGraph
     """
     original_graph = get_network_by_id(network_id)
-    result_graph = filter_graph(original_graph, expand_nodes=expand_nodes, remove_nodes=remove_nodes, **kwargs)
+    result_graph = filter_graph(original_graph, expand_nodes=expand_nodes, remove_nodes=remove_nodes, **annotations)
 
     add_canonical_names(result_graph)
-    relabel_nodes_to_hashes(result_graph)
+    relabel_nodes_to_identifiers(result_graph)
 
     return result_graph
 
@@ -193,7 +209,7 @@ def to_node_link(graph):
 # Graph set all filters
 
 # TODO @ddomingof create view for rendering the filters only in multiple dropdowns wrapped in a form
-# @ddomingof see pybel_utils.summary.get_unique_annotations
+# TODO @ddomingof see pybel_utils.summary.get_unique_annotations
 def graph_dict_filter(graph):
     """ Creates a dictionary with annotation type as keys and set of annotations as values"""
 
