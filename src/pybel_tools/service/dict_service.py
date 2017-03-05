@@ -8,8 +8,9 @@ import logging
 
 from flask import Flask, request, jsonify, render_template
 
+from pybel_tools.summary import get_unique_annotations
 from .dict_service_utils import query_builder, nid_node, get_network_ids, to_node_link, load_networks, \
-    get_incident_edges
+    get_incident_edges, get_network_by_id
 
 log = logging.getLogger(__name__)
 
@@ -22,6 +23,16 @@ REMOVE_PARAM = 'remove'
 @app.route('/')
 def list_networks():
     return render_template('network_list.html', nids=get_network_ids())
+
+
+# TODO @ddomingof create html for this for rendering the filters only in multiple dropdowns wrapped in a form
+@app.route('/network/filter/<int:network_id>', methods=['GET'])
+def get_filter(network_id):
+    graph = get_network_by_id(network_id)
+
+    unique_annotation_dict = get_unique_annotations(graph)
+
+    return render_template('base.html', context={'filters': unique_annotation_dict})
 
 
 @app.route('/network/<int:network_id>', methods=['GET'])
