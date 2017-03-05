@@ -52,15 +52,18 @@ def web(host, debug):
 
 @main.command()
 @click.option('--connection', help='Input cache location. Defaults to {}'.format(DEFAULT_CACHE_LOCATION))
-@click.option('--host', help='Flask host')
+@click.option('--host', help='Flask host. Defaults to http://localhost:5000')
 @click.option('--debug', is_flag=True)
 @click.option('--skip-check-version', is_flag=True, help='Skip checking the PyBEL version of the gpickle')
 def service(connection, host, debug, skip_check_version):
     """Runs the PyBEL API RESTful web service"""
     from .service.dict_service import app
-    from .service.dict_service_utils import load_networks
+    from .service import dict_service_utils
 
-    load_networks(connection=connection, check_version=(not skip_check_version))
+    if debug:
+        dict_service_utils.log.setLevel(10)
+
+    dict_service_utils.load_networks(connection=connection, check_version=(not skip_check_version))
     app.run(debug=debug, host=host)
 
 
