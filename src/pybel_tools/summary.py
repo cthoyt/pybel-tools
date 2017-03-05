@@ -11,7 +11,7 @@ from collections import Counter, defaultdict
 import pandas as pd
 from fuzzywuzzy import process, fuzz
 
-from pybel.constants import RELATION, FUNCTION, ANNOTATIONS, NAMESPACE, NAME, ABUNDANCE
+from pybel.constants import *
 from pybel.parser.parse_exceptions import MissingNamespaceNameWarning, NakedNameWarning
 from .utils import check_has_annotation, keep_node
 
@@ -69,6 +69,60 @@ def get_unique_names(graph):
     return result
 
 
+def has_causal_out_edges(graph, node):
+    """Gets if the node has causal out edges
+
+    :param graph: A BEL Graph
+    :type graph: pybel.BELGraph
+    :param node: A node
+    :type node: tuple
+    :return: If the node has causal out edges
+    :rtype: bool
+    """
+    return any(d[RELATION] in CAUSAL_RELATIONS for _, _, d in graph.out_edges_iter(node, data=True))
+
+
+def has_causal_in_edges(graph, node):
+    """Gets if the node has causal in edges
+
+    :param graph: A BEL Graph
+    :type graph: pybel.BELGraph
+    :param node: A node
+    :type node: tuple
+    :return: If the node has causal in edges
+    :rtype: bool
+    """
+    return any(d[RELATION] in CAUSAL_RELATIONS for _, _, d in graph.in_edges_iter(node, data=True))
+
+
+def get_causal_out_edges(graph, node):
+    """Gets the out-edges to the given node that are causal
+
+    :param graph: A BEL Graph
+    :type graph: pybel.BELGraph
+    :param node: A node
+    :type node: tuple
+    :return:
+    :rtype: set
+    """
+
+    return {(u, v) for u, v, d in graph.out_edges_iter(node, data=True) if d[RELATION] in CAUSAL_RELATIONS}
+
+
+def get_causal_in_edges(graph, node):
+    """Gets the in-edges to the given node that are causal
+
+    :param graph: A BEL Graph
+    :type graph: pybel.BELGraph
+    :param node: A node
+    :type node: tuple
+    :return:
+    :rtype: set
+    """
+    return {(u, v) for u, v, d in graph.in_edges_iter(node, data=True) if d[RELATION] in CAUSAL_RELATIONS}
+
+
+# TODO only count over causal edges
 def get_source_abundances(graph):
     """Returns a set of all ABUNDANCE nodes that have an in-degree of 0, which likely means that it is an external
     perterbagen and is not known to have any causal origin from within the biological system.
@@ -80,7 +134,8 @@ def get_source_abundances(graph):
     :return: A set of source ABUNDANCE nodes
     :rtype: set
     """
-    return {n for n, d in graph.nodes_iter(data=True) if d[FUNCTION] == ABUNDANCE and graph.in_degree(n) == 0}
+    return {n for n, d in graph.nodes_iter(data=True) if
+            d[FUNCTION] == ABUNDANCE and not has_causal_in_edges(graph, n) and has_causal_out_edges(graph, n)}
 
 
 def get_central_abundances(graph):
@@ -95,14 +150,14 @@ def get_central_abundances(graph):
     result = set()
 
     for n, d in graph.nodes_iter(data=True):
-        if d[FUNCTION] == ABUNDANCE and graph.in_degree(n) > 0 and graph.out_degree(n) > 0:
+        if d[FUNCTION] == ABUNDANCE and has_causal_in_edges(graph, n) and has_causal_out_edges(graph, n):
             result.add(n)
 
     return result
 
 
 def get_sink_abundances(graph):
-    """Returns a set of all ABUNDANCE nodes that have an out-degree of 0, which likely means that the knowledge
+    """Returns a set of all ABUNDANCE nodes that have an causal out-degree of 0, which likely means that the knowledge
     assembly is incomplete, or there is a curation error.
 
     :param graph: A BEL Graph
@@ -110,7 +165,8 @@ def get_sink_abundances(graph):
     :return: A set of sink ABUNDANCE nodes
     :rtype: set
     """
-    return {n for n, d in graph.nodes_iter(data=True) if d[FUNCTION] == ABUNDANCE and graph.out_degree(n) == 0}
+    return {n for n, d in graph.nodes_iter(data=True) if
+            d[FUNCTION] == ABUNDANCE and not has_causal_out_edges(graph, n) and has_causal_in_edges(graph, n)}
 
 
 # EDGE HISTOGRAMS
@@ -252,7 +308,9 @@ def calculate_suggestions(incorrect_name_dict, namespace_dict):
     """Uses fuzzy string matching to try and find the appropriate names for each of the incorrectly identified names
 
     :param incorrect_name_dict: A dictionary of {namespace: list of wrong names}
-    :param namespace_dict: A dictinary of {namespace: list of allowed names}
+    :type incorrect_name_dict: dict
+    :param namespace_dict: A dictionary of {namespace: list of allowed names}
+    :type namespace_dict: dict
     :return: A dictionary of suggestions for each wrong namespace, name pair
     :rtype: dict
     """
