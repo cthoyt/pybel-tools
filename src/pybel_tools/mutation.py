@@ -339,13 +339,13 @@ def add_canonical_names(graph):
             log.debug('Canonical name already in dictionary for %s', data[CNAME])
         elif data[FUNCTION] == COMPLEX and NAMESPACE in data:
             graph.node[node][CNAME] = graph.node[node][NAME]
-        elif VARIANTS not in data and FUSION not in data:  # this is should be a simple node
-            graph.node[node][CNAME] = graph.node[node][NAME]
         elif VARIANTS in data:
             graph.node[node][CNAME] = decanonicalize_node(graph, node)
         elif FUSION in data:
             graph.node[node][CNAME] = decanonicalize_node(graph, node)
         elif data[FUNCTION] in {REACTION, COMPOSITE, COMPLEX}:
             graph.node[node][CNAME] = decanonicalize_node(graph, node)
+        elif VARIANTS not in data and FUSION not in data:  # this is should be a simple node
+            graph.node[node][CNAME] = graph.node[node][NAME]
         else:
             raise ValueError('Unexpected node data: {}'.format(data))
