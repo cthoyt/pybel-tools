@@ -22,10 +22,10 @@ log = logging.getLogger(__name__)
 networks = {}
 
 #: dictionary of {tuple node: int id}
-node_id = {}
+node_nid = {}
 
 #: dictionary of {int id: tuple node}
-id_node = {}
+nid_node = {}
 
 
 # Helper functions
@@ -46,10 +46,10 @@ def _citation_to_tuple(citation):
     ])
 
 
-def _build_edge_json(u, v, d):
+def _build_edge_json(graph, u, v, d):
     return {
-        'source': u,
-        'target': v,
+        'source': graph.node[u] + {'id': node_nid[u]},
+        'target': graph.node[v] + {'id': node_nid[v]},
         'data': d
     }
 
@@ -99,11 +99,11 @@ def update_node_indexes(graph):
     :type graph: pybel.BELGraph
     """
     for node in graph.nodes_iter():
-        if node in node_id:
+        if node in node_nid:
             continue
 
-        node_id[node] = len(node_id)
-        id_node[node_id[node]] = node
+        node_nid[node] = len(node_nid)
+        nid_node[node_nid[node]] = node
 
 
 # Graph mutation functions
@@ -115,7 +115,7 @@ def relabel_nodes_to_identifiers(graph):
     :param graph: A BEL Graph
     :type graph: pybel.BELGraph
     """
-    mapping = {k: v for k, v in node_id.items() if k in graph}
+    mapping = {k: v for k, v in node_nid.items() if k in graph}
     nx.relabel.relabel_nodes(graph, mapping, copy=False)
 
 
@@ -140,6 +140,10 @@ def get_network_by_id(network_id):
     return networks[network_id]
 
 
+def get_node_by_id(node_id):
+    return nid_node[node_id]
+
+
 def get_namespaces_in_network(network_id):
     return list(get_network_by_id(network_id).namespace_url.values())
 
@@ -159,9 +163,14 @@ def get_edges_in_network(network_id):
     return list(_build_edge_json(*x) for x in g.edges_iter(data=True))
 
 
-def get_edges_in_network_filtered(network_id, **kwargs):
-    g = get_network_by_id(network_id)
-    return list(_build_edge_json(u, v, d) for u, v, d in g.edges_iter(data=True, **kwargs))
+def get_incident_edges(gid, nid):
+    graph = get_network_by_id(gid)
+    node = get_node_by_id(nid)
+
+    successors = list(_build_edge_json(graph, u, v, d) for u, v, d in graph.out_edges_iter(node, data=True))
+    predecessors = list(_build_edge_json(graph, u, v, d) for u, v, d in graph.in_edges_iter(node, data=True))
+
+    return successors + predecessors
 
 
 def query_builder(network_id, expand_nodes=None, remove_nodes=None, **annotations):
