@@ -5,18 +5,23 @@ PyBEL Tools Documentation
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Graph Utilities
+   :name: graphutils
 
    summary
    comparison
    selection
    integration
    mutation
+
+.. toctree::
+   :caption: Other Utilities
+   :name: utilities
+
    definitions
    documentutils
    utilities
    lexer
-
 
 
 Indices and tables
