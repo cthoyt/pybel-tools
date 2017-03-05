@@ -3,9 +3,8 @@ This module contains all of the services necessary through the PyBEL API Definit
 dictionary
 """
 
-import json
 import logging
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 
 import networkx as nx
 
@@ -68,8 +67,10 @@ def add_network(network_id, graph):
     :type network_id: int
     :param graph: A BEL Graph
     :type graph: pybel.BELGraph
-    :return:
     """
+    if network_id in networks:
+        return
+
     networks[network_id] = graph
     update_node_indexes(graph)
 
@@ -86,9 +87,9 @@ def load_networks(connection=None, check_version=True):
     gcm = GraphCacheManager(connection=connection)
 
     for nid, blob in gcm.session.query(Network.id, Network.blob).all():
-        log.info('loading network %s', nid)
         graph = from_bytes(blob, check_version=check_version)
         add_network(nid, graph)
+        log.info('loaded network: [%s] %s v%s', nid, graph.document[METADATA_NAME], graph.document[METADATA_VERSION])
 
 
 def update_node_indexes(graph):
@@ -114,7 +115,8 @@ def relabel_nodes_to_identifiers(graph):
     :param graph: A BEL Graph
     :type graph: pybel.BELGraph
     """
-    nx.relabel.relabel_nodes(graph, node_id, copy=False)
+    mapping = {k: v for k, v in node_id.items() if k in graph}
+    nx.relabel.relabel_nodes(graph, mapping, copy=False)
 
 
 # Graph selection functions
@@ -183,7 +185,15 @@ def query_builder(network_id, expand_nodes=None, remove_nodes=None, **annotation
     :return: A BEL Graph
     :rtype: BELGraph
     """
+    log.debug('Requested: %s', {
+        'network_id': network_id,
+        'expand': expand_nodes,
+        'delete': remove_nodes,
+        'annotations': annotations
+    })
+
     original_graph = get_network_by_id(network_id)
+
     result_graph = filter_graph(original_graph, expand_nodes=expand_nodes, remove_nodes=remove_nodes, **annotations)
 
     add_canonical_names(result_graph)
@@ -197,13 +207,15 @@ def to_node_link(graph):
     as :code:`pybel.io.to_json_dict` because that function makes a standard node-link structure, and this function
     auguments/improves on the standard structure.
 
+    After conversion to json, this dict will be passed to :code:`flask.jsonify` for rendering
+
     :param graph: A BEL Graph
     :type graph: pybel.BELGraph
     :return: The JSON object representing this dictionary
     :rtype: dict
     """
     json_graph = to_json_dict(graph)
-    return json.dumps(OrderedDict([("nodes", json_graph['nodes']), ("links", json_graph['links'])]), ensure_ascii=False)
+    return json_graph
 
 
 # Graph set all filters

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Networks</title>
+</head>
+<body>
+<h1>Networks</h1>
+<ul>
+{% for nid in nids %}
+    <li><a href="/network/{{ nid }}">Network {{ nid }}</a></li>
+{% endfor %}
+</ul>
+</body>
+</html>
