@@ -11,10 +11,9 @@ from collections import Counter, defaultdict
 import pandas as pd
 from fuzzywuzzy import process, fuzz
 
-from pybel import BELGraph
 from pybel.constants import RELATION, FUNCTION, ANNOTATIONS, NAMESPACE, NAME, ABUNDANCE
 from pybel.parser.parse_exceptions import MissingNamespaceNameWarning, NakedNameWarning
-from .utils import graph_content_transform, check_has_annotation, keep_node
+from .utils import check_has_annotation, keep_node
 
 
 # NODE HISTOGRAMS
@@ -23,7 +22,7 @@ def count_functions(graph):
     """Counts the frequency of each function present in a graph
 
     :param graph: A BEL graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :rtype: Counter
     """
     return Counter(data[FUNCTION] for _, data in graph.nodes_iter(data=True))
@@ -33,7 +32,7 @@ def count_namespaces(graph):
     """Counts the frequency of each namespace across all nodes (that have namespaces)
 
     :param graph: A BEL graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :rtype: Counter
     """
     return Counter(data[NAMESPACE] for _, data in graph.nodes_iter(data=True) if NAMESPACE in data)
@@ -43,7 +42,7 @@ def get_names(graph, namespace):
     """Get the set of all of the names in a given namespace that are in the graph
 
     :param graph: A BEL graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :param namespace: A namespace
     :type namespace: str
     :return: A set of names belonging to the given namespace that are in the given graph
@@ -57,7 +56,7 @@ def get_unique_names(graph):
     """Get a dictionary of {namespace: set of names} present in the graph
 
     :param graph: A BEL Graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :return: A dictionary of {namespace: set of names}
     :rtype: dict
     """
@@ -77,7 +76,7 @@ def get_source_abundances(graph):
     These nodes are useful to identify because they generally don't provide any mechanistic insight.
 
     :param graph: A BEL Graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :return: A set of source ABUNDANCE nodes
     :rtype: set
     """
@@ -89,7 +88,7 @@ def get_central_abundances(graph):
     that they are an integral part of a pathway, since they are both produced and consumed.
 
     :param graph: A BEL Graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :return: A set of central ABUNDANCE nodes
     :rtype: set
     """
@@ -107,7 +106,7 @@ def get_sink_abundances(graph):
     assembly is incomplete, or there is a curation error.
 
     :param graph: A BEL Graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :return: A set of sink ABUNDANCE nodes
     :rtype: set
     """
@@ -120,10 +119,24 @@ def count_relations(graph):
     """Returns a histogram over all relationships in a graph
 
     :param graph: A BEL graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :rtype: Counter
     """
     return Counter(d[RELATION] for _, _, d in graph.edges_iter(data=True))
+
+
+def get_edge_relations(graph):
+    """Builds a dictionary of {node pair: set of edge types}
+
+    :param graph: A BEL Graph
+    :type graph: pybel.BELGraph
+    :return: A dictionary of {(node, node): set of edge types}
+    :rtype: dict
+    """
+    edge_relations = defaultdict(set)
+    for u, v, d in graph.edges_iter(data=True):
+        edge_relations[u, v].add(d[RELATION])
+    return edge_relations
 
 
 def count_unique_relations(graph):
@@ -132,17 +145,17 @@ def count_unique_relations(graph):
     Note: this operation only counts each type of edge once for each pair of nodes
 
     :param graph: A BEL graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :rtype: Counter
     """
-    return Counter(itt.chain.from_iterable(graph_content_transform(graph).values()))
+    return Counter(itt.chain.from_iterable(get_edge_relations(graph).values()))
 
 
 def count_annotations(graph):
     """Counts how many times each annotation is used in the graph
 
     :param graph: A BEL graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :rtype: Counter
     """
     return Counter(key for _, _, d in graph.edges_iter(data=True) if ANNOTATIONS in d for key in d[ANNOTATIONS])
@@ -152,7 +165,7 @@ def count_annotation_instances(graph, annotation):
     """Counts in how many edges each annotation appears in a graph
 
     :param graph: A BEL graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :param annotation: An annotation to count
     :type annotation: str
     :rtype: Counter
@@ -167,7 +180,7 @@ def count_annotation_instances_filtered(graph, annotation, source_filter=None, t
     Default filters get rid of PATHOLOGY nodes. These functions take graph, node as arguments.
 
     :param graph: A BEL graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :param annotation: An annotation to count
     :type annotation: str
     :rtype: Counter
@@ -183,7 +196,7 @@ def get_unique_annotations(graph):
     """Gets the annotations used in a BEL Graph
 
     :param graph: A BEL Graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :return: Dictionary of {annotation: set of values}
     :rtype: dict
     """
@@ -202,7 +215,7 @@ def count_error_types(graph):
     """Counts the occurrence of each type of error in a graph
 
     :param graph: A BEL graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :rtype: Counter
     """
     return Counter(e.__class__.__name__ for _, _, e, _ in graph.warnings)
@@ -212,7 +225,7 @@ def count_naked_names(graph):
     """Counts the frequency of each naked name (names without namespaces)
 
     :param graph: A BEL graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :rtype: Counter
     """
     return Counter(e.name for _, _, e, _ in graph.warnings if isinstance(e, NakedNameWarning))
@@ -222,7 +235,7 @@ def calculate_incorrect_name_dict(graph):
     """Groups all of the incorrect identifiers in a dict of {namespace: list of wrong names}
 
     :param graph: A BEL graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :rtype: dict
     """
     missing = defaultdict(list)
@@ -260,9 +273,9 @@ def calculate_suggestions(incorrect_name_dict, namespace_dict):
 def calculate_error_by_annotation(graph, annotation):
     """Groups the graph by a given annotation and builds lists of errors for each
 
-    :param graph:
-    :type graph: BELGraph
-    :param annotation:
+    :param graph: A BEL Graph
+    :type graph: pybel.BELGraph
+    :param annotation: The annotation to group errors by
     :type annotation: str
     :return:
     :rtype: dict
@@ -296,7 +309,7 @@ def plot_summary_axes(graph, lax, rax):
     2. Count of edges, grouped by relation type
 
     :param graph: A BEL graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :param lax: An axis object from matplotlib
     :param rax: An axis object from matplotlib
 
@@ -338,7 +351,7 @@ def plot_summary(graph, plt, figsize=(11, 4), **kwargs):
     2. Count of edges, grouped by relation type
 
     :param graph: A BEL graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :param plt: Give :code:`matplotlib.pyplot` to this parameter
 
     Example usage:

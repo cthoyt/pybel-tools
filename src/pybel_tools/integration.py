@@ -13,7 +13,8 @@ log = logging.getLogger(__name__)
 def overlay_data(graph, data, label, overwrite=False):
     """Overlays tabular data on the network
 
-    :type graph: BELGraph
+    :param graph: A BEL Graph
+    :type graph: pybel.BELGraph
     :param data: A dictionary of {pybel node: data for that node}
     :type data: dict
     :param label: The annotation label to put in the node dictionary
@@ -39,7 +40,8 @@ def overlay_type_data(graph, data, label, function, namespace, overwrite=False, 
     probably has HGNC identifiers, but no specific annotations that they are in the HGNC namespace or
     that the entities to which they refer are RNA.
 
-    :type graph: BELGraph
+    :param graph: A BEL Graph
+    :type graph: pybel.BELGraph
     :param data: A dictionary of {name: data}
     :type data: dict
     :param label: The annotation label to put in the node dictionary

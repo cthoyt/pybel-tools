@@ -1,22 +1,12 @@
-from collections import defaultdict, Counter
+"""
 
-from pybel import BELGraph
-from pybel.constants import RELATION, ANNOTATIONS, FUNCTION, PATHOLOGY
+This module contains functions useful throughout PyBEL Tools
 
+"""
 
-# TODO rename this function
-def graph_content_transform(graph):
-    """Builds a dictionary of {node pair: set of edge types}
+from collections import Counter
 
-    :param graph: A BEL Graph
-    :type graph: BELGraph
-    :return: A dictionary of {(node, node): set of edge types}
-    :rtype dict
-    """
-    edge_relations = defaultdict(set)
-    for u, v, d in graph.edges_iter(data=True):
-        edge_relations[u, v].add(d[RELATION])
-    return edge_relations
+from pybel.constants import ANNOTATIONS, FUNCTION, PATHOLOGY
 
 
 def count_defaultdict(d):
@@ -72,7 +62,7 @@ def keep_node(graph, node, super_nodes=None):
     easily used with :py:func:`functools.partial`:
 
     :param graph: A BEL Graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :param node: The node to check if it should be kepy
     :type node: tuple
     :param super_nodes: A list of nodes to automatically throw out

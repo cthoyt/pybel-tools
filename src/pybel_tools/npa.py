@@ -6,7 +6,6 @@ An implementation of the NPA algorithm inspired by Reagon Kharki's implementatio
 
 from __future__ import print_function
 
-from pybel import BELGraph
 from pybel.constants import RELATION, INCREASES, DIRECTLY_DECREASES, DIRECTLY_INCREASES, DECREASES
 
 #: Signifies the initial gene expression/NPA score
@@ -28,7 +27,7 @@ def calculate_npa_score_iteration(graph, node):
     Calculates the score of the given node
 
     :param graph: A BEL Graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :param node: A node in the BEL graph
     :type node: tuple
     :return:
@@ -49,7 +48,7 @@ def get_score_central_hub(graph, hub_dict, hub_list=None):
     """
 
     :param graph: A BEL graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :param hub_list:
     :param hub_dict:
     :return:
@@ -77,20 +76,31 @@ def get_score_central_hub(graph, hub_dict, hub_list=None):
 
 
 def flag_hubs(graph):
+    """
+
+    :param graph: A BEL Graph
+    :type graph: pybel.BELGraph
+    """
     for node in graph.nodes_iter():
         graph.node[node][HUB] = 0 < len(graph.predecessors(node))
 
 
 def generate_hub_list(graph):
+    """
+
+    :param graph: A BEL Graph
+    :type graph: pybel.BELGraph
+    :return:
+    """
     hub_dict = {i: node for i, node in enumerate(graph.nodes_iter()) if graph.node[node][HUB]}
     return hub_dict, list(hub_dict.values())
 
 
-def do_work(graph,  hub_dict, hub_list):
+def do_work(graph, hub_dict, hub_list):
     """
 
-    :param graph:
-    :type graph: BELGraph
+    :param graph: A BEL Graph
+    :type graph: pybel.BELGraph
     :param hub_dict:
     :type hub_dict: dict
     :param hub_list:
@@ -128,6 +138,13 @@ def do_work(graph,  hub_dict, hub_list):
 
 
 def prep_scores(graph, heat_key=WEIGHT):
+    """
+
+    :param graph: A BEL Graph
+    :type graph: pybel.BELGraph
+    :param heat_key:
+    :type heat_key: str
+    """
     for node in graph.nodes_iter():
         graph.node[node][SCORE] = DEFAULT_SCORE
 
@@ -146,11 +163,13 @@ def npa(graph, heat_key=WEIGHT):
         * yup
 
 
-    :param graph:
+    :param graph: A BEL Graph
+    :type graph: pybel.BELGraph
     :param heat_key:
+    :type heat_key: str
     :return:
     """
     prep_scores(graph, heat_key=heat_key)
     flag_hubs(graph)
     hub_dict, hub_list = generate_hub_list(graph)
-    do_work(graph,  hub_dict, hub_list)
+    do_work(graph, hub_dict, hub_list)

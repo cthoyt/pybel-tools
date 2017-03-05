@@ -7,7 +7,6 @@ This module contains functions that help mutate a network
 import logging
 from collections import defaultdict
 
-from pybel import BELGraph
 from pybel.canonicalize import decanonicalize_node
 from pybel.constants import *
 from .constants import INFERRED_INVERSE, CNAME
@@ -19,9 +18,9 @@ def left_merge(g, h):
     """Adds nodes and edges from H to G, in-place for G
 
     :param g: A BEL Graph
-    :type g: BELGraph
+    :type g: pybel.BELGraph
     :param h: A BEL Graph
-    :type h: BELGraph
+    :type h: pybel.BELGraph
     """
 
     for node, data in h.nodes_iter(data=True):
@@ -42,7 +41,7 @@ def collapse_nodes(graph, dict_of_sets_of_nodes):
     """Collapses all nodes in values to the key nodes in place
 
     :param graph: A BEL Graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :param dict_of_sets_of_nodes: A dictionary of {node: set of nodes}
     :type dict_of_sets_of_nodes: dict
     """
@@ -76,7 +75,7 @@ def build_central_dogma_collapse_dict(graph):
     """Builds a dictionary to direct the collapsing on the central dogma
 
     :param graph: A BEL Graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :return: A dictionary of {node: set of nodes}
     :rtype: dict
     """
@@ -107,7 +106,7 @@ def build_central_dogma_collapse_gene_dict(graph):
     """Builds a dictionary to direct the collapsing on the central dogma
 
     :param graph: A BEL Graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :return: A dictionary of {node: set of nodes}
     :rtype: dict
     """
@@ -134,11 +133,10 @@ def build_central_dogma_collapse_gene_dict(graph):
 
 
 def collapse_by_central_dogma(graph):
-    """Collapses all nodes from the central dogma (GENE, RNA, PROTEIN) to PROTEIN, or most downstream possible
-     entity, in place
+    """Collapses all nodes from the central dogma (GENE, RNA, PROTEIN) to PROTEIN, or most downstream possible entity, in place
 
     :param graph: A BEL Graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     """
     collapse_dict = build_central_dogma_collapse_dict(graph)
     log.info('Collapsing %d groups', len(collapse_dict))
@@ -149,7 +147,7 @@ def collapse_by_central_dogma_to_genes(graph):
     """Collapses all nodes from the central dogma (GENE, RNA, PROTEIN) to GENE in place
 
     :param graph: A BEL Graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     """
     collapse_dict = build_central_dogma_collapse_gene_dict(graph)
     log.info('Collapsing %d groups', len(collapse_dict))
@@ -160,7 +158,7 @@ def collapse_variants_to_genes(graph):
     """Finds all protein variants that are pointing to a gene and not a protein and fixes them
 
     :param graph: A BEL Graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     """
     for node, data in graph.nodes(data=True):
         if data[FUNCTION] != PROTEIN:
@@ -184,7 +182,7 @@ def infer_central_dogmatic_translations(graph):
     """For all Protein entities, adds the missing origin RNA and RNA-Protein translation edge
 
     :param graph: A BEL Graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     """
     for node, data in graph.nodes(data=True):
         if data[FUNCTION] == PROTEIN and NAMESPACE in data and VARIANTS not in data:
@@ -197,7 +195,7 @@ def infer_central_dogmatic_transcriptions(graph):
     """For all RNA entities, adds the missing origin Gene and Gene-RNA transcription edge
 
     :param graph: A BEL Graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     """
     for node, data in graph.nodes(data=True):
         if data[FUNCTION] == RNA and NAMESPACE in data and VARIANTS not in data:
@@ -211,7 +209,7 @@ def infer_central_dogma(graph):
     :code:`infer_central_dogmatic_translations` then :code:`infer_central_dogmatic_transcriptions`
 
     :param graph: A BEL Graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     """
     infer_central_dogmatic_translations(graph)
     infer_central_dogmatic_transcriptions(graph)
@@ -221,7 +219,7 @@ def opening_by_central_dogma(graph):
     """Performs origin completion then collapsing to furthest downstream, in place
 
     :param graph: A BEL Graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     """
     infer_central_dogma(graph)
     collapse_by_central_dogma(graph)
@@ -231,7 +229,7 @@ def opening_by_central_dogma_to_genes(graph):
     """Performs origin completion then collapsing to gene, in place
 
     :param graph: A BEL Graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     """
     infer_central_dogma(graph)
     collapse_by_central_dogma_to_genes(graph)
@@ -244,7 +242,7 @@ def prune_by_namespace(graph, function, namespace):
     from MGI and RGD in diseases where mice and rats don't give much insight to the human disease mechanism.
 
     :param graph: A BEL Graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :param function: The function to filter
     :type function: str
     :param namespace: The namespace to filter
@@ -265,7 +263,7 @@ def prune_by_type(graph, function=None, prune_threshold=1):
 
 
     :param graph: a BEL network
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :param function: If set, filters by the node's function from :code:`pybel.constants` like :code:`GENE`, :code:`RNA`,
                      :code:`PROTEIN`, or :code:`BIOPROCESS`
     :type function: str
@@ -289,7 +287,7 @@ def prune(graph):
     """Prunes genes, then RNA, in place
 
     :param graph: a BEL network
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
 
     """
     prune_by_type(graph, GENE)
@@ -300,7 +298,7 @@ def add_inferred_edges(graph, relations):
     """Adds inferred edges based on pre-defined axioms
 
     :param graph: a BEL network
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :param relations: single or iterable of relation names to add their inverse inferred edges
     :type relations: str or list
     """
@@ -320,7 +318,7 @@ def add_inferred_two_way_edge(graph, u, v):
     Use: two way edges from BEL definition and/or axiomatic inverses of membership relations
 
     :param graph: A BEL Graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :param u: the source node
     :type u: tuple
     :param v: the target node
@@ -334,7 +332,7 @@ def add_canonical_names(graph):
     Otherwise, uses the BEL string.
 
     :param graph: A BEL Graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     """
     for node, data in graph.nodes_iter(data=True):
         if CNAME in data:

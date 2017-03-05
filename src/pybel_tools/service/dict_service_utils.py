@@ -67,7 +67,7 @@ def add_network(network_id, graph):
     :param network_id: The ID (from the database) to use
     :type network_id: int
     :param graph: A BEL Graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :return:
     """
     networks[network_id] = graph
@@ -95,7 +95,7 @@ def update_node_indexes(graph):
     """Updates identifiers for nodes based on addition order
 
     :param graph: A BEL Graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     """
     for node in graph.nodes_iter():
         if node in node_id:
@@ -112,7 +112,7 @@ def relabel_nodes_to_identifiers(graph):
     :code:`relabel.relabel_nodes` with the module level variable :code:`node_id` used as the mapping.
 
     :param graph: A BEL Graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     """
     nx.relabel.relabel_nodes(graph, node_id, copy=False)
 
@@ -198,7 +198,7 @@ def to_node_link(graph):
     auguments/improves on the standard structure.
 
     :param graph: A BEL Graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :return: The JSON object representing this dictionary
     :rtype: dict
     """

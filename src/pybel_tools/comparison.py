@@ -2,7 +2,7 @@ import itertools as itt
 import logging
 
 from pybel import BELGraph
-from .utils import graph_content_transform
+from pybel_tools.summary import get_edge_relations
 
 log = logging.getLogger(__name__)
 
@@ -11,9 +11,9 @@ def graph_entities_equal(g, h):
     """Tests that two graphs have the same nodes
 
     :param g: A BEL Graph
-    :type g: BELGraph
+    :type g: pybel.BELGraph
     :param h: Another BEL Graph
-    :type h: BELGraph
+    :type h: pybel.BELGraph
     :return: Do the two graphs share the same set of nodes?
     :rtype: bool
     """
@@ -24,9 +24,9 @@ def graph_topologically_equal(g, h):
     """Tests that two graphs are topologically equal, defined by having the same nodes, and same connectivity
 
     :param g: A BEL Graph
-    :type g: BELGraph
+    :type g: pybel.BELGraph
     :param h: Another BEL Graph
-    :type h: BELGraph
+    :type h: pybel.BELGraph
     :return: Do the graphs share the same set of nodes, and the same connectivity?
     :rtype: bool
     """
@@ -41,17 +41,17 @@ def graph_relations_equal(g, h):
     same connection types
 
     :param g: A BEL Graph
-    :type g: BELGraph
+    :type g: pybel.BELGraph
     :param h: Another BEL Graph
-    :type h: BELGraph
+    :type h: pybel.BELGraph
     :return: Do the two graphs share the same set of nodes, same connectivity, and types of connections?
     :rtype: bool
     """
     if not graph_topologically_equal(g, h):
         return False
 
-    g_t = graph_content_transform(g)
-    h_t = graph_content_transform(h)
+    g_t = get_edge_relations(g)
+    h_t = get_edge_relations(h)
 
     return all(g_t[u, v] == h_t[u, v] for u, v in g.edges_iter())
 
@@ -61,9 +61,9 @@ def graph_provenance_equal(g, h):
     and same attributes exactly.
 
     :param g: A BEL Graph
-    :type g: BELGraph
+    :type g: pybel.BELGraph
     :param h: Another BEL Graph
-    :type h: BELGraph
+    :type h: pybel.BELGraph
     :return: Do the two graphs share the same set of nodes, same connectivity, types of connections, evidences, and
               annotations?
     :rtype: bool
@@ -83,9 +83,9 @@ def graph_edges_intersection(g, h):
     """
 
     :param g: A BEL Graph
-    :type g: BELGraph
+    :type g: pybel.BELGraph
     :param h: Another BEL Graph
-    :type h: BELGraph
+    :type h: pybel.BELGraph
     :return: The set of edges shared between the two graphs
     :rtype: set
     """
@@ -96,9 +96,9 @@ def graph_edges_subtract(g, h):
     """
 
     :param g: A BEL Graph
-    :type g: BELGraph
+    :type g: pybel.BELGraph
     :param h: Another BEL Graph
-    :type h: BELGraph
+    :type h: pybel.BELGraph
     :return: The asymmetric difference between the edges in g and h
     :rtype: set
     """
@@ -109,9 +109,9 @@ def graph_edges_xor(g, h):
     """
 
     :param g: A BEL Graph
-    :type g: BELGraph
+    :type g: pybel.BELGraph
     :param h: Another BEL Graph
-    :type h: BELGraph
+    :type h: pybel.BELGraph
     :return: The symmetric difference between the edges in g and h
     :rtype: set
     """

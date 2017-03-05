@@ -5,7 +5,6 @@ This module has tools for downloading and structuring gene orthology data from H
 """
 import requests
 
-from pybel import BELGraph
 from pybel.constants import GENE, ORTHOLOGOUS, RELATION
 
 #: Columns: HGNC ID, HGNC Symbol, MGI Curated, MGI Dump, RGD Dump
@@ -77,7 +76,7 @@ def add_mgi_orthology_statements(graph, mgi_orthologies):
     """Adds orthology statements for all MGI nodes
 
     :param graph:
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :param mgi_orthologies:
     :type mgi_orthologies: list
     :return:
@@ -99,7 +98,7 @@ def add_rgd_orthology_statements(graph, rgd_orthologies):
     """Adds orthology statements for all MGI nodes
 
     :param graph:
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :param mgi_orthologies:
     :return:
     """
@@ -136,7 +135,7 @@ def collapse_orthologies(graph):
     This won't work for two way orthology annotations, so it's best to use :code:`integrate_orthologies` first
 
     :param graph:
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :return:
     """
 

@@ -18,7 +18,7 @@ def group_subgraphs(graph, annotation):
     """Groups the nodes that occur in edges by the given annotation
 
     :param graph: A BEL graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :param annotation: An annotation to use to group edges
     :type annotation: str
     :return: dict of sets of BELGraph nodes
@@ -40,7 +40,7 @@ def get_subgraph_by_annotation(graph, annotation, value):
     """Builds a new subgraph induced over all edges whose annotations match the given key and value
 
     :param graph: A BEL Graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :param annotation: An annotation
     :type annotation: str
     :param value: The value for the annotation
@@ -70,7 +70,7 @@ def get_triangles(graph, node):
     """Yields all triangles pointed by the given node
 
     :param graph: A BEL Graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :param node: The source node
     :type node: tuple
     """
@@ -90,7 +90,7 @@ def filter_graph(graph, expand_nodes=None, remove_nodes=None, **kwargs):
     3. Remove nodes
 
     :param graph: A BEL Graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :param expand_nodes: Add the neighborhoods around all of these nodes
     :type expand_nodes: list
     :param remove_nodes: Remove these nodes and all of their in/out edges
@@ -130,9 +130,9 @@ def expand_graph_around_node(graph, query_graph, node):
     in place.
 
     :param graph: The graph to add stuff to
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :param query_graph: The graph containing the stuff to add
-    :type query_graph: BELGraph
+    :type query_graph: pybel.BELGraph
     :param node: A node tuples from the query graph
     :type node: tuple
     """

@@ -2,10 +2,22 @@ from collections import Counter, defaultdict
 
 from pybel.constants import ANNOTATIONS
 from .summary import count_annotation_instances
-from .utils import check_has_annotation, keep_node
+from .utils import check_has_annotation
+
+
+def _permissive_node_filter(graph, node):
+    return True
 
 
 def get_possible_successor_edges(graph, subgraph):
+    """Gets the set of possible successor edges peripheral to the subgraph
+
+    :param graph: A BEL Graph
+    :type graph: pybel.BELGraph
+    :param subgraph: A set of nodes
+    :return: A set of edges
+    :rtype: set
+    """
     return {(u, v) for u in subgraph for v in graph.successors_iter(u) if v not in subgraph}
 
 
@@ -14,6 +26,14 @@ def count_possible_successors(graph, subgraph):
 
 
 def get_possible_predecessor_edges(graph, subgraph):
+    """Gets the set of possible predecessor edges peripheral to the subgraph
+
+    :param graph: A BEL Graph
+    :type graph: pybel.BELGraph
+    :param subgraph: A set of nodes
+    :return: A set of edges
+    :rtype: set
+    """
     return {(u, v) for v in subgraph for u in graph.predecessors_iter(v) if u not in subgraph}
 
 
@@ -21,15 +41,34 @@ def count_possible_predecessors(graph, subgraph):
     return Counter(v for u, v in get_possible_predecessor_edges(graph, subgraph))
 
 
-def get_subgraph_edges(graph, subgraph_name, subgraph_key='Subgraph', node_filter=keep_node):
+def get_subgraph_edges(graph, subgraph_name, subgraph_key='Subgraph', source_filter=None, target_filter=None):
+    if source_filter is None:
+        source_filter = _permissive_node_filter
+
+    if target_filter is None:
+        target_filter = _permissive_node_filter
+
     for u, v, k, d in graph.edges_iter(keys=True, data=True):
         if not check_has_annotation(d, subgraph_key):
             continue
-        if d[ANNOTATIONS][subgraph_key] == subgraph_name and node_filter(graph, u) and node_filter(graph, v):
+        if d[ANNOTATIONS][subgraph_key] == subgraph_name and source_filter(graph, u) and target_filter(graph, v):
             yield u, v, k, d
 
 
-def get_subgraph_fill_edges(graph, subgraph, node_filter=keep_node):
+def get_subgraph_fill_edges(graph, subgraph, node_filter=None):
+    """
+
+    :param graph: A BEL Graph
+    :type graph: pybel.BELGraph
+    :param subgraph: A set of nodes
+    :type subgraph: iter
+    :param node_filter: Optional filter function (graph, node) -> bool
+    :return:
+    """
+
+    if node_filter is None:
+        node_filter = _permissive_node_filter
+
     possible_succ = get_possible_successor_edges(graph, subgraph)
     succ_counter = Counter(v for u, v in possible_succ)
 
@@ -53,8 +92,8 @@ def infer_subgraph_expansion(graph, subgraph_key='Subgraph'):
     1. Group subgraphs
     2. Build dictionary of {(u,v,k): {set of inferred subgraph names}}
 
-    :param graph:
-    :type graph: BELGraph
+    :param graph: A BEL Graph
+    :type graph: pybel.BELGraph
     :return:
     """
 
@@ -73,9 +112,9 @@ def enrich_unqualified(graph, subgraph):
     TODO: example
 
     :param graph: A BEL graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :param subgraph: A BEL graph's subgraph
-    :Type subgraph: BELGRaph
+    :type subgraph: pybel.BELGraph
     :return:
     """
     raise NotImplementedError

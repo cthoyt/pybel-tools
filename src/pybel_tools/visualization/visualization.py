@@ -1,10 +1,15 @@
+"""
+
+This module provides functions for making HTML visualizations of BEL Graphs
+
+"""
+
 from __future__ import print_function
 
 import os
 
 import jinja2
 
-from pybel import BELGraph
 from pybel.io import to_jsons
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -36,7 +41,7 @@ def build_graph_context(graph):
     """Builds the data dictionary to be used by the Jinja templating engine in :py:func:`to_html`
 
     :param graph: A BEL Graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     """
     graph_json_str = to_jsons(graph)
 
@@ -51,7 +56,7 @@ def to_html(graph):
     """Creates an HTML visualization for the given JSON representation of a BEL graph
 
     :param graph: A BEL Graph
-    :type graph: BELGraph
+    :type graph: pybel.BELGraph
     :rtype: str
     """
     return render_graph_template(build_graph_context(graph))
@@ -61,7 +66,9 @@ def to_html_file(graph, file):
     """Writes the HTML visualization to a file or file-like
 
     :param graph: A BEL Graph
+    :type graph: pybel.BELGraph
     :param file: A file or file-like
+    :type file: file
     """
     print(to_html(graph), file=file)
 
@@ -70,7 +77,9 @@ def to_html_path(graph, path):
     """Writes the HTML visualization to a file specified by the file path
 
     :param graph: A BEL Graph
+    :type graph: pybel.BELGraph
     :param path: The file path
+    :type path: str
     """
     with open(os.path.expanduser(path), 'w') as f:
         to_html_file(graph, f)
