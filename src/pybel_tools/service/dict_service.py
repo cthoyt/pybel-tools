@@ -8,7 +8,7 @@ import logging
 
 from flask import Flask, request, jsonify, render_template
 
-from pybel_tools.summary import get_unique_annotations
+from ..summary import get_unique_annotations
 from .dict_service_utils import query_builder, nid_node, get_network_ids, to_node_link, load_networks, \
     get_incident_edges, get_network_by_id
 
