@@ -55,8 +55,19 @@ def check_has_annotation(d, key):
     return _check_has_data(d, ANNOTATIONS, key)
 
 
+def keep_node_permissive(graph, node):
+    """A default node filter that is true for all nodes
+
+    :param graph: A BEL Graph
+    :type graph: pybel.BELGraph
+    :param node: The node
+    :type node: tuple
+    """
+    return True
+
+
 def keep_node(graph, node, super_nodes=None):
-    """A default function for filtering out unwanted nodes in an analysis.
+    """A default node filter for removing unwanted nodes in an analysis.
 
     This function returns false for nodes that have PATHOLOGY or are on a pre-defined blacklist. This can be most
     easily used with :py:func:`functools.partial`:

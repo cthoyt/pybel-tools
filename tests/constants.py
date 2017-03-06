@@ -5,7 +5,7 @@ from pybel.constants import FUNCTION, NAMESPACE, NAME
 dir_path = os.path.dirname(os.path.realpath(__file__))
 resources_path = os.path.join(dir_path, 'resources')
 
-orthology_path = os.path.join(resources_path, 'orthology.tsv')
+rgd_orthologs_path = os.path.join(resources_path, 'RGD_ORTHOLOGS.txt')
 
 
 def add_simple(graph, function, namespace, name):
