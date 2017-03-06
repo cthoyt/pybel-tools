@@ -184,6 +184,7 @@ def expand_graph_around_node(graph, query_graph, node):
     skip_successors = set()
     for successor in query_graph.successors_iter(node):
         if successor in graph:
+            skip_successors.add(successor)
             continue
         graph.add_node(successor, attr_dict=query_graph.node[node])
 
