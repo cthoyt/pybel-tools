@@ -89,7 +89,7 @@ def load_networks(connection=None, check_version=True):
     for nid, blob in gcm.session.query(Network.id, Network.blob).all():
         graph = from_bytes(blob, check_version=check_version)
         add_network(nid, graph)
-        log.info('loaded network: [%s] %s v%s', nid, graph.document[METADATA_NAME], graph.document[METADATA_VERSION])
+        log.info('loaded network: [%s] %s ', nid, graph.document.get(METADATA_NAME, 'UNNAMED'))
 
 
 def update_node_indexes(graph):
