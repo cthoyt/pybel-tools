@@ -34,7 +34,7 @@ def render_graph_template(context):
     :type context: dict
     :rtype: str
     """
-    return render_template('graph_template.html', context)
+    return render_template('graph_template.html', **context)
 
 
 def build_graph_context(graph):
