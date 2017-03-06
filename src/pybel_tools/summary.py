@@ -359,6 +359,67 @@ def calculate_error_by_annotation(graph, annotation):
     return results
 
 
+def calculate_subgraph_overlap(graph, annotation='Subgraph'):
+    """Builds a dataframe to show the overlap between different subgraphs
+
+    Options:
+    1. Total number of edges overlap (intersection)
+    2. Percentage overlap (tanimoto similarity)
+
+
+    :param graph: A BEL Graph
+    :type graph: pybel.BELGraph
+    :param annotation: The annotation to group by and compare. Defaults to 'Subgraph'
+    :type annotation: str
+    :return: {subgraph: set of edges}, {(subgraph 1, subgraph2): set of intersecting edges},
+            {(subgraph 1, subgraph2): set of unioned edges}, {(subgraph 1, subgraph2): tanimoto similarity},
+    """
+
+    sg2edge = defaultdict(set)
+
+    for u, v, d in graph.edges_iter(data=True):
+        if not check_has_annotation(d, annotation):
+            continue
+        sg2edge[d[ANNOTATIONS][annotation]].add((u, v))
+
+    subgraph_intersection = {}
+    subgraph_union = {}
+    subgraph_overlap = {}
+
+    for sg1, sg2 in itt.combinations(sorted(sg2edge), 2):
+        subgraph_intersection[sg1, sg2] = sg2edge[sg1] & sg2edge[sg2]
+        subgraph_union[sg1, sg2] = sg2edge[sg1] | sg2edge[sg2]
+        subgraph_overlap[sg1, sg2] = len(subgraph_intersection[sg1, sg2]) / len(subgraph_union[sg1, sg2])
+
+    return sg2edge, subgraph_intersection, subgraph_union, subgraph_overlap
+
+
+def summarize_subgraph_overlap(graph, annotation='Subgraph'):
+    """Returns a distance matrix between all subgraphs (or other given annotation)
+
+    :param graph: A BEL Graph
+    :type graph: pybel.BELGraph
+    :param annotation: The annotation to group by and compare. Defaults to :code:`"Subgraph"`
+    :type annotation: str
+    :return: A similarity matrix in a pandas dataframe
+    :rtype: pd.DataFrame
+    """
+    sg2edge, subgraph_intersection, subgraph_union, subgraph_overlap = calculate_subgraph_overlap(graph, annotation)
+    labels = sorted(sg2edge)
+    mat = []
+    for sg1 in labels:
+        row = []
+        for sg2 in labels:
+            if sg1 == sg2:
+                row.append(1)
+            elif (sg1, sg2) in subgraph_overlap:
+                row.append(subgraph_overlap[sg1, sg2])
+            elif (sg2, sg1) in subgraph_overlap:
+                row.append(subgraph_overlap[sg2, sg1])
+        mat.append(row)
+    return pd.DataFrame(mat, index=labels, columns=labels)
+
+
 # Visualization with matplotlib
 
 def plot_summary_axes(graph, lax, rax):
