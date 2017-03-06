@@ -3,6 +3,8 @@ PyBEL Tools Documentation
 
 :code:`pybel_tools` provides extra functions to deal with BEL graphs parsed by :code:`pybel`.
 
+.. automodule:: pybel_tools
+
 .. toctree::
    :maxdepth: 2
    :caption: Graph Utilities
