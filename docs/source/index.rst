@@ -18,6 +18,7 @@ PyBEL Tools Documentation
    :caption: Pipelines
    :name: pipelines
 
+   orthology
    expansion
 
 .. toctree::

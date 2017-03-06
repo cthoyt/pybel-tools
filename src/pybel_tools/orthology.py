@@ -6,6 +6,7 @@ This module has tools for downloading and structuring gene orthology data from H
 import pandas as pd
 import requests
 
+from pybel.constants import CITATION, CITATION_NAME, CITATION_REFERENCE, CITATION_TYPE, EVIDENCE, ANNOTATIONS
 from pybel.constants import GENE, ORTHOLOGOUS, RELATION
 
 HGNC = 'HGNC'
@@ -28,7 +29,7 @@ RGD_ONLY = 'http://www.genenames.org/cgi-bin/download?col=gd_app_sym&col=md_rgd_
 MGI_ANNOTATIONS = 'http://www.informatics.jax.org/downloads/reports/MGI_MRK_Coord.rpt'
 
 #: Columns: Human Marker Symbol, Human Entrez Gene ID, HomoloGene ID, Mouse Marker Symbol, MGI Marker Accession ID, High-level Mammalian Phenotype ID (space-delimited)
-#: .. seealso:: http://www.informatics.jax.org/downloads/reports/index.html#pheno
+#: See: http://www.informatics.jax.org/downloads/reports/index.html#pheno
 MGI_ORTHOLOGY = 'http://www.informatics.jax.org/downloads/reports/HMD_HumanPhenotype.rpt'
 
 #: Columns: RAT_GENE_SYMBOL	RAT_GENE_RGD_ID	RAT_GENE_NCBI_GENE_ID	HUMAN_ORTHOLOG_SYMBOL	HUMAN_ORTHOLOG_RGD	HUMAN_ORTHOLOG_NCBI_GENE_ID	HUMAN_ORTHOLOG_SOURCE	MOUSE_ORTHOLOG_SYMBOL	MOUSE_ORTHOLOG_RGD	MOUSE_ORTHOLOG_NCBI_GENE_ID	MOUSE_ORTHOLOG_MGI	MOUSE_ORTHOLOG_SOURCE	HUMAN_ORTHOLOG_HGNC_ID
@@ -77,8 +78,8 @@ def structure_orthologies_from_hgnc(lines=None):
     return mgi_orthologies, rgd_orthologies
 
 
-def structure_orthologies_from_rgd():
-    df = pd.read_csv(RGD_ORTHOLOGY, skiprows=52, sep='\t')
+def structure_orthologies_from_rgd(path=None):
+    df = pd.read_csv(RGD_ORTHOLOGY if path is None else path, skiprows=52, sep='\t')
 
     mgi_orthologies = []
     rgd_orthologies = []
@@ -90,46 +91,42 @@ def structure_orthologies_from_rgd():
     return mgi_orthologies, rgd_orthologies
 
 
-def add_mgi_orthology_statements(graph, mgi_orthologies):
-    """Adds orthology statements for all MGI nodes
+def add_orthology_statements(graph, orthologies, namespace):
+    """Adds orthology statements for all orthologous nodes to HGNC nodes
 
     :param graph:
     :type graph: pybel.BELGraph
-    :param mgi_orthologies: An iterable over pairs of (HGNC, MGI) identifiers
-    :type mgi_orthologies: list
+    :param orthologies: An iterable over pairs of (HGNC, ORTHOLOG) identifiers
+    :type orthologies: list
     """
-    for hgnc, mgi in mgi_orthologies:
+    for hgnc, ortholog in orthologies:
         hgnc_node = GENE, HGNC, hgnc
-        mgi_node = GENE, MGI, mgi
+        ortholog_node = GENE, namespace, ortholog
 
-        if mgi_node not in graph:
+        if ortholog_node not in graph:
             continue
 
         if hgnc_node not in graph:
             graph.add_simple_node(*hgnc_node)
 
-        graph.add_unqualified_edge(hgnc_node, mgi_node, ORTHOLOGOUS)
+        graph.add_edge(hgnc_node, ortholog_node, attr_dict={
+            RELATION: ORTHOLOGOUS,
+            CITATION: {
+                CITATION_TYPE: 'PubMed',
+                CITATION_REFERENCE: '25355511',
+                CITATION_NAME: 'Rat Genome Database'
+            },
+            EVIDENCE: 'Asserted from: {}'.format(RGD_ORTHOLOGY),
+            ANNOTATIONS: {}
+        })
+
+
+def add_mgi_orthology_statements(graph, mgi_orthologies):
+    add_orthology_statements(graph, mgi_orthologies, MGI)
 
 
 def add_rgd_orthology_statements(graph, rgd_orthologies):
-    """Adds orthology statements for all RGD nodes
-
-    :param graph:
-    :type graph: pybel.BELGraph
-    :param rgd_orthologies: AN iterable over pairs of (HGNC, RGD) identifiers
-    :type rgd_orthologies: list
-    """
-    for hgnc, rgd in rgd_orthologies:
-        hgnc_node = GENE, HGNC, hgnc
-        rgd_node = GENE, RGD, rgd
-
-        if rgd_node not in graph:
-            continue
-
-        if hgnc_node not in graph:
-            graph.add_simple_node(*hgnc_node)
-
-        graph.add_unqualified_edge(hgnc_node, rgd_node, ORTHOLOGOUS)
+    add_orthology_statements(graph, rgd_orthologies, RGD)
 
 
 def integrate_orthologies_from_hgnc(graph, lines=None):
@@ -146,15 +143,17 @@ def integrate_orthologies_from_hgnc(graph, lines=None):
     add_rgd_orthology_statements(graph, rgdo)
 
 
-def integrate_orthologies_from_rgd(graph):
+def integrate_orthologies_from_rgd(graph, path=None):
     """Adds orthology statements to graph using HGNC symbols, MGI symbols, and RGD symbols.
 
     For MGI IDs and RGD IDs, use :func:`integrate_orthologies_from_hgnc`
 
     :param graph: A BEL Graph
     :type graph: pybel.BELGraph
+    :param path: optional path to local RGD_ORTHOLOGS.txt.
+                 Defaults to downloading directly from RGD FTP server with pandas
     """
-    mgio, rgdo = structure_orthologies_from_rgd()
+    mgio, rgdo = structure_orthologies_from_rgd(path=path)
     add_mgi_orthology_statements(graph, mgio)
     add_rgd_orthology_statements(graph, rgdo)
 
@@ -164,10 +163,10 @@ def collapse_orthologies(graph):
 
     Assumes: orthologies are annotated for edge (u,v) where u is the higher priority node
 
-    This won't work for two way orthology annotations, so it's best to use :func:`integrate_orthologies` first
-
     :param graph: A BEL Graph
     :type graph: pybel.BELGraph
+
+    .. warning:: This won't work for two way orthology annotations, so it's best to use :func:`integrate_orthologies_from_rgd` first
     """
 
     orthologs = []
