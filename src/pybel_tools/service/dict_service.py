@@ -30,9 +30,7 @@ def get_filter(network_id):
 
     unique_annotation_dict = get_unique_annotations(graph)
 
-    json_dict= []
-    for k, v in unique_annotation_dict.items():
-        json_dict.append({'text': k, 'children':[{'text': annotation} for annotation in v] })
+    json_dict = [{'text': k, 'children': [{'text': annotation} for annotation in v]} for k, v in unique_annotation_dict.items()]
 
     return render_template('network_visualization.html', **{'filter_json': json_dict, 'network_id': network_id})
 

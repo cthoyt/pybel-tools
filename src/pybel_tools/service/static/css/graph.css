@@ -138,6 +138,12 @@ td.bigger-rows {
     display: block;
     margin: auto;
     vertical-align: middle;
+    height: 80vh;
+    max-height: 80vh;
+}
+
+svg {
+    border: 1px solid black;
 }
 
 .graph-controller {
@@ -172,43 +178,43 @@ td.bigger-rows {
 
 }
 
-.Pathology{
-    fill:#FF7F0E;
+.Pathology {
+    fill: #FF7F0E;
 }
 
-.Abundance{
-    fill:#AEC7E8;
+.Abundance {
+    fill: #AEC7E8;
 }
 
-.Gene{
-    fill:#FFBB78;
+.Gene {
+    fill: #FFBB78;
 }
 
-.miRNA{
-    fill:#D62728;
+.miRNA {
+    fill: #D62728;
 }
 
-.Protein{
-    fill:#1F77B4;
+.Protein {
+    fill: #1F77B4;
 }
 
-.RNA{
-    fill:#FF9896;
+.RNA {
+    fill: #FF9896;
 }
 
-.BiologicalProcess{
-    fill:#2CA02C;
+.BiologicalProcess {
+    fill: #2CA02C;
 }
 
-.Pathology{
-    fill:#FF7F0E;
+.Pathology {
+    fill: #FF7F0E;
 }
 
-.Complex{
-    fill:#98DF8A;
+.Complex {
+    fill: #98DF8A;
 }
 
-.Composite{
-    fill:#9467BD;
+.Composite {
+    fill: #9467BD;
 }
 

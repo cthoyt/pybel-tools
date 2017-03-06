@@ -7,8 +7,10 @@
           href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.6/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/graph.css')}}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='js/inspire-tree-1.12/inspire-tree.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/graph.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='js/inspire-tree-1.12/inspire-tree.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='js/inspire-tree-1.12/tree.css') }}">
+
     <script src="https://npmcdn.com/tether@1.2.4/dist/js/tether.min.js"></script>
     <script type="text/javascript"
             src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
@@ -24,112 +26,115 @@
             src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/2.4.0/svg.min.js"></script>
     <script type="text/javascript"
             src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.3/FileSaver.min.js"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/graph_controller/graph_controller.js') }}"></script>
+    <script type="text/javascript"
+            src="{{ url_for('static', filename='js/graph_controller/graph_controller.js') }}"></script>
+    <script type="text/javascript"
+            src="{{ url_for('static', filename='js/inspire-tree-1.12/inspire-tree-bundled.js') }}"></script>
 
-    <script type="text/javascript" src="{{ url_for('static', filename='js/inspire-tree-1.12/inspire-tree-bundled.js') }}"></script>
     <script type="text/javascript">
 
-         window.filters = {{ filter_json|safe }};
 
-         console.log(window.filters);
-         window.id = {{ network_id }};
+        window.filters = {{ filter_json|safe }};
+
+        window.id = {{ network_id }};
 
         $(document).ready(function () {
 
-         var tree = new InspireTree({
+            var tree = new InspireTree({
                 target: '#tree',
-                selection:{
+                selection: {
                     mode: 'checkbox',
-                   multiple: true
+                    multiple: true
                 },
                 data: window.filters
             });
 
-            tree.on('model.loaded', function() {
+            tree.on('model.loaded', function () {
                 tree.expand();
             });
 
+            // Render the empty frame
+            render_frame();
 
-        $( "#filter_form" ).submit(function( event ) {
-             $.getJSON("/network/"+window.id, function( data ) {
-                  init_d3_force(data);
+
+            $("#filter_form").submit(function (event) {
+                $.getJSON("/network/" + window.id, function (data) {
+                    init_d3_force(data);
+                });
             });
-         });
-
         });
     </script>
 
 </head>
 <body>
-<div class="container"><!-- /.container-fluid -->
-    <div class="col-lg-12 graph-controller"><!-- /.graph-controls -->
-        <nav class="navbar navbar-default">
-            <div class="container">
-                <div class="navbar-collapse">
-                    <ul class="nav navbar-nav">
-                        <!-- Nodes - Edges - Funcionalities - Export - Legend -->
-                        <li class="controls dropdown">
-                            <a class="dropdown-toggle" data-toggle="dropdown" role="button">Nodes<span
-                                    class="caret"></span></a>
-                            <ul class="dropdown-menu controls-lower-case">
-                                <div>
-                                    <div class="input-group">
-                                        <span class="input-group-addon" id="sizing-addon"><i
-                                                class="fa fa-connectdevelop fa-0.5x"></i></span>
-                                        <input placeholder="Node finder (click to show)" id="node-search"
-                                               class="wide form-control"
-                                               aria-describedby="sizing-addon1" type="text"/>
-                                    </div>
-                                </div>
-                                <div id="node-list">
-                                </div>
-                            </ul>
-                        </li>
-                        <li class="controls dropdown">
-                            <a class="dropdown-toggle" data-toggle="dropdown" role="button">Edges<span
-                                    class="caret"></span></a>
-                            <ul class="dropdown-menu controls-lower-case">
-                                <div>
-                                    <div class="input-group">
-                                        <span class="input-group-addon" id="sizing-addon"><i
-                                                class="fa fa-connectdevelop fa-0.5x"></i></span>
-                                        <input placeholder="Edge finder (click to show)" id="edge-search"
-                                               class="form-control"
-                                               aria-describedby="sizing-addon1" type="text"/>
-                                    </div>
-                                </div>
-                                <div id="edge-list">
-                                </div>
-                            </ul>
-                        </li>
-                        <li class="controls"><a data-toggle="modal" data-target="#info-graph">Functionalities</a>
-                        <li class="dropdown">
-                            <a class="dropdown-toggle controls" data-toggle="dropdown" role="button">Export Graph<span
-                                    class="caret"></span></a>
-                            <ul class="dropdown-menu controls">
-                                <li class="align_left"><a id="save-svg-graph">Save image <i class="fa fa-file-image-o"
-                                ></i></a></li>
-                            </ul>
-                        </li>
+{#<div class="col-lg-12 graph-controller"><!-- /.graph-controls -->#}
+{#    <nav class="navbar navbar-default">#}
+{#        <div class="container">#}
+{#            <div class="navbar-collapse">#}
+{#                <ul class="nav navbar-nav">#}
+{#                    <!-- Nodes - Edges - Funcionalities - Export - Legend -->#}
+{#                    <li class="controls dropdown">#}
+{#                        <a class="dropdown-toggle" data-toggle="dropdown" role="button">Nodes<span#}
+{#                                class="caret"></span></a>#}
+{#                        <ul class="dropdown-menu controls-lower-case">#}
+{#                            <div>#}
+{#                                <div class="input-group">#}
+{#                                        <span class="input-group-addon" id="sizing-addon"><i#}
+{#                                                class="fa fa-connectdevelop fa-0.5x"></i></span>#}
+{#                                    <input placeholder="Node finder (click to show)" id="node-search"#}
+{#                                           class="wide form-control"#}
+{#                                           aria-describedby="sizing-addon1" type="text"/>#}
+{#                                </div>#}
+{#                            </div>#}
+{#                            <div id="node-list">#}
+{#                            </div>#}
+{#                        </ul>#}
+{#                    </li>#}
+{#                    <li class="controls dropdown">#}
+{#                        <a class="dropdown-toggle" data-toggle="dropdown" role="button">Edges<span#}
+{#                                class="caret"></span></a>#}
+{#                        <ul class="dropdown-menu controls-lower-case">#}
+{#                            <div>#}
+{#                                <div class="input-group">#}
+{#                                        <span class="input-group-addon" id="sizing-addon"><i#}
+{#                                                class="fa fa-connectdevelop fa-0.5x"></i></span>#}
+{#                                    <input placeholder="Edge finder (click to show)" id="edge-search"#}
+{#                                           class="form-control"#}
+{#                                           aria-describedby="sizing-addon1" type="text"/>#}
+{#                                </div>#}
+{#                            </div>#}
+{#                            <div id="edge-list">#}
+{#                            </div>#}
+{#                        </ul>#}
+{#                    </li>#}
+{#                    <li class="controls"><a data-toggle="modal" data-target="#info-graph">Functionalities</a>#}
+{#                    <li class="dropdown">#}
+{#                        <a class="dropdown-toggle controls" data-toggle="dropdown" role="button">Export Graph<span#}
+{#                                class="caret"></span></a>#}
+{#                        <ul class="dropdown-menu controls">#}
+{#                            <li class="align_left"><a id="save-svg-graph">Save image <i class="fa fa-file-image-o"#}
+{#                            ></i></a></li>#}
+{#                        </ul>#}
+{#                    </li>#}
+{##}
+{#                    <li class="controls"><a data-toggle="modal" data-target="#legend">Legend</a>#}
+{#                    </li>#}
+{#                </ul>#}
+{#            </div><!-- /.navbar-collapse -->#}
+{#        </div><!-- /.container-fluid -->#}
+{#    </nav>#}
+{#</div><!-- /.graph-controls -->#}
 
-                        <li class="controls"><a data-toggle="modal" data-target="#legend">Legend</a>
-                        </li>
-                    </ul>
-                </div><!-- /.navbar-collapse -->
-            </div><!-- /.container-fluid -->
-        </nav>
-    </div><!-- /.graph-controls -->
+<div class="col-lg-12">
+    <h2 class="text-center"> Biological Network Explorer</h2>
 
-    <div class="container align_row">
-        <div class="col-md-12">
-            <h2 class="title text-center"> Biological Network Explorer</h2>
-            <!-- / Force -->
-            <div id="graph-chart">
-            </div>
-            <!-- /.Force -->
+    <div class="row justify-content-md-center">
+        <div class="col-lg-2" id="tree">
+        </div>
+        <div class="col-lg-9" id="graph-chart">
         </div>
     </div>
-</div><!-- /.container-fluid -->
+</div>
 
 <div id="info-graph" class="modal fade"><!-- /.info-graph Modal -->
     <div class="modal-dialog"><!-- /.Modal dialog -->
@@ -550,9 +555,6 @@
     </div>
     <!-- .modal-dialog -->
 </div><!-- .Legend Modal -->
-
-             <div id="tree">
-   </div>
 
 
 </body>
