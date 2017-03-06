@@ -122,9 +122,7 @@ def calculate_tanimoto_set_distances(dict_of_sets):
 def calculate_global_tanimoto_set_distances(dict_of_sets):
     """Calculates an alternative distance matrix based on the following equation:
 
-    .. math::
-
-        distance(A, B)=1-\frac{\|A \cup B\|}{\|\bigcup_{s \in S} s\|}
+    .. math:: distance(A, B)=1- \|A \cup B\| / \| \cup_{s \in S} s\|
 
     :param dict_of_sets: A dict of {x: set of y}
     :type dict_of_sets: dict
