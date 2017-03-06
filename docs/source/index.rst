@@ -15,6 +15,12 @@ PyBEL Tools Documentation
    mutation
 
 .. toctree::
+   :caption: Pipelines
+   :name: pipelines
+
+   expansion
+
+.. toctree::
    :caption: Other Utilities
    :name: utilities
 
