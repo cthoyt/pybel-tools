@@ -3,12 +3,12 @@ import unittest
 from pybel import BELGraph
 from pybel.constants import *
 from pybel_tools.orthology import HGNC, MGI
-from pybel_tools.orthology import integrate_orthologies_from_rgd
+from pybel_tools.orthology import integrate_orthologies_from_rgd, collapse_orthologies
 from tests.constants import add_simple, rgd_orthologs_path
 
 
 class TestOrthology(unittest.TestCase):
-    def test_orthology(self):
+    def test_collapse_by_orthology(self):
         graph = BELGraph()
 
         g1 = GENE, HGNC, 'A1BG'
@@ -31,3 +31,8 @@ class TestOrthology(unittest.TestCase):
 
         self.assertTrue(graph.has_edge(g1, g3))
         self.assertFalse(graph.has_edge(g3, g1))
+
+        collapse_orthologies(graph)
+
+        self.assertEqual(3, graph.number_of_nodes())
+        self.assertEqual(0, graph.number_of_edges())

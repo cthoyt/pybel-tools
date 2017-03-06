@@ -171,9 +171,12 @@ def collapse_orthologies(graph):
 
     orthologs = []
 
-    for hgnc, ortholog in graph.edges_iter(**{RELATION: ORTHOLOGOUS}):
+    for hgnc, ortholog in list(graph.edges_iter(**{RELATION: ORTHOLOGOUS})):
 
         for u, _, k, d in graph.in_edges_iter(ortholog, data=True, keys=True):
+            if d[RELATION] == ORTHOLOGOUS:
+                continue
+
             if k < 0:
                 graph.add_edge(u, hgnc, key=k, attr_dict=d)
             else:
