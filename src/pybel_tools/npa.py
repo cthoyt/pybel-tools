@@ -22,15 +22,14 @@ HUB = 'hub'
 
 
 def calculate_npa_score_iteration(graph, node):
-    """
-
-    Calculates the score of the given node
+    """Calculates the score of the given node
 
     :param graph: A BEL Graph
     :type graph: pybel.BELGraph
     :param node: A node in the BEL graph
     :type node: tuple
-    :return:
+    :return: The new weight of the node
+    :rtype: float
     """
 
     weight = graph.node[node][WEIGHT]
@@ -45,13 +44,12 @@ def calculate_npa_score_iteration(graph, node):
 
 
 def get_score_central_hub(graph, hub_dict, hub_list=None):
-    """
+    """Recursively scores central hubs
 
     :param graph: A BEL graph
     :type graph: pybel.BELGraph
     :param hub_list:
     :param hub_dict:
-    :return:
     """
     if not hub_list:
         return
