@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
-import re
-
 #
 # pybel-tools documentation build configuration file, created by
 # sphinx-quickstart on Mon Feb 13 10:55:55 2017.
@@ -21,8 +18,9 @@ import re
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-import sys
 import os
+import re
+import sys
 sys.path.insert(0, os.path.abspath('../../src'))
 
 
