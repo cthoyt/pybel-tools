@@ -11,22 +11,23 @@ from pandas import DataFrame
 from pybel.constants import ANNOTATIONS, FUNCTION, PATHOLOGY
 
 
-def count_defaultdict(d):
-    """Takes a defaultdict(list) and applys a counter to each list
+def count_defaultdict(dict_of_lists):
+    """Takes a dictionary and applies a counter to each list
 
-    :param d: A dictionary of lists
-    :type d: defaultdict(list)
+    :param dict_of_lists: A dictionary of lists
+    :type dict_of_lists: dict
     :return: A dictionary of {key: Counter(values)}
     :rtype: dict
     """
-    return {k: Counter(v) for k, v in d.items()}
+    return {k: Counter(v) for k, v in dict_of_lists.items()}
 
 
 def count_dict_values(dict_of_counters):
     """Counts the number of elements in each value (can be list, Counter, etc)
 
-    :param dict_of_counters: A dictionary of lists
-    :type dict_of_counters: defaultdict(list)
+    :param dict_of_counters: A dictionary of things whose lengths can be measured (lists, Counters, dicts)
+    :type dict_of_counters: dict
+    :return: A dictionary with the same keys as the input but the count of the length of the values
     :rtype: dict
     """
     return {k: len(v) for k, v in dict_of_counters.items()}
@@ -36,11 +37,13 @@ def _check_has_data(d, sd, key):
     return sd in d and key in d[sd]
 
 
-def check_has_annotation(d, key):
+def check_has_annotation(data, key):
     """Checks that ANNOTATION is included in the data dictionary and that the key is also present
 
-    :param d: The data dictionary from a BELGraph's edge
+    :param data: The data dictionary from a BELGraph's edge
+    :type data: dict
     :param key: An annotation key
+    :param key: str
     :return: If the annotation key is present in the current data dictionary
     :rtype: bool
 
@@ -54,7 +57,7 @@ def check_has_annotation(d, key):
     >>>         continue
     >>>     print(u, v, data)
     """
-    return _check_has_data(d, ANNOTATIONS, key)
+    return _check_has_data(data, ANNOTATIONS, key)
 
 
 def keep_node_permissive(graph, node):
@@ -64,6 +67,8 @@ def keep_node_permissive(graph, node):
     :type graph: pybel.BELGraph
     :param node: The node
     :type node: tuple
+    :return: True
+    :rtype: bool
     """
     return True
 
