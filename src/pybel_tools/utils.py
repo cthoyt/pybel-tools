@@ -3,8 +3,10 @@
 This module contains functions useful throughout PyBEL Tools
 
 """
+import itertools as itt
+from collections import Counter, defaultdict
 
-from collections import Counter
+import pandas as pd
 
 from pybel.constants import ANNOTATIONS, FUNCTION, PATHOLOGY
 
@@ -23,8 +25,8 @@ def count_defaultdict(d):
 def count_dict_values(dict_of_counters):
     """Counts the number of elements in each value (can be list, Counter, etc)
 
-    :param d: A dictionary of lists
-    :type d: defaultdict(list)
+    :param dict_of_counters: A dictionary of lists
+    :type dict_of_counters: defaultdict(list)
     :rtype: dict
     """
     return {k: len(v) for k, v in dict_of_counters.items()}
@@ -95,3 +97,49 @@ def keep_node(graph, node, super_nodes=None):
         return False
 
     return True
+
+
+def calculate_tanimoto_set_distances(dict_of_sets):
+    """Returns a distance matrix keyed by the keys in the given dict. Distances are calculated
+    based on pairwise tanimoto similarity of the sets contained
+
+    :param dict_of_sets: A dict of {x: set of y}
+    :type dict_of_sets: dict
+    :return: A distance matrix based on the set overlap (tanimoto) score between each x
+    :rtype: pandas.DataFrame
+    """
+    result = defaultdict(dict)
+
+    for x, y in itt.combinations(dict_of_sets, 2):
+        result[x][y] = result[y][x] = len(dict_of_sets[x] & dict_of_sets[y]) / len(dict_of_sets[x] | dict_of_sets[y])
+
+    for x in dict_of_sets:
+        result[x][x] = 1
+
+    return pd.DataFrame.from_dict(result)
+
+
+def calculate_global_tanimoto_set_distances(dict_of_sets):
+    """Calculates an alternative distance matrix based on the following equation:
+
+    .. math::
+
+        distance(A, B)=1-\frac{\|A \cup B\|}{\|\bigcup_{s \in S} s\|}
+
+    :param dict_of_sets: A dict of {x: set of y}
+    :type dict_of_sets: dict
+    :return: A distance matrix based on the
+    :rtype: pandas.DataFrame
+    """
+    universe = set(itt.chain.from_iterable(dict_of_sets.values()))
+    universe_size = len(universe)
+
+    result = defaultdict(dict)
+
+    for x, y in itt.combinations(dict_of_sets, 2):
+        result[x][y] = result[y][x] = 1 - len(dict_of_sets[x] | dict_of_sets[y]) / universe_size
+
+    for x in dict_of_sets:
+        result[x][x] = 1 - len(x) / len(universe)
+
+    return pd.DataFrame.from_dict(result)

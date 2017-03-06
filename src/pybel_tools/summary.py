@@ -7,13 +7,17 @@ and provide some suggestions for fixes.
 
 import itertools as itt
 from collections import Counter, defaultdict
+from operator import itemgetter
 
 import pandas as pd
 from fuzzywuzzy import process, fuzz
 
+from pybel import to_pickle
 from pybel.constants import *
 from pybel.parser.parse_exceptions import MissingNamespaceNameWarning, NakedNameWarning
-from .utils import check_has_annotation, keep_node_permissive
+from pybel_tools.utils import calculate_tanimoto_set_distances
+from .selection import group_subgraphs_filtered, get_subgraph_by_annotation
+from .utils import check_has_annotation, keep_node_permissive, count_dict_values
 
 
 # NODE HISTOGRAMS
@@ -359,7 +363,7 @@ def calculate_error_by_annotation(graph, annotation):
     return results
 
 
-def calculate_subgraph_overlap(graph, annotation='Subgraph'):
+def calculate_subgraph_edge_overlap(graph, annotation='Subgraph'):
     """Builds a dataframe to show the overlap between different subgraphs
 
     Options:
@@ -394,7 +398,7 @@ def calculate_subgraph_overlap(graph, annotation='Subgraph'):
     return sg2edge, subgraph_intersection, subgraph_union, subgraph_overlap
 
 
-def summarize_subgraph_overlap(graph, annotation='Subgraph'):
+def summarize_subgraph_edge_overlap(graph, annotation='Subgraph'):
     """Returns a distance matrix between all subgraphs (or other given annotation)
 
     :param graph: A BEL Graph
@@ -404,7 +408,8 @@ def summarize_subgraph_overlap(graph, annotation='Subgraph'):
     :return: A similarity matrix in a pandas dataframe
     :rtype: pd.DataFrame
     """
-    sg2edge, subgraph_intersection, subgraph_union, subgraph_overlap = calculate_subgraph_overlap(graph, annotation)
+    sg2edge, subgraph_intersection, subgraph_union, subgraph_overlap = calculate_subgraph_edge_overlap(graph,
+                                                                                                       annotation)
     labels = sorted(sg2edge)
     mat = []
     for sg1 in labels:
@@ -418,6 +423,46 @@ def summarize_subgraph_overlap(graph, annotation='Subgraph'):
                 row.append(subgraph_overlap[sg2, sg1])
         mat.append(row)
     return pd.DataFrame(mat, index=labels, columns=labels)
+
+
+def rank_subgraph_by_node_filter(graph, node_filter, annotation='Subgraph', reverse=True):
+    """Ranks subgraphs by which have the most nodes matching an given filter
+
+    :param graph:
+    :param node_filter:
+    :param annotation:
+    :param reverse:
+    :return:
+
+    A use case for this function would be to identify which subgraphs contain the most differentially expressed
+    genes.
+
+    >>> from pybel import from_pickle
+    >>> from pybel.constants import *
+    >>> from pybel_tools.integration import overlay_type_data
+    >>> from pybel_tools.summary import rank_subgraph_by_node_filter
+    >>> import pandas as pd
+    >>> graph = from_pickle('~/dev/bms/aetionomy/alzheimers.gpickle')
+    >>> df = pd.read_csv('~/dev/bananas/data/alzheimers_dgxp.csv', columns=['Gene', 'log2fc'])
+    >>> data = {gene: log2fc for _, gene, log2fc in df.itertuples()}
+    >>> overlay_type_data(graph, data, 'log2fc', GENE, 'HGNC', impute=0)
+    >>> results = rank_subgraph_by_node_filter(graph, lambda g, n: 1.3 < abs(g.node[n]['log2fc']))
+    """
+
+    r1 = group_subgraphs_filtered(graph, node_filter, annotation)
+    r2 = count_dict_values(r1)
+    return sorted(r2.items(), key=itemgetter(1), reverse=reverse)
+
+
+def summarize_node_overlap(graph, node_filter, annotation='Subgraph'):
+    """Calculates the subgraph similarity tanimoto similarity in nodes passing the given filter
+
+    Provides an alternate view on subgraph similarity, from a more node-centric view
+
+    """
+    r1 = group_subgraphs_filtered(graph, node_filter, annotation)
+    r2 = calculate_tanimoto_set_distances(r1)
+    return r2
 
 
 # Visualization with matplotlib
@@ -493,3 +538,27 @@ def plot_summary(graph, plt, figsize=(11, 4), **kwargs):
 
     plot_summary_axes(graph, lax, rax)
     plt.tight_layout()
+
+
+# Export
+
+def subgraphs_to_pickles(graph, directory, annotation='Subgraph'):
+    """Groups the given graph into subgraphs by the given annotation with :func:`group_subgraphs` and outputs them
+    as gpickle files to the given directory with :func:`pybel.to_pickle`
+
+    :param graph: A BEL Graph
+    :type graph: pybel.BELGraph
+    :param directory: A directory to output the pickles
+    :type directory: str
+    :param annotation: An annotation to split by. Suggestion: 'Subgraph'
+    :type annotation: str
+    """
+    c = count_annotation_instances(graph, annotation)
+
+    for value in c:
+        sg = get_subgraph_by_annotation(graph, annotation, value)
+        sg.document.update(graph.document)
+
+        file_name = '{}_{}.gpickle'.format(annotation, value.replace(' ', '_'))
+        path = os.path.join(directory, file_name)
+        to_pickle(sg, path)

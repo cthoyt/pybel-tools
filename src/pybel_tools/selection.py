@@ -4,19 +4,17 @@ This module contains functions to help select data from networks
 
 """
 import logging
-import os
 from collections import defaultdict
 from itertools import combinations
 
-from pybel import BELGraph, to_pickle
+from pybel import BELGraph
 from pybel.constants import ANNOTATIONS
-from .summary import count_annotation_instances
 from .utils import check_has_annotation
 
 log = logging.getLogger(__name__)
 
 
-def group_subgraphs(graph, annotation):
+def group_subgraphs(graph, annotation='Subgraph'):
     """Groups the nodes that occur in edges by the given annotation
 
     :param graph: A BEL graph
@@ -25,6 +23,7 @@ def group_subgraphs(graph, annotation):
     :type annotation: str
     :return: dict of sets of BELGraph nodes
     """
+
     result = defaultdict(set)
 
     for u, v, d in graph.edges_iter(data=True):
@@ -38,15 +37,28 @@ def group_subgraphs(graph, annotation):
     return result
 
 
-def get_subgraph_by_annotation(graph, annotation, value):
+def group_subgraphs_filtered(graph, node_filter, annotation='Subgraph'):
+    """Groups the nodes occurring in edges matching the given annotation, filtered
+
+    :param graph: A BEL Graph
+    :type graph: pybel.BELGraph
+    :param node_filter: A predicate (graph, node) -> bool for passing nodes
+    :param annotation: The annotation to use for grouping
+    :return: A dictionary of {annotation value: set of nodes}
+    :rtype: dict
+    """
+    return {k: {n for n in v if node_filter(graph, n)} for k, v in group_subgraphs(graph, annotation).items()}
+
+
+def get_subgraph_by_annotation(graph, value, annotation='Subgraph'):
     """Builds a new subgraph induced over all edges whose annotations match the given key and value
 
     :param graph: A BEL Graph
     :type graph: pybel.BELGraph
-    :param annotation: An annotation
-    :type annotation: str
     :param value: The value for the annotation
     :type value: str
+    :param annotation: An annotation
+    :type annotation: str
     :rtype: BELGraph
     """
     bg = BELGraph()
@@ -66,27 +78,6 @@ def get_subgraph_by_annotation(graph, annotation, value):
             bg.add_edge(u, v, key=key, attr_dict=attr_dict)
 
     return bg
-
-
-def subgraphs_to_pickles(graph, annotation, directory):
-    """Groups the given graph into subgraphs by the given annotation with :func:`group_subgraphs` and outputs them
-    as gpickle files to the given directory with :func:`pybel.to_pickle`
-
-    :param graph: A BEL Graph
-    :type graph: pybel.BELGraph
-    :param annotation: An annotation to split by. Suggestion: 'Subgraph'
-    :type annotation: str
-    :param directory: A directory to output the pickles
-    """
-    c = count_annotation_instances(graph, annotation)
-
-    for value in c:
-        sg = get_subgraph_by_annotation(graph, annotation, value)
-        sg.document.update(graph.document)
-
-        file_name = '{}_{}.gpickle'.format(annotation, value.replace(' ', '_'))
-        path = os.path.join(directory, file_name)
-        to_pickle(sg, path)
 
 
 def get_triangles(graph, node):
