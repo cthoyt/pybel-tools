@@ -13,7 +13,7 @@ from fuzzywuzzy import process, fuzz
 
 from pybel.constants import *
 from pybel.parser.parse_exceptions import MissingNamespaceNameWarning, NakedNameWarning
-from .utils import check_has_annotation, keep_node
+from .utils import check_has_annotation, keep_node_permissive
 
 
 # NODE HISTOGRAMS
@@ -233,16 +233,20 @@ def count_annotation_instances(graph, annotation):
 def count_annotation_instances_filtered(graph, annotation, source_filter=None, target_filter=None):
     """Counts in how many edges each annotation appears in a graph, but filter out source nodes and target nodes
 
-    Default filters get rid of PATHOLOGY nodes. These functions take graph, node as arguments.
+    See :func:`pybel_tools.utils.keep_node` for a basic filter.
 
     :param graph: A BEL graph
     :type graph: pybel.BELGraph
     :param annotation: An annotation to count
     :type annotation: str
+    :param source_filter: a predicate (graph, node) -> bool for keeping source nodes
+    :type source_filter: lambda
+    :param target_filter: a predicate (graph, node) -> bool for keeping target nodes
+    :type target_filter: lambda
     :rtype: Counter
     """
-    source_filter = keep_node if source_filter is None else source_filter
-    target_filter = keep_node if target_filter is None else target_filter
+    source_filter = keep_node_permissive if source_filter is None else source_filter
+    target_filter = keep_node_permissive if target_filter is None else target_filter
 
     return Counter(d[ANNOTATIONS][annotation] for u, v, d in graph.edges_iter(data=True) if
                    check_has_annotation(d, annotation) and source_filter(graph, u) and target_filter(graph, v))
