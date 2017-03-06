@@ -6,7 +6,7 @@ This module contains functions useful throughout PyBEL Tools
 import itertools as itt
 from collections import Counter, defaultdict
 
-import pandas as pd
+from pandas import DataFrame
 
 from pybel.constants import ANNOTATIONS, FUNCTION, PATHOLOGY
 
@@ -116,7 +116,7 @@ def calculate_tanimoto_set_distances(dict_of_sets):
     for x in dict_of_sets:
         result[x][x] = 1
 
-    return pd.DataFrame.from_dict(result)
+    return DataFrame.from_dict(result)
 
 
 def calculate_global_tanimoto_set_distances(dict_of_sets):
@@ -140,4 +140,4 @@ def calculate_global_tanimoto_set_distances(dict_of_sets):
     for x in dict_of_sets:
         result[x][x] = 1 - len(x) / len(universe)
 
-    return pd.DataFrame.from_dict(result)
+    return DataFrame.from_dict(result)
