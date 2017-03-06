@@ -4,11 +4,13 @@ This module contains functions to help select data from networks
 
 """
 import logging
+import os
 from collections import defaultdict
 from itertools import combinations
 
-from pybel import BELGraph
+from pybel import BELGraph, to_pickle
 from pybel.constants import ANNOTATIONS
+from .summary import count_annotation_instances
 from .utils import check_has_annotation
 
 log = logging.getLogger(__name__)
@@ -66,6 +68,27 @@ def get_subgraph_by_annotation(graph, annotation, value):
     return bg
 
 
+def subgraphs_to_pickles(graph, annotation, directory):
+    """Groups the given graph into subgraphs by the given annotation with :func:`group_subgraphs` and outputs them
+    as gpickle files to the given directory with :func:`pybel.to_pickle`
+
+    :param graph: A BEL Graph
+    :type graph: pybel.BELGraph
+    :param annotation: An annotation to split by. Suggestion: 'Subgraph'
+    :type annotation: str
+    :param directory: A directory to output the pickles
+    """
+    c = count_annotation_instances(graph, annotation)
+
+    for value in c:
+        sg = get_subgraph_by_annotation(graph, annotation, value)
+        sg.document.update(graph.document)
+
+        file_name = '{}_{}.gpickle'.format(annotation, value.replace(' ', '_'))
+        path = os.path.join(directory, file_name)
+        to_pickle(sg, path)
+
+
 def get_triangles(graph, node):
     """Yields all triangles pointed by the given node
 
@@ -95,7 +118,7 @@ def filter_graph(graph, expand_nodes=None, remove_nodes=None, **kwargs):
     :type expand_nodes: list
     :param remove_nodes: Remove these nodes and all of their in/out edges
     :type remove_nodes: list
-    :param kwargs: Annotation filters (match all with :code:`pybel.utils.subdict_matches`)
+    :param kwargs: Annotation filters (match all with :func:`pybel.utils.subdict_matches`)
     :type kwargs: dict
     :return: A BEL Graph
     :rtype: BELGraph
