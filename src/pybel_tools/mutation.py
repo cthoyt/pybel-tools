@@ -28,13 +28,16 @@ def left_merge(g, h):
             g.add_node(node, data)
 
     for u, v, k, d in h.edges_iter(keys=True, data=True):
-        if 0 <= k:  # not an unqualified edge
 
-            if all(d != gd for gd in g.edge[u][v].values()):
-                g.add_edge(u, v, attr_dict=d)
-
-        elif k not in g.edge[u][v]:  # unqualified edge that's not in G yet
-            g.add_edge(u, v, key=k, attr_dict=d)
+        if k < 0:  # unqualified edge that's not in G yet
+            if v not in g.edge[u] or k not in g.edge[u][v]:
+                g.add_edge(u, v, key=k, attr_dict=d)
+        elif v not in g.edge[u]:
+            g.add_edge(u, v, attr_dict=d)
+        elif any(0 <= gk and d == gd for gk, gd in g.edge[u][v].items()):
+            continue
+        else:
+            g.add_edge(u, v, attr_dict=d)
 
 
 def collapse_nodes(graph, dict_of_sets_of_nodes):
