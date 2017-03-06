@@ -1,5 +1,5 @@
 """
-Entrypoint module, in case you use `python -m pybel_tools`
+Entrypoint module, in case you use `python3 -m pybel_tools`
 
 Why does this file exist, and why __main__? For more info, read:
 
