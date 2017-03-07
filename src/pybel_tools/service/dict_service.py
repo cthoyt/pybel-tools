@@ -6,7 +6,8 @@ This module runs the dictionary-backed PyBEL API
 
 import logging
 
-from flask import Flask, request, jsonify, render_template
+import flask
+from flask import Flask
 
 from pybel.io import to_json_dict
 from .dict_service_utils import DictionaryService
@@ -16,6 +17,7 @@ log = logging.getLogger(__name__)
 
 APPEND_PARAM = 'append'
 REMOVE_PARAM = 'remove'
+SUPER_NETWORK = 'supernetwork'
 DICTIONARY_SERVICE = 'dictionary_service'
 
 
@@ -44,7 +46,7 @@ def build_dictionary_service_app(dsa):
     @dsa.route('/')
     def list_networks():
         nids = api.get_network_ids()
-        return render_template('network_list.html', nids=nids)
+        return flask.render_template('network_list.html', nids=nids)
 
     @dsa.route('/network/filter/<int:network_id>', methods=['GET'])
     def get_filter(network_id):
@@ -55,29 +57,44 @@ def build_dictionary_service_app(dsa):
         json_dict = [{'text': k, 'children': [{'text': annotation} for annotation in v]} for k, v in
                      unique_annotation_dict.items()]
 
-        return render_template('network_visualization.html', **{'filter_json': json_dict, 'network_id': network_id})
+        return flask.render_template('network_visualization.html',
+                                     **{'filter_json': json_dict, 'network_id': network_id})
 
     @dsa.route('/network/<int:network_id>', methods=['GET'])
-    def get_network(network_id):
+    def get_network_by_id_filtered(network_id):
         # Convert from list of hashes (as integers) to node tuples
-        expand_nodes = [api.nid_node[int(h)] for h in request.args.getlist(APPEND_PARAM)]
-        remove_nodes = [api.nid_node[int(h)] for h in request.args.getlist(REMOVE_PARAM)]
-        annotations = {k: request.args.getlist(k) for k in request.args if k not in {APPEND_PARAM, REMOVE_PARAM}}
+        expand_nodes = [api.nid_node[int(h)] for h in flask.request.args.getlist(APPEND_PARAM)]
+        remove_nodes = [api.nid_node[int(h)] for h in flask.request.args.getlist(REMOVE_PARAM)]
+        annotations = {k: flask.request.args.getlist(k) for k in flask.request.args if
+                       k not in {APPEND_PARAM, REMOVE_PARAM}}
 
-        graph = api.query_builder(network_id, expand_nodes, remove_nodes, **annotations)
+        graph = api.query_filtered_builder(network_id, expand_nodes, remove_nodes, **annotations)
 
         graph_json = to_node_link(graph)
 
-        return jsonify(graph_json)
+        return flask.jsonify(graph_json)
+
+    @dsa.route('/supernetwork/', methods=['GET'])
+    def get_network_filtered():
+        expand_nodes = [api.nid_node[int(h)] for h in flask.request.args.getlist(APPEND_PARAM)]
+        remove_nodes = [api.nid_node[int(h)] for h in flask.request.args.getlist(REMOVE_PARAM)]
+        annotations = {k: flask.request.args.getlist(k) for k in flask.request.args if
+                       k not in {APPEND_PARAM, REMOVE_PARAM}}
+
+        graph = api.query_all_builder(expand_nodes, remove_nodes, **annotations)
+
+        graph_json = to_node_link(graph)
+
+        return flask.jsonify(graph_json)
 
     @dsa.route('/edges/<int:network_id>/<int:node_id>')
     def get_edges(network_id, node_id):
         res = api.get_incident_edges(network_id, node_id)
-        return jsonify(res)
+        return flask.jsonify(res)
 
     @dsa.route('/nid/')
     def get_node_hashes():
-        return jsonify(api.nid_node)
+        return flask.jsonify(api.nid_node)
 
     @dsa.route('/nid/<nid>')
     def get_node_hash(nid):

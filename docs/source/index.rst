@@ -24,6 +24,12 @@ PyBEL Tools Documentation
    expansion
 
 .. toctree::
+   :caption: Services
+   :name: services
+
+   dictservice
+
+.. toctree::
    :caption: Other Utilities
    :name: utilities
 

@@ -86,6 +86,8 @@ class DictionaryService:
             self.add_network(nid, graph)
             log.info('loaded network: [%s] %s ', nid, graph.document.get(METADATA_NAME, 'UNNAMED'))
 
+        self.full_network = None
+
     def update_node_indexes(self, graph):
         """Updates identifiers for nodes based on addition order
 
@@ -130,6 +132,25 @@ class DictionaryService:
         """
         return self.networks[network_id]
 
+    def get_super_network(self):
+        """Gets all networks and merges them together. Caches in self.full_network.
+
+        :return: A BEL Graph
+        :rtype: pybel.BELGraph
+        """
+
+        if self.full_network is not None:
+            return self.full_network
+
+        result = BELGraph()
+
+        for network_id in self.get_network_ids():
+            left_merge(result, self.get_network_by_id(network_id))
+
+        self.full_network = result
+
+        return result
+
     def get_node_by_id(self, node_id):
         """Returns the node tuple based on the node id
 
@@ -161,16 +182,26 @@ class DictionaryService:
         g = self.get_network_by_id(network_id)
         return list(self._build_edge_json(*x) for x in g.edges_iter(data=True))
 
-    def get_incident_edges(self, gid, nid):
-        graph = self.get_network_by_id(gid)
-        node = self.get_node_by_id(nid)
+    def get_incident_edges(self, network_id, node_id):
+        graph = self.get_network_by_id(network_id)
+        node = self.get_node_by_id(node_id)
 
         successors = list(self._build_edge_json(graph, u, v, d) for u, v, d in graph.out_edges_iter(node, data=True))
         predecessors = list(self._build_edge_json(graph, u, v, d) for u, v, d in graph.in_edges_iter(node, data=True))
 
         return successors + predecessors
 
-    def query_builder(self, network_id, expand_nodes=None, remove_nodes=None, **annotations):
+    def _query_helper(self, original_graph, expand_nodes=None, remove_nodes=None, **annotations):
+        result_graph = filter_graph(original_graph, expand_nodes=expand_nodes, remove_nodes=remove_nodes, **annotations)
+        add_canonical_names(result_graph)
+        self.relabel_nodes_to_identifiers(result_graph)
+        return result_graph
+
+    def query_all_builder(self, expand_nodes=None, remove_nodes=None, **annotations):
+        original_graph = self.get_super_network()
+        return self._query_helper(original_graph, expand_nodes, remove_nodes, **annotations)
+
+    def query_filtered_builder(self, network_id, expand_nodes=None, remove_nodes=None, **annotations):
         """Filters a dictionary from the module level cache.
 
         1. Thin wrapper around :code:`pybel_tools.selection.filter_graph`:
@@ -197,41 +228,5 @@ class DictionaryService:
             'delete': remove_nodes,
             'annotations': annotations
         })
-
         original_graph = self.get_network_by_id(network_id)
-
-        result_graph = filter_graph(original_graph, expand_nodes=expand_nodes, remove_nodes=remove_nodes, **annotations)
-
-        add_canonical_names(result_graph)
-        self.relabel_nodes_to_identifiers(result_graph)
-
-        return result_graph
-
-    def get_full_network(self):
-        """Gets all networks and merges them together
-
-        :return: A BEL Graph
-        :rtype: pybel.BELGraph
-        """
-
-        if self.full_network is not None:
-            return self.full_network
-
-        result = BELGraph()
-
-        for network_id in self.get_network_ids():
-            left_merge(result, self.get_network_by_id(network_id))
-
-        self.full_network = result
-
-        return result
-
-    def query_all_builder(self, expand_nodes=None, remove_nodes=None, **annotations):
-        original_graph = self.get_full_network()
-
-        result_graph = filter_graph(original_graph, expand_nodes=expand_nodes, remove_nodes=remove_nodes, **annotations)
-
-        add_canonical_names(result_graph)
-        self.relabel_nodes_to_identifiers(result_graph)
-
-        return result_graph
+        return self._query_helper(original_graph, expand_nodes, remove_nodes, **annotations)
