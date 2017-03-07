@@ -7,7 +7,7 @@ This module contains functions that help mutate a network
 import logging
 from collections import defaultdict
 
-from pybel.canonicalize import decanonicalize_node
+from pybel.canonicalize import calculate_canonical_name
 from pybel.constants import *
 from .constants import INFERRED_INVERSE, CNAME
 
@@ -328,37 +328,6 @@ def add_inferred_two_way_edge(graph, u, v):
     :type v: tuple
     """
     raise NotImplementedError
-
-
-def calculate_canonical_name(graph, node):
-    """Calculates the canonical name for a given node. If it is a simple node, uses the already given name.
-    Otherwise, it uses the BEL string.
-
-    :param graph: A BEL Graph
-    :type graph: pybel.BELGraph
-    :param node: A node
-    :type node: tuple
-    :return: Canonical node name
-    :rtype: str
-    """
-    data = graph.node[node]
-
-    if data[FUNCTION] == COMPLEX and NAMESPACE in data:
-        return graph.node[node][NAME]
-
-    if VARIANTS in data:
-        return decanonicalize_node(graph, node)
-
-    if FUSION in data:
-        return decanonicalize_node(graph, node)
-
-    if data[FUNCTION] in {REACTION, COMPOSITE, COMPLEX}:
-        return decanonicalize_node(graph, node)
-
-    if VARIANTS not in data and FUSION not in data:  # this is should be a simple node
-        return graph.node[node][NAME]
-
-    raise ValueError('Unexpected node data: {}'.format(data))
 
 
 def add_canonical_names(graph):
