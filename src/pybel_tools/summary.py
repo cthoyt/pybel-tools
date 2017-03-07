@@ -267,6 +267,9 @@ def get_unique_annotations(graph):
     result = defaultdict(set)
 
     for _, _, data in graph.edges_iter(data=True):
+        if ANNOTATIONS not in data:
+            continue
+
         for key, value in data[ANNOTATIONS].items():
             result[key].add(value)
 
