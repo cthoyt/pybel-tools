@@ -57,13 +57,8 @@ def web(host, debug):
 @click.option('--skip-check-version', is_flag=True, help='Skip checking the PyBEL version of the gpickle')
 def service(connection, host, debug, skip_check_version):
     """Runs the PyBEL API RESTful web service"""
-    from .service.dict_service import app
-    from .service import dict_service_utils
-
-    if debug:
-        dict_service_utils.log.setLevel(10)
-
-    dict_service_utils.load_networks(connection=connection, check_version=(not skip_check_version))
+    from .service.dict_service import app, get_dict_service
+    get_dict_service(app).load_networks(connection=connection, check_version=(not skip_check_version))
     app.run(debug=debug, host=host)
 
 
