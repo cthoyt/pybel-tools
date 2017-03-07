@@ -33,6 +33,11 @@ def _node_to_identifier(node, graph):
 
 
 class DictionaryService:
+    """
+
+    The dictionary service contains functions that implement the PyBEL API with a in-memory backend using dictionaries.
+
+    """
     def __init__(self):
         #: dictionary of {int id: BELGraph graph}
         self.networks = {}
