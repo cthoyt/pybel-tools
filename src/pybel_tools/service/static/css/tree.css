@@ -340,7 +340,7 @@
 }
 
 .inspire-tree .loading > .title-wrap .title:before {
-    background: url(863c5a2796b088dea28a1f75a0973372.gif) 0 0 no-repeat;
+    background: url(../js/inspire-tree-1.12/863c5a2796b088dea28a1f75a0973372.gif) 0 0 no-repeat;
     content: '';
     height: 14px;
     width: 14px
@@ -400,11 +400,11 @@ section {
 .inspire-tree {
     font: 400 12px Helvetica Nueue, Verdana, sans-serif;
     height: 80vh;
-    max-height: 80vh;
+    max-height: 70vh;
     overflow: auto;
     border: 1px solid;
     margin: 1em;
-    width: 25%;
+    width: 100%;
 }
 
 header, p {

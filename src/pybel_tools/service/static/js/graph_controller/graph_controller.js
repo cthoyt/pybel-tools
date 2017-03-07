@@ -12,12 +12,12 @@ $(document).ready(function () {
 
             selection_hash_map[key] = node_object.children.map(function (child) {
                 return child.text
+
             });
 
         });
 
         var params = $.param(selection_hash_map, true);
-
 
         $.getJSON("/network/" + window.id + '?' + params, function (data) {
 
@@ -76,28 +76,34 @@ function render_frame() {
 
     svg.append("text")
         .attr("class", "title")
-        .attr("x", w / 2.8)
+        .attr("x", w / 3.2)
         .attr("y", h / 2)
         .text("Please filter the graph by annotation and press submit");
-}
-
-
-function erase_frame(div) {
-    d3.select(div).remove();
 }
 
 
 // Initialize d3.js force to plot the networks from neo4j json
 function init_d3_force(graph) {
 
+
+    $(".disabled").attr('class', 'nav-link ');
+
+
     //////////////////////////////
     // Main graph visualization //
     //////////////////////////////
 
+    // Force div
     var graph_div = $('#graph-chart');
+    // Node search div
+    var node_panel = $('#node-list');
+    // Edge search div
+    var edge_panel = $('#edge-list');
 
     // Clean the current frame
     graph_div.empty();
+    node_panel.empty();
+    edge_panel.empty();
 
     d = document;
     e = d.documentElement;
@@ -336,7 +342,7 @@ function init_d3_force(graph) {
         .attr("dx", 12)
         .attr("dy", ".35em")
         .text(function (d) {
-            return d.name
+            return d.cname
         });
 
     // Highlight on mouseenter and back to normal on mouseout
@@ -419,6 +425,8 @@ function init_d3_force(graph) {
         svg.selectAll(".link, .node").style("visibility", "visible").style("opacity", "1");
         // Show node names
         svg.selectAll(".node-name").style("visibility", "visible").style("opacity", "1");
+        svg.selectAll(".node-name").style("display", "block");
+
     }
 
     function hide_select_nodes_text(node_list, visualization) {
@@ -633,46 +641,53 @@ function init_d3_force(graph) {
         document.body.removeChild(element);
     }
 
-    // Build the node multi-level dropdown
-    $('#node-list').append("<ul id='node-list-ul' class='dropdown-menu node-dropdown' role='menu' " +
-        "aria-labelledby='dropdownMenu' " + "class='no-bullets min-padding-left'></ul>");
+    ///////////////////////////////////////
+    // Build the node selection toggle
+    ///////////////////////////////////////
 
-    // Variable with all node names for shortest path autocompletion input
+    // Build the node unordered list
+    node_panel.append("<ul id='node-list-ul' class='list-group checked-list-box not-rounded'></ul>");
+
+    // Variable with all node names for autocompletion input
     var node_names = [];
 
     $.each(graph.nodes, function (key, value_array) {
 
-        node_names.push(value_array.id);
+        node_names.push(value_array.cname);
 
-        $("#node-list-ul").append("<li class='dropdown-submenu node_selector node-dropdown'><a id='" +
-            value_array.id + "'>" + value_array.name + "<ul class='dropdown-menu no-bullets min-padding-left'>" +
-            "<li>Name: " + value_array.name + "" + "</li><li>Namespace: " + value_array.namespace + "</li>" +
-            "<li>BEL function: " + value_array.function + "</li></ul></li>");
+        $("#node-list-ul").append("<li class='list-group-item'><input class='node-checkbox' type='checkbox'><div class='node-checkbox " + value_array.function + "'></div><span class>" + value_array.cname + "</span></li>");
     });
 
+    $('#get-checked-data').on('click', function (event) {
+        event.preventDefault();
+        var checkedItems = {}, counter = 0;
+        $(".node-checkbox:checked").each(function (idx, li) {
+            checkedItems[counter] = $(li).text();
+            counter++;
+        });
+        console.log(checkedItems);
+    });
+
+    // Autocompletion
+    node_names = node_names.sort();
+
+
     ///////////////////////////////////////
-    // Build the edge multi-level dropdown
+    // Build the edge selection toggle
     ///////////////////////////////////////
 
-    $('#edge-list').append("<ul id='edge-list-ul' class='dropdown-menu edge-dropdown' role='menu' " +
-        "aria-labelledby='dropdownMenu' " + "class='no-bullets min-padding-left'></ul>");
+
+    // Build the node unordered list
+    edge_panel.append("<ul id='edge-list-ul' class='list-group checked-list-box not-rounded'></ul>");
+
 
     $.each(graph.links, function (key, value_array) {
 
-        var pubmed_hyperlink = 'https://www.ncbi.nlm.nih.gov/pubmed/' + value_array.citation.reference;
-
-        $("#edge-list-ul").append("<li class='dropdown-submenu edge_selector '><a id='value'>" +
-            value_array.source.name + ' ' + value_array.relation + ' ' + value_array.target.name +
-            "</a><ul class='dropdown-menu no-bullets min-padding-left edge-info'><li><span class='color_red'>" +
-            "From: </span>" + value_array.source.name + "</li><li><span class='color_red'>To: </span>" +
-            value_array.target.name + "</li><li><span class='color_red'>Relationship </span>" + value_array.relation +
-            "</li><li><span class='color_red'>PubMed: </span><a href='" + pubmed_hyperlink + "' target='_blank' " +
-            "style='color: blue; text-decoration: underline'>" + value_array.citation.reference + "</a></li><li>" +
-            "<span class='color_red'>Journal: </span>" + value_array.citation.name + "</li><li>" +
-            "<span class='color_red'>Evidence: </span>" + value_array.SupportingText + "+</li><li>" +
-            "<span class='color_red'>Context: </span>" + value_array.context + "" + "</li></ul></li>");
+        $("#edge-list-ul").append("<li class='list-group-item'><input class='node-checkbox' type='checkbox'><span class>" +
+            value_array.source.name + ' ' + value_array.relation + ' ' + value_array.target.name + "</span></li>");
 
     });
+
 
     // Shortest path autocompletion input
     node_names = node_names.sort();
@@ -687,17 +702,11 @@ function init_d3_force(graph) {
         appendTo: "#info-graph"
     });
 
-    // Select node in the graph from selector
-    $(".node_selector").click(function () {
 
-        reset_attributes();
-
-        // $this=li, first element is the a with the id of the node
-        var node_array = [$(this)[0].childNodes[0].id.split(',')];
-        selected_nodes_highlight(node_array);
-        reset_attributes_on_double_click();
-
-    });
+    // Required for multiple autocompletion
+    function split(val) {
+        return val.split(/,\s*/);
+    }
 
     // Update Node Dropdown
     $("#node-search").on("keyup", function () {
@@ -706,9 +715,9 @@ function init_d3_force(graph) {
         searchText = searchText.toLowerCase();
         searchText = searchText.replace(/\s+/g, '');
 
-        $.each($('#node-list-ul')[0].childNodes, dropdown_update);
-        function dropdown_update() {
-            var currentLiText = $(this).find("a")[0].innerHTML,
+        $.each($('#node-list-ul')[0].childNodes, node_list_update);
+        function node_list_update() {
+            var currentLiText = $(this).find("span")[0].innerHTML,
                 showCurrentLi = ((currentLiText.toLowerCase()).replace(/\s+/g, '')).indexOf(searchText) !== -1;
             $(this).toggle(showCurrentLi);
         }
@@ -721,18 +730,29 @@ function init_d3_force(graph) {
         searchText = searchText.toLowerCase();
         searchText = searchText.replace(/\s+/g, '');
 
-        $.each($('#edge-list-ul')[0].childNodes, dropdown_update);
-        function dropdown_update() {
+        $.each($('#edge-list-ul')[0].childNodes, edge_list_update);
+        function edge_list_update() {
 
-            var currentLiText = $(this).find("a")[0].innerHTML,
+            var currentLiText = $(this).find("span")[0].innerHTML,
                 showCurrentLi = ((currentLiText.toLowerCase()).replace(/\s+/g, '')).indexOf(searchText) !== -1;
             $(this).toggle(showCurrentLi);
         }
     });
 
     // Select node in the graph from selector
+    $(".node_selector").click(function () {
+
+        reset_attributes();
+
+        // $this=li, first element is the a with the id of the node
+        var node_array = [$(this)[0].childNodes[0].id.split(',')];
+        selected_nodes_highlight(node_array);
+        reset_attributes_on_double_click();
+
+    });
+
+    // Select node in the graph from selector
     $(".edge_selector").on("click", "#value", function () {
-        console.log($(this)[0])
 
         reset_attributes();
 
@@ -758,7 +778,6 @@ function init_d3_force(graph) {
         reset_attributes();
     });
 }
-;
 
 // Saves visualized network as image
 $("#save-svg-graph").click(function () {

@@ -9,9 +9,13 @@
           href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.6/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/graph.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='js/inspire-tree-1.12/inspire-tree.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='js/inspire-tree-1.12/tree.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tree.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/legend.css') }}">
 
-    <script src="https://npmcdn.com/tether@1.2.4/dist/js/tether.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.js"></script>
+    <script type="text/javascript"
+            src="https://npmcdn.com/tether@1.2.4/dist/js/tether.min.js"></script>
     <script type="text/javascript"
             src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script type="text/javascript"
@@ -41,82 +45,93 @@
 
 </head>
 <body>
-{#<div class="col-lg-12 graph-controller"><!-- /.graph-controls -->#}
-{#    <nav class="navbar navbar-default">#}
-{#        <div class="container">#}
-{#            <div class="navbar-collapse">#}
-{#                <ul class="nav navbar-nav">#}
-{#                    <!-- Nodes - Edges - Funcionalities - Export - Legend -->#}
-{#                    <li class="controls dropdown">#}
-{#                        <a class="dropdown-toggle" data-toggle="dropdown" role="button">Nodes<span#}
-{#                                class="caret"></span></a>#}
-{#                        <ul class="dropdown-menu controls-lower-case">#}
-{#                            <div>#}
-{#                                <div class="input-group">#}
-{#                                        <span class="input-group-addon" id="sizing-addon"><i#}
-{#                                                class="fa fa-connectdevelop fa-0.5x"></i></span>#}
-{#                                    <input placeholder="Node finder (click to show)" id="node-search"#}
-{#                                           class="wide form-control"#}
-{#                                           aria-describedby="sizing-addon1" type="text"/>#}
-{#                                </div>#}
-{#                            </div>#}
-{#                            <div id="node-list">#}
-{#                            </div>#}
-{#                        </ul>#}
-{#                    </li>#}
-{#                    <li class="controls dropdown">#}
-{#                        <a class="dropdown-toggle" data-toggle="dropdown" role="button">Edges<span#}
-{#                                class="caret"></span></a>#}
-{#                        <ul class="dropdown-menu controls-lower-case">#}
-{#                            <div>#}
-{#                                <div class="input-group">#}
-{#                                        <span class="input-group-addon" id="sizing-addon"><i#}
-{#                                                class="fa fa-connectdevelop fa-0.5x"></i></span>#}
-{#                                    <input placeholder="Edge finder (click to show)" id="edge-search"#}
-{#                                           class="form-control"#}
-{#                                           aria-describedby="sizing-addon1" type="text"/>#}
-{#                                </div>#}
-{#                            </div>#}
-{#                            <div id="edge-list">#}
-{#                            </div>#}
-{#                        </ul>#}
-{#                    </li>#}
-{#                    <li class="controls"><a data-toggle="modal" data-target="#info-graph">Functionalities</a>#}
-{#                    <li class="dropdown">#}
-{#                        <a class="dropdown-toggle controls" data-toggle="dropdown" role="button">Export Graph<span#}
-{#                                class="caret"></span></a>#}
-{#                        <ul class="dropdown-menu controls">#}
-{#                            <li class="align_left"><a id="save-svg-graph">Save image <i class="fa fa-file-image-o"#}
-{#                            ></i></a></li>#}
-{#                        </ul>#}
-{#                    </li>#}
-{##}
-{#                    <li class="controls"><a data-toggle="modal" data-target="#legend">Legend</a>#}
-{#                    </li>#}
-{#                </ul>#}
-{#            </div><!-- /.navbar-collapse -->#}
-{#        </div><!-- /.container-fluid -->#}
-{#    </nav>#}
-{#</div><!-- /.graph-controls -->#}
 
-<div class="col-lg-12">
-    <h2 class="text-center"> Biological Network Explorer</h2>
+<div class="container">
+    <div class="col-lg-12">
+        <div class="row justify-content-md-center "><!-- Title row -->
 
-    <div class="row justify-content-md-center">
+            <h2 class="text-center"> Biological Network Explorer</h2>
 
-        <div class="col-lg-9" id="graph-chart">
-        </div>
-        <div class="col-lg-2" id="tree">
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-lg-10">
-        </div>
-        <div class="col-lg-2 center">
-            <button type="button" id="submit-button" class="btn btn-primary btn-lg">
-                Submit
-            </button>
-        </div>
+        </div><!-- Title row -->
+
+        <div class="row justify-content-md-center"><!-- visualization row -->
+
+
+            <div class="col-lg-8" id="graph-chart"><!-- force -->
+            </div><!-- force -->
+            <div class="col-lg-4"><!-- filters and tools div -->
+
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="tab" href="#tree-panel" role="tab"><i
+                                class="fa fa-filter" aria-hidden="true"></i> Annotation filter</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" data-toggle="tab" href="#nodes-panel" role="tab"><i
+                                class="fa fa-circle-o"
+                                aria-hidden="true"></i>
+                            Nodes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" data-toggle="tab" href="#edges-panel" role="tab"><i
+                                class="fa fa-long-arrow-right" aria-hidden="true"></i> Edges</a>
+                    </li>
+
+                </ul>
+
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tree-panel" role="tabpanel">
+                        <div id="tree"></div>
+                    </div>
+                    <div class="tab-pane not-rounded" id="nodes-panel" role="tabpanel">
+                        <button class='btn btn-primary not-rounded' id='get-checked-nodes'>Show selected nodes</button>
+                        <div class="input-group">
+                                        <span class="input-group-addon not-rounded2" id="sizing-addon"><i
+                                                class="fa fa-connectdevelop fa-0.5x"></i></span>
+                            <input placeholder="Search node" id="node-search"
+                                   class="wide form-control not-rounded"
+                                   aria-describedby="sizing-addon1" type="text"/>
+                        </div>
+                        <div class="not-rounded2" id="node-list"
+                             style="max-height: 70vh;height: 70vh;overflow: auto;"></div>
+
+                    </div>
+                    <div class="tab-pane not-rounded" id="edges-panel" role="tabpanel">
+                        <button class='btn btn-primary not-rounded' id='get-checked-edges'>Show selected edges</button>
+                        <div class="input-group">
+                                        <span class="input-group-addon not-rounded2" id="sizing-addon"><i
+                                                class="fa fa-connectdevelop fa-0.5x"></i></span>
+                            <input placeholder="Search edge" id="edge-search"
+                                   class="wide form-control not-rounded"
+                                   aria-describedby="sizing-addon1" type="text"/>
+                        </div>
+                        <div id="edge-list" class="not-rounded2"
+                             style="max-height: 70vh;height: 70vh;overflow: auto;"></div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div><!-- visualization row -->
+        <div class="row"><!-- button row -->
+            <div class="col-lg-8">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#legend">
+                    Legend
+                </button>
+                <button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#info-graph">
+                    Info and funcionalities
+                </button>
+
+            </div>
+
+            <div class="col-lg-4 center">
+                <button type="button" id="submit-button" class="btn btn-primary btn-lg">
+                    Submit
+                </button>
+            </div>
+        </div><!-- button row -->
     </div>
 </div>
 
@@ -132,17 +147,6 @@
 
             <div class="modal-body text-left"><!-- /.Modal body -->
 
-                <h4>Subgraph info</h4>
-                <p class="color_red text-left">Number of nodes: <span class="color_black">{{ number_nodes }}</span></p>
-
-                <p class="color_red text-left">Number of edges: <span class="color_black">{{ number_edges }}</span></p>
-
-                <p class="color_red text-left">Average degree connectivity: <span
-                        class="color_black">{{ number_edges }}</span>
-                </p>
-
-                <h5 class="text-left"><span class="color_red">Selection </span> Network</h5>
-                <hr>
                 <hr>
                 <div class="text-center">
                     <button type="button" id="hide_node_names" class="btn btn-info">Hide BEL names
@@ -197,24 +201,6 @@
                         </tbody>
                     </table>
                 </div>
-                <hr>
-                <h4>Paths Visualization Info (Sankey Diagram)</h4>
-                <div class="table-wrapper">
-                    <table class="table table-responsive">
-                        <thead>
-                        <tr>
-                            <th><b>Function</b></th>
-                            <th><b>Action</b></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td>See all connections of node via paths</td>
-                            <td>Click on node</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
             </div><!-- /.Modal body -->
 
             <div class="modal-footer">
@@ -232,23 +218,22 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h4 class="modal-title">Legend</h4>
+                <h4 class="modal-title center">Legend</h4>
             </div>
             <!-- .modal-header -->
 
             <div class="modal-body">
-                <div id="accordion" class="panel-group">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <a class="collapsed" data-toggle="collapse" data-parent="#accordion"
-                               data-target="#nodes-legend">
-                                Nodes
+                <div id="accordion" role="tablist" aria-multiselectable="true">
+                    <div class="card">
+                        <div class="card-header center" role="tab" id="headingOne">
+                            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne"
+                               aria-expanded="true" aria-controls="collapseOne">
+                                Node legend
                             </a>
                         </div>
-                        <!-- .panel-heading -->
 
-                        <div style="height: 0;" id="nodes-legend" class="panel-collapse collapse">
-                            <div class="panel-body">
+                        <div id="collapseOne" class="collapse show" role="tabpanel" aria-labelledby="headingOne">
+                            <div class="card-block">
                                 <div class="table-wrapper">
                                     <table class="table table-responsive">
                                         <thead>
@@ -260,41 +245,41 @@
                                         </thead>
                                         <tbody>
                                         <tr>
-                                            <td class="col-md-2">p(A)</td>
+                                            <td class="col-md-2">p()</td>
                                             <td class="col-md-1">
                                                 <div class="Protein"></div>
                                             </td>
-                                            <td>Abundance of protein A</td>
+                                            <td>Abundance of protein</td>
                                         </tr>
 
                                         <tr>
-                                            <td>a(A)</td>
+                                            <td>a()</td>
                                             <td>
                                                 <div class="Abundance"></div>
                                             </td>
-                                            <td>Abundance of chemical A (or other non-gene, RNA, protein abundances)
+                                            <td>Abundance of chemical (or other non-gene, RNA, protein abundances)
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>r(A)</td>
+                                            <td>r()</td>
                                             <td>
                                                 <div class="RNA"></div>
                                             </td>
-                                            <td>Abundance of RNA A</td>
+                                            <td>Abundance of RNA</td>
                                         </tr>
                                         <tr>
-                                            <td>m(A)</td>
+                                            <td>m()</td>
                                             <td>
                                                 <div class="miRNA"></div>
                                             </td>
-                                            <td>Abundance of microRNA A</td>
+                                            <td>Abundance of microRNA</td>
                                         </tr>
                                         <tr>
-                                            <td>g(A)</td>
+                                            <td>g()</td>
                                             <td>
                                                 <div class="Gene"></div>
                                             </td>
-                                            <td>Abundance of gene A</td>
+                                            <td>Abundance of gene</td>
                                         </tr>
                                         <tr>
                                             <td>composite()</td>
@@ -331,24 +316,19 @@
                                     </table>
                                     <!-- .table -->
                                 </div>
-                                <!-- .table-wrapper -->
                             </div>
-                            <!-- .panel-body -->
                         </div>
-                        <!-- #nodes-legend.panel-collapse -->
                     </div>
-                    <!-- .panel.panel-default -->
 
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <a data-toggle="collapse" data-parent="#accordion" data-target="#edges-legend">
-                                Edges
+                    <div class="card">
+                        <div class="card-header center" role="tab" id="headingTwo">
+                            <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo"
+                               aria-expanded="false" aria-controls="collapseTwo">
+                                Edge legend
                             </a>
                         </div>
-                        <!-- .panel-heading -->
-
-                        <div style="height: auto;" id="edges-legend" class="panel-collapse collapse in">
-                            <div class="panel-body">
+                        <div id="collapseTwo" class="collapse" role="tabpanel" aria-labelledby="headingTwo">
+                            <div class="card-block">
                                 <div class="table-wrapper">
                                     <table class="table">
                                         <thead>
@@ -516,28 +496,26 @@
                                     </table>
                                     <!-- .table -->
                                 </div>
-                                <!-- .table-wrapper -->
                             </div>
-                            <!-- .panel-body -->
                         </div>
-                        <!-- #edges-legend.panel-collapse.collapse -->
                     </div>
-                    <!-- .panel.panel-default -->
                 </div>
-                <!-- #accordian.panel-group -->
+                <!-- .panel.panel-default -->
             </div>
-            <!-- .modal-body -->
-
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">
-                    Close
-                </button>
-            </div>
-            <!-- .modal-footer -->
+            <!-- #accordian.panel-group -->
         </div>
-        <!-- .modal-content -->
+        <!-- .modal-body -->
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">
+                Close
+            </button>
+        </div>
+        <!-- .modal-footer -->
     </div>
-    <!-- .modal-dialog -->
+    <!-- .modal-content -->
+</div>
+<!-- .modal-dialog -->
 </div><!-- .Legend Modal -->
 
 
