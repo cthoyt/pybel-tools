@@ -10,8 +10,6 @@ $(document).ready(function () {
 
             var key = node_object.text.toString();
 
-            console.log(key);
-
             selection_hash_map[key] = node_object.children.map(function (child) {
                 return child.text
             });
@@ -92,18 +90,19 @@ function erase_frame(div) {
 // Initialize d3.js force to plot the networks from neo4j json
 function init_d3_force(graph) {
 
-    // Clean the current frame
-    d3.select("#graph-chart").remove();
-
     //////////////////////////////
     // Main graph visualization //
     //////////////////////////////
+
+    var graph_div = $('#graph-chart');
+
+    // Clean the current frame
+    graph_div.empty();
 
     d = document;
     e = d.documentElement;
     g = d.getElementsByTagName('body')[0];
 
-    var graph_div = $('#graph-chart');
     var w = graph_div.width(), h = graph_div.height();
 
     var focus_node = null, highlight_node = null;
