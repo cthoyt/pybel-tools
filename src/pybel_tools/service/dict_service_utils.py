@@ -11,7 +11,7 @@ from pybel import from_bytes, BELGraph
 from pybel.constants import *
 from pybel.manager.graph_cache import GraphCacheManager
 from pybel.manager.models import Network
-from ..mutation import add_canonical_names
+from ..mutation import add_canonical_names, left_merge
 from ..selection import filter_graph
 
 log = logging.getLogger(__name__)
@@ -42,6 +42,8 @@ class DictionaryService:
 
         #: dictionary of {int id: tuple node}
         self.nid_node = {}
+
+        self.full_network = None
 
     def _validate_network_id(self, network_id):
         if network_id not in self.networks:
@@ -197,6 +199,35 @@ class DictionaryService:
         })
 
         original_graph = self.get_network_by_id(network_id)
+
+        result_graph = filter_graph(original_graph, expand_nodes=expand_nodes, remove_nodes=remove_nodes, **annotations)
+
+        add_canonical_names(result_graph)
+        self.relabel_nodes_to_identifiers(result_graph)
+
+        return result_graph
+
+    def get_full_network(self):
+        """Gets all networks and merges them together
+
+        :return: A BEL Graph
+        :rtype: pybel.BELGraph
+        """
+
+        if self.full_network is not None:
+            return self.full_network
+
+        result = BELGraph()
+
+        for network_id in self.get_network_ids():
+            left_merge(result, self.get_network_by_id(network_id))
+
+        self.full_network = result
+
+        return result
+
+    def query_all_builder(self, expand_nodes=None, remove_nodes=None, **annotations):
+        original_graph = self.get_full_network()
 
         result_graph = filter_graph(original_graph, expand_nodes=expand_nodes, remove_nodes=remove_nodes, **annotations)
 
