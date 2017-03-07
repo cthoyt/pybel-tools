@@ -33,36 +33,10 @@
 
     <script type="text/javascript">
 
-
         window.filters = {{ filter_json|safe }};
 
         window.id = {{ network_id }};
 
-        $(document).ready(function () {
-
-            var tree = new InspireTree({
-                target: '#tree',
-                selection: {
-                    mode: 'checkbox',
-                    multiple: true
-                },
-                data: window.filters
-            });
-
-            tree.on('model.loaded', function () {
-                tree.expand();
-            });
-
-            // Render the empty frame
-            render_frame();
-
-
-            $("#filter_form").submit(function (event) {
-                $.getJSON("/network/" + window.id, function (data) {
-                    init_d3_force(data);
-                });
-            });
-        });
     </script>
 
 </head>
@@ -132,6 +106,13 @@
         <div class="col-lg-2" id="tree">
         </div>
         <div class="col-lg-9" id="graph-chart">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-2 center">
+            <button type="button" id="submit-button" class="btn btn-primary btn-lg">
+                Submit
+            </button>
         </div>
     </div>
 </div>

@@ -1,3 +1,56 @@
+$(document).ready(function () {
+
+    function get_selected_nodes(tree) {
+        var selected_nodes = tree.selected(true);
+        console.log(selected_nodes);
+
+        var selection_hash_map = {};
+
+        selected_nodes.forEach(function (node_object) {
+
+            var key = node_object.text.toString();
+
+            console.log(key);
+
+            selection_hash_map[key] = node_object.children.map(function (child) {
+                return child.text
+            });
+
+        });
+
+        var params = $.param(selection_hash_map, true);
+
+
+        $.getJSON("/network/" + window.id + '?' + params, function (data) {
+
+            console.log(data);
+            init_d3_force(data);
+        });
+
+    }
+
+    var tree = new InspireTree({
+        target: '#tree',
+        selection: {
+            mode: 'checkbox',
+            multiple: true
+        },
+        data: window.filters
+    });
+
+    tree.on('model.loaded', function () {
+        tree.expand();
+    });
+
+    // Render the empty frame
+    render_frame();
+
+    $("#submit-button").on("click", function () {
+        get_selected_nodes(tree);
+    })
+
+});
+
 function render_frame() {
 
     d = document;
@@ -25,13 +78,22 @@ function render_frame() {
 
     svg.append("text")
         .attr("class", "title")
-        .attr("text-anchor", "middle")
-        .attr("dominant-baseline", "central")
-        .text("Why Are We Leaving Facebook?");
+        .attr("x", w / 2.8)
+        .attr("y", h / 2)
+        .text("Please filter the graph by annotation and press submit");
 }
+
+
+function erase_frame(div) {
+    d3.select(div).remove();
+}
+
 
 // Initialize d3.js force to plot the networks from neo4j json
 function init_d3_force(graph) {
+
+    // Clean the current frame
+    d3.select("#graph-chart").remove();
 
     //////////////////////////////
     // Main graph visualization //
@@ -41,10 +103,8 @@ function init_d3_force(graph) {
     e = d.documentElement;
     g = d.getElementsByTagName('body')[0];
 
-
-    // Graph uses 0.85 x 0.85 of the window size
-    var w = $('.col-lg-12').width(), h = 0.72 * w.innerHeight ||
-        0.72 * e.clientHeight || 0.72 * g.clientHeight;
+    var graph_div = $('#graph-chart');
+    var w = graph_div.width(), h = graph_div.height();
 
     var focus_node = null, highlight_node = null;
 
@@ -445,8 +505,6 @@ function init_d3_force(graph) {
     function selected_nodes_highlight(node_list) {
 
         hide_select_nodes_text(node_list, false);
-        console.log('Node list');
-        console.log(node_list);
 
         // Filter not mapped nodes to change opacity
         var not_mapped_nodes_objects = svg.selectAll(".node").filter(function (el) {
