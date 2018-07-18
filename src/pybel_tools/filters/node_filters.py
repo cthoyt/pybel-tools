@@ -36,7 +36,6 @@ __all__ = [
     'node_missing_label',
     'include_pathology_filter',
     'exclude_pathology_filter',
-    'node_is_upstream_leaf',
     'build_node_data_search',
     'build_node_key_search',
     'build_node_name_search',
@@ -330,16 +329,6 @@ include_pathology_filter = function_inclusion_filter_builder(PATHOLOGY)
 exclude_pathology_filter = function_exclusion_filter_builder(PATHOLOGY)
 
 
-def node_is_upstream_leaf(graph, node):
-    """Returns if the node is an upstream leaf. An upstream leaf is defined as a node that has no in-edges, and exactly
-    1 out-edge.
-
-    :param pybel.BELGraph graph: A BEL graph
-    :param tuple node: A BEL node
-    :return: If the node is an upstream leaf
-    :rtype: bool
-    """
-    return 0 == len(graph.predecessors(node)) and 1 == len(graph.successors(node))
 
 
 # TODO node filter that is false for abundances with no in-edges
