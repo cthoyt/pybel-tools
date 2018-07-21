@@ -6,9 +6,9 @@ from pybel.constants import (
     EQUIVALENT_TO, FUNCTION, GENE, HAS_VARIANT, ORTHOLOGOUS, PROTEIN, RELATION, TRANSCRIBED_TO,
     VARIANTS,
 )
-from pybel.struct.filters import has_polarity
+from pybel.struct.filters import filter_edges, has_polarity
 from pybel.struct.mutation import (
-    collapse_edges_passing_predicates, collapse_nodes, collapse_pair, collapse_to_genes, get_subgraph_by_edge_filter,
+    collapse_nodes, collapse_pair, collapse_to_genes, get_subgraph_by_edge_filter,
 )
 from pybel.struct.pipeline import in_place_transformation, transformation
 from ..filters.edge_filters import build_relation_filter, build_source_namespace_filter, build_target_namespace_filter
@@ -37,6 +37,11 @@ def _collapse_variants_by_function(graph, func):
     for parent_node, variant_node, data in graph.edges(data=True):
         if data[RELATION] == HAS_VARIANT and graph.node[parent_node][FUNCTION] == func:
             collapse_pair(graph, from_node=variant_node, to_node=parent_node)
+
+
+def _collapse_edges_passing_predicates(graph, edge_predicates):
+    for u, v, _ in list(filter_edges(graph, edge_predicates)):
+        collapse_pair(graph, u, v)
 
 
 @in_place_transformation
@@ -94,7 +99,7 @@ def _collapse_edge_by_namespace(graph, victim_namespace, survivor_namespace, rel
         target_namespace_filter
     ]
 
-    collapse_edges_passing_predicates(graph, edge_predicates=edge_predicates)
+    _collapse_edges_passing_predicates(graph, edge_predicates=edge_predicates)
 
 
 @in_place_transformation
@@ -182,7 +187,7 @@ def collapse_entrez_equivalencies(graph):
         source_namespace_filter,
     ]
 
-    collapse_edges_passing_predicates(graph, edge_predicates=edge_predicates)
+    _collapse_edges_passing_predicates(graph, edge_predicates=edge_predicates)
 
 
 @in_place_transformation
