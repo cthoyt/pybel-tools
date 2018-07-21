@@ -39,11 +39,6 @@ def _collapse_variants_by_function(graph, func):
             collapse_pair(graph, from_node=variant_node, to_node=parent_node)
 
 
-def _collapse_edges_passing_predicates(graph, edge_predicates):
-    for u, v, _ in list(filter_edges(graph, edge_predicates)):
-        collapse_pair(graph, u, v)
-
-
 @in_place_transformation
 def collapse_protein_variants(graph):
     """Collapses all protein's variants' edges to their parents, in-place
@@ -80,6 +75,17 @@ def rewire_variants_to_genes(graph):
             graph.node[node][FUNCTION] = GENE
 
 
+def _collapse_edge_passing_predicates(graph, edge_predicates=None):
+    """Collapse all edges passing the given edge predicates.
+
+    :param pybel.BELGraph graph: A BEL Graph
+    :param edge_predicates: A predicate or list of predicates
+    :type edge_predicates: None or (pybel.BELGraph, tuple, tuple, int) -> bool or iter[(pybel.BELGraph, tuple, tuple, int) -> bool]
+    """
+    for u, v, _ in filter_edges(graph, edge_predicates=edge_predicates):
+        collapse_pair(graph, survivor=u, victim=v)
+
+
 def _collapse_edge_by_namespace(graph, victim_namespace, survivor_namespace, relation):
     """Collapses pairs of nodes with the given namespaces that have the given relationship
 
@@ -99,7 +105,7 @@ def _collapse_edge_by_namespace(graph, victim_namespace, survivor_namespace, rel
         target_namespace_filter
     ]
 
-    _collapse_edges_passing_predicates(graph, edge_predicates=edge_predicates)
+    _collapse_edge_passing_predicates(graph, edge_predicates=edge_predicates)
 
 
 @in_place_transformation
@@ -187,7 +193,7 @@ def collapse_entrez_equivalencies(graph):
         source_namespace_filter,
     ]
 
-    _collapse_edges_passing_predicates(graph, edge_predicates=edge_predicates)
+    _collapse_edge_passing_predicates(graph, edge_predicates=edge_predicates)
 
 
 @in_place_transformation
