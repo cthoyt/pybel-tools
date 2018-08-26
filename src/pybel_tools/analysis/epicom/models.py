@@ -4,7 +4,7 @@ from sqlalchemy import Column, Float, ForeignKey, Integer
 from sqlalchemy.orm import relationship
 
 from pybel.manager.models import (
-    ANNOTATION_ENTRY_TABLE_NAME, AnnotationEntry, Base, NAMESPACE_ENTRY_TABLE_NAME,
+    ANNOTATION_TABLE_NAME, AnnotationEntry, Base, NAME_TABLE_NAME,
     NETWORK_TABLE_NAME, NamespaceEntry, Network,
 )
 
@@ -21,10 +21,10 @@ class Score(Base):
     network_id = Column(Integer, ForeignKey('{}.id'.format(NETWORK_TABLE_NAME)))
     network = relationship(Network)
 
-    annotation_id = Column(Integer, ForeignKey('{}.id'.format(ANNOTATION_ENTRY_TABLE_NAME)))
+    annotation_id = Column(Integer, ForeignKey('{}.id'.format(ANNOTATION_TABLE_NAME)))
     annotation = relationship(AnnotationEntry)
 
-    drug_id = Column(Integer, ForeignKey('{}.id'.format(NAMESPACE_ENTRY_TABLE_NAME)))
+    drug_id = Column(Integer, ForeignKey('{}.id'.format(NAME_TABLE_NAME)))
     drug = relationship(NamespaceEntry)
 
     score = Column(Float, nullable=False, unique=False, index=True)

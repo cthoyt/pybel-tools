@@ -29,7 +29,7 @@ INSTALL_REQUIRES = [
     'pybel>=0.11.11',
     'pybel-artifactory',
     'pandas',
-    'networkx==1.11',
+    'networkx',
     'requests',
     'sqlalchemy',
     'click',

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import itertools as itt
-
 import logging
 
-from pybel.constants import RELATION, TWO_WAY_RELATIONS, unqualified_edge_code
+import itertools as itt
+
+from pybel.constants import RELATION, TWO_WAY_RELATIONS
 from pybel.struct import enrich_protein_and_rna_origins
 from pybel.struct.filters import build_relation_predicate, filter_edges
 from pybel.struct.pipeline import in_place_transformation, uni_in_place_transformation
@@ -43,9 +43,9 @@ def infer_missing_inverse_edge(graph, relations):
     :param relations: single or iterable of relation names to add their inverse inferred edges
     :type relations: str or iter[str]
     """
-    for u, v, _, d in filter_edges(graph, build_relation_predicate(relations)):
-        relation = d[RELATION]
-        graph.add_edge(v, u, key=unqualified_edge_code[relation], **{RELATION: INFERRED_INVERSE[relation]})
+    for u, v, k in filter_edges(graph, build_relation_predicate(relations)):
+        relation = graph[u][v][k][RELATION]
+        graph.add_edge(v, u, key=k, **{RELATION: INFERRED_INVERSE[relation]})
 
 
 @in_place_transformation

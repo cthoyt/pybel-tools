@@ -1,12 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from collections import defaultdict
-
 import logging
 
-from pybel.constants import ANNOTATIONS
-from pybel.struct.utils import update_metadata
-from .utils import safe_add_edge
+from pybel.struct.grouping import get_subgraphs_by_annotation
 
 log = logging.getLogger(__name__)
 
@@ -24,20 +20,8 @@ def get_subgraphs_by_annotation_filtered(graph, annotation, values):
     :param iter[str] values: The values to keep
     :rtype: dict[str,pybel.BELGraph]
     """
-    result = defaultdict(graph.fresh_copy)
-    values = set(values)
-
-    for source, target, key, data in graph.edges_iter(keys=True, data=True):
-        annotation_dict = data.get(ANNOTATIONS)
-
-        if annotation_dict is None or annotation not in annotation_dict:
-            continue
-
-        for value in annotation_dict[annotation]:
-            if value in values:
-                safe_add_edge(result[value], source, target, key, data)
-
-    for value in result.values():
-        update_metadata(value, graph)
-
-    return dict(result)
+    return {
+        k: v
+        for k, v in get_subgraphs_by_annotation(graph, annotation).items()
+        if k in values
+    }

@@ -39,7 +39,6 @@ __all__ = [
     'build_node_data_search',
     'build_node_key_search',
     'build_node_cname_search',
-    'iter_undefined_families',
 ]
 
 
@@ -319,32 +318,3 @@ def build_node_cname_search(query):
     :rtype: (pybel.BELGraph, tuple) -> bool
     """
     return build_node_key_search(query, CNAME)
-
-
-def iter_undefined_families(graph, namespace):
-    """Finds protein families from a given namespace (Such as SFAM) that aren't qualified by members
-
-    :param pybel.BELGraph graph: A BEL graph
-    :param namespace: The namespace to filter by
-    :type namespace: str or iter[str]
-    :return: An iterator over nodes that don't
-    :rtype: iter[tuple]
-    """
-    node_predicates = [
-        function_inclusion_filter_builder(PROTEIN),
-        namespace_inclusion_builder(namespace)
-    ]
-
-    for node in filter_nodes(graph, node_predicates):
-        if VARIANTS or FUSION in graph.node[node]:
-            continue
-
-        relations = {
-            d[RELATION]
-            for _, v, d in graph.out_edges_iter(node, data=True)
-        }
-
-        if HAS_MEMBER in relations:
-            continue
-
-        yield node
