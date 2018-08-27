@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 
 import logging
+
 import networkx as nx
 
 from pybel.struct.filters import filter_nodes, is_causal_relation
 from pybel.struct.mutation import (
-    expand_nodes_neighborhoods, get_multi_causal_downstream, get_multi_causal_upstream,
+    expand_nodes_neighborhoods, get_multi_causal_downstream, get_multi_causal_upstream, get_random_subgraph,
     get_subgraph_by_all_shortest_paths, get_subgraph_by_annotation_value, get_subgraph_by_annotations,
     get_subgraph_by_authors, get_subgraph_by_edge_filter, get_subgraph_by_induction, get_subgraph_by_neighborhood,
     get_subgraph_by_pubmed, get_subgraph_by_second_neighbors,
 )
 from pybel.struct.pipeline import transformation
-from .random_subgraph import get_random_subgraph
 from .search import search_node_names
 from ..filters.edge_filters import build_edge_data_filter
 
