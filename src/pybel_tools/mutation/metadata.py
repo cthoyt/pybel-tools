@@ -2,22 +2,18 @@
 
 import logging
 
-from pybel.canonicalize import calculate_canonical_name
 from pybel.constants import CITATION, CITATION_AUTHORS, CITATION_REFERENCE
 from pybel.manager.citation_utils import get_citations_by_pmids
-from pybel.struct.filters import filter_edges, filter_nodes
+from pybel.struct.filters import filter_edges
 from pybel.struct.filters.edge_predicates import has_authors, has_pubmed
 from pybel.struct.pipeline import in_place_transformation, uni_in_place_transformation
 from pybel.struct.summary import get_pubmed_identifiers
 from pybel.struct.summary.node_summary import get_namespaces
-from ..constants import CNAME
-from ..filters.node_filters import node_missing_cname
 from ..summary.edge_summary import get_annotations
 
 __all__ = [
     'parse_authors',
     'serialize_authors',
-    'add_canonical_names',
     'enrich_pubmed_citations',
 ]
 
@@ -79,19 +75,6 @@ def serialize_authors(graph, force_serialize=False):
 
     if 'PYBEL_PARSED_AUTHORS' in graph.graph:
         del graph.graph['PYBEL_PARSED_AUTHORS']
-
-
-@in_place_transformation
-def add_canonical_names(graph, replace=False):
-    """Adds a canonical name to each node's data dictionary if they are missing, in place. 
-
-    :param pybel.BELGraph graph: A BEL graph
-    :param bool replace: Should the canonical names be recalculated?
-    """
-    nodes = graph if replace else filter_nodes(graph, node_missing_cname)
-
-    for node in nodes:
-        graph.node[node][CNAME] = calculate_canonical_name(graph, node)
 
 
 @in_place_transformation
