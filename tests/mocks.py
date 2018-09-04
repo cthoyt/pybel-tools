@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
+"""Mocks for the query builder tests."""
+
 from pybel.manager.models import Network
 from pybel.struct import union
-from pybel.utils import hash_node
 
 
 class MockNetwork(object):
@@ -11,6 +12,7 @@ class MockNetwork(object):
 
 
 class MockQueryManager(object):
+
     def __init__(self, graphs=None):
         """Builds a mock manager appropriate for testing the pipeline and query builders
 

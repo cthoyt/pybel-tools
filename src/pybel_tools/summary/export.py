@@ -114,14 +114,9 @@ def info_list(graph):
         ('Edges', graph.number_of_edges()),
         ('Citations', count_unique_citations(graph)),
         ('Authors', count_unique_authors(graph)),
-        ('Network density', nx.density(graph)),
+        ('Network density', '{:.2E}'.format(nx.density(graph))),
         ('Components', nx.number_weakly_connected_components(graph)),
     ]
-
-    try:
-        result.append(('Average degree', sum(graph.in_degree().values()) / float(number_nodes)))
-    except ZeroDivisionError:
-        log.info('Graph has no nodes')
 
     if graph.warnings:
         result.append(('Compilation warnings', len(graph.warnings)))

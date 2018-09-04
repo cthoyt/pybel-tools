@@ -15,9 +15,9 @@ A general use for a node filter function is to use the built-in :func:`filter` i
 
 from collections import Iterable
 
-from pybel.constants import FUNCTION, FUSION, HAS_MEMBER, LABEL, NAMESPACE, PATHOLOGY, PROTEIN, RELATION, VARIANTS
+from pybel.constants import FUNCTION, LABEL, NAMESPACE, PATHOLOGY
 from pybel.struct.filters import build_node_data_search, build_node_key_search, data_missing_key_builder
-from pybel.struct.filters.node_filters import count_passed_node_filter, filter_nodes
+from pybel.struct.filters.node_filters import count_passed_node_filter
 from ..constants import CNAME
 
 __all__ = [
