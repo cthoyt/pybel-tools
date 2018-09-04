@@ -10,6 +10,7 @@ from pybel.struct.mutation import (
     get_subgraph_by_annotation_value, get_subgraph_by_annotations, get_subgraph_by_authors, get_subgraph_by_edge_filter,
     get_subgraph_by_induction, get_subgraph_by_neighborhood, get_subgraph_by_pubmed, get_subgraph_by_second_neighbors,
 )
+from pybel.struct.operations import subgraph
 from pybel.struct.pipeline import transformation
 from pybel.struct.query import get_subgraph
 from .search import search_node_names
@@ -82,4 +83,5 @@ def get_largest_component(graph):
     :return: The giant component of the graph
     :rtype: pybel.BELGraph
     """
-    return max(nx.weakly_connected_component_subgraphs(graph), key=len)
+    biggest_component_nodes = max(nx.weakly_connected_components(graph), key=len)
+    return subgraph(graph, biggest_component_nodes)
