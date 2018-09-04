@@ -17,11 +17,9 @@ from collections import Iterable
 
 from pybel.constants import *
 from pybel.struct.filters import (
-    build_annotation_dict_all_filter, build_annotation_dict_any_filter,
-    count_passed_edge_filter,
+    build_annotation_dict_all_filter, build_annotation_dict_any_filter, count_passed_edge_filter,
 )
-from pybel.struct.filters.edge_predicates import edge_predicate, has_authors, has_pubmed, is_causal_relation
-from pybel.struct.filters.node_predicates import is_pathology
+from pybel.struct.filters.edge_predicates import edge_predicate, has_authors, has_pathology_causal, has_pubmed
 from pybel.utils import subdict_matches
 
 __all__ = [
@@ -187,24 +185,6 @@ def build_author_inclusion_filter(author):
             )
 
         return author_filter
-
-
-def has_pathology_causal(graph, u, v, k):
-    """Returns if the subject of this edge is a pathology and participates in a causal relation where the object is
-    not a pathology. These relations are generally nonsense.
-
-    :param pybel.BELGraph graph: A BEL Graph
-    :param tuple u: A BEL node
-    :param tuple v: A BEL node
-    :param int k: The edge key between the given nodes
-    :return: If the subject of this edge is a pathology and it participates in a causal reaction.
-    :rtype: bool
-    """
-    return (
-            is_pathology(graph, u) and
-            is_causal_relation(graph, u, v, k) and
-            graph.node[v][FUNCTION] not in {PATHOLOGY, BIOPROCESS}
-    )
 
 
 def node_has_namespace(graph, node, namespace):
