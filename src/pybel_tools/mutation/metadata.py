@@ -47,7 +47,7 @@ def parse_authors(graph, force_parse=False):
 
         edge_authors = list(author_str.split('|'))
         all_authors.update(edge_authors)
-        graph.edge[u][v][k][CITATION][CITATION_AUTHORS] = edge_authors
+        graph[u][v][k][CITATION][CITATION_AUTHORS] = edge_authors
 
     graph.graph['PYBEL_PARSED_AUTHORS'] = True
 
@@ -71,7 +71,7 @@ def serialize_authors(graph, force_serialize=False):
         if not isinstance(authors, list):
             continue
 
-        graph.edge[u][v][k][CITATION][CITATION_AUTHORS] = '|'.join(authors)
+        graph[u][v][k][CITATION][CITATION_AUTHORS] = '|'.join(authors)
 
     if 'PYBEL_PARSED_AUTHORS' in graph.graph:
         del graph.graph['PYBEL_PARSED_AUTHORS']
@@ -101,14 +101,14 @@ def enrich_pubmed_citations(graph, stringify_authors=False, manager=None):
     pmid_data, errors = get_citations_by_pmids(manager=manager, pmids=pmids)
 
     for u, v, k in filter_edges(graph, has_pubmed):
-        pmid = graph.edge[u][v][k][CITATION][CITATION_REFERENCE].strip()
+        pmid = graph[u][v][k][CITATION][CITATION_REFERENCE].strip()
 
         if pmid not in pmid_data:
             log.warning('Missing data for PubMed identifier: %s', pmid)
             errors.add(pmid)
             continue
 
-        graph.edge[u][v][k][CITATION].update(pmid_data[pmid])
+        graph[u][v][k][CITATION].update(pmid_data[pmid])
 
     if stringify_authors:
         serialize_authors(graph)

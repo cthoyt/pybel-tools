@@ -9,7 +9,7 @@ from pybel.constants import *
 from pybel.parser import BELParser
 from pybel_tools.serialization.functional import convert_for_belief
 
-
+@unittest.skip
 class TestFunctionalize(unittest.TestCase):
     """These examples are taken from pybel's test functions in tests/test_parse_bel.py"""
 
