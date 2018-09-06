@@ -11,7 +11,7 @@ from pybel.manager import Manager
 from pybel.struct.mutation import enrich_protein_and_rna_origins
 from pybel.struct.summary import get_annotation_values
 from .io import from_path_ensure_pickle
-from .mutation import add_canonical_names, enrich_pubmed_citations
+from .mutation import enrich_pubmed_citations
 from .selection import get_subgraph_by_annotation_value
 
 __all__ = [
