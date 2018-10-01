@@ -13,25 +13,30 @@ from pybel.dsl.node_classes import BaseAbundance, CentralDogma, Gene, ListAbunda
 from pybel_tools.constants import KEGG_RELATIONS
 
 
-def build_matrices(graph: BELGraph) -> Dict:
-    """Build adjencency matrices for each KEGG relationships.
+def get_matrix_index(graph: BELGraph) -> set:
+    """Return set of HGNC names from Proteins/Rnas/Genes/miRNA, nodes that can be used by SPIA.
 
     :param graph: BELGraph
-    :return: Dictionary of adjency matrix for each relationship
+    :return: node names
     """
     # TODO: Using HGNC Symbols for now
-    nodes = {
+    return {
         node.name
         for node in graph.nodes()
         if issubclass(type(node), BaseAbundance) and node.namespace == 'HGNC'
     }
 
-    matrix_dict = {
+
+def build_matrices(nodes: set) -> Dict[str, DataFrame]:
+    """Build adjacency matrices for each KEGG relationships.
+
+    :param nodes: nodes to be included in the matrix
+    :return: Dictionary of adjency matrix for each relationship
+    """
+    return {
         relation: DataFrame(0, index=nodes, columns=nodes)
         for relation in KEGG_RELATIONS
     }
-
-    return matrix_dict
 
 
 def update_matrix(matrix_dict, sub, obj, data):
@@ -105,7 +110,7 @@ def bel_to_spia(graph: BELGraph) -> Dict:
     """Create excel sheet ready to be used in SPIA software.
 
     :param graph: BELGraph
-    :return:
+    :return: dictionary with matrices
     """
 
     matrix_dict = build_matrices(graph)
@@ -149,6 +154,7 @@ def bel_to_spia(graph: BELGraph) -> Dict:
 
         # else Not valid edge
 
+    matrix_dict["nodes"] = node
     # TODO: Add nodes, title, and number of reactions
 
     return matrix_dict

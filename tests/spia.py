@@ -9,7 +9,7 @@ from pandas import DataFrame
 
 from pybel.dsl import protein, pmod
 from pybel.examples.sialic_acid_example import sialic_acid_graph
-from pybel_tools.analysis.spia import build_matrices, update_matrix
+from pybel_tools.analysis.spia import build_matrices, get_matrix_index, update_matrix
 
 log = logging.getLogger(__name__)
 log.setLevel(10)
@@ -24,7 +24,9 @@ class TestSpia(unittest.TestCase):
     def test_build_matrix(self):
         """Test build empty matrix."""
 
-        matrix_dict = build_matrices(self.sialic_acid_graph)
+        node_names = get_matrix_index(self.sialic_acid_graph)
+
+        matrix_dict = build_matrices(node_names)
 
         nodes = {'PTPN11', 'TREM2', 'PTPN6', 'TYROBP', 'CD33', 'SYK'}
 
