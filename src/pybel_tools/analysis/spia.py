@@ -9,6 +9,7 @@ from typing import Dict
 import pandas as pd
 
 from pybel import BELGraph
+from pybel.constants import ASSOCIATION, INCREASES, DECREASES, DIRECTLY_DECREASES, DIRECTLY_INCREASES
 from pybel.dsl.node_classes import BaseAbundance, CentralDogma, Gene, ListAbundance, Rna, ProteinModification
 from pybel_tools.constants import KEGG_RELATIONS
 
@@ -58,7 +59,7 @@ def update_matrix(matrix_dict, sub, obj, data):
 
         relation = data['relation']
 
-        if relation == 'increase':
+        if relation in {DIRECTLY_INCREASES, INCREASES}:
 
             # If it has pmod check which one and add it to the corresponding matrix
             if any(isinstance(variant, ProteinModification) for variant in obj.variants):
@@ -80,7 +81,7 @@ def update_matrix(matrix_dict, sub, obj, data):
                 else:
                     matrix_dict['activation'][subject_name][object_name] = 1
 
-        if relation == "decrease":
+        if relation in {DIRECTLY_DECREASES, DECREASES}:
 
             # If it has pmod check which one and add it to the corresponding matrix
             if any(isinstance(variant, ProteinModification) for variant in obj.variants):
@@ -102,7 +103,7 @@ def update_matrix(matrix_dict, sub, obj, data):
                 else:
                     matrix_dict["inhibition"][subject_name][object_name] = 1
 
-        if relation == 'association':
+        if relation == ASSOCIATION:
             matrix_dict["binding_association"][subject_name][object_name] = 1
 
 

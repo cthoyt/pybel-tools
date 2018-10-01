@@ -42,7 +42,7 @@ class TestSpia(unittest.TestCase):
 
         test_dict = {}
 
-        test_matrix= DataFrame(0, index=index, columns=index)
+        test_matrix = DataFrame(0, index=index, columns=index)
         # Initialize matrix correctly
         self.assertEqual(test_matrix.values.all(), 0)
 
