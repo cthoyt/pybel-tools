@@ -6,7 +6,7 @@
 from itertools import product
 from typing import Dict
 
-from pandas import DataFrame
+import pandas as pd
 
 from pybel import BELGraph
 from pybel.dsl.node_classes import BaseAbundance, CentralDogma, Gene, ListAbundance, Rna, ProteinModification
@@ -27,14 +27,14 @@ def get_matrix_index(graph: BELGraph) -> set:
     }
 
 
-def build_matrices(nodes: set) -> Dict[str, DataFrame]:
+def build_matrices(nodes: set) -> Dict[str, pd.DataFrame]:
     """Build adjacency matrices for each KEGG relationships.
 
     :param nodes: nodes to be included in the matrix
     :return: Dictionary of adjency matrix for each relationship
     """
     return {
-        relation: DataFrame(0, index=nodes, columns=nodes)
+        relation: pd.DataFrame(0, index=nodes, columns=nodes)
         for relation in KEGG_RELATIONS
     }
 
@@ -154,8 +154,24 @@ def bel_to_spia(graph: BELGraph) -> Dict:
 
         # else Not valid edge
 
-    matrix_dict["nodes"] = index_nodes
-    matrix_dict["title"] = graph.name
-    matrix_dict["NumberOfReactions"] = 0
-
     return matrix_dict
+
+
+def spia_to_excel(spia_data_dict: Dict[str, pd.DataFrame]):
+    """Export SPIA data dictionary into an excel sheet.
+
+    :param spia_data_dict: data coming from bel_to_spia
+    """
+
+    writer = pd.ExcelWriter('{}.xlsx'.format(spia_data_dict['title']), engine='xlsxwriter')
+
+    for relation, df in spia_data_dict:
+        df.to_excel(writer, sheet_name=relation)
+
+    # The R import should add the values:
+    # ["nodes"] from the columns
+    # ["title"] from the name of the file
+    # ["NumberOfReactions"] set to "0"
+
+    # Save excel
+    writer.save()
