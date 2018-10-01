@@ -103,7 +103,7 @@ def update_matrix(matrix_dict, sub, obj, data):
                     matrix_dict["inhibition"][subject_name][object_name] = 1
 
         if relation == 'association':
-            matrix_dict["binding/association"][subject_name][object_name] = 1
+            matrix_dict["binding_association"][subject_name][object_name] = 1
 
 
 def bel_to_spia(graph: BELGraph) -> Dict:
@@ -153,19 +153,19 @@ def bel_to_spia(graph: BELGraph) -> Dict:
                     update_matrix(matrix_dict, sub_member, obj_member, data)
 
         # else Not valid edge
-
     return matrix_dict
 
 
-def spia_to_excel(spia_data_dict: Dict[str, pd.DataFrame]):
+def spia_to_excel(spia_data_dict: Dict[str, pd.DataFrame], file_name: str):
     """Export SPIA data dictionary into an excel sheet.
 
     :param spia_data_dict: data coming from bel_to_spia
+    :param file_name: file name
     """
 
-    writer = pd.ExcelWriter('{}.xlsx'.format(spia_data_dict['title']), engine='xlsxwriter')
+    writer = pd.ExcelWriter('{}.xlsx'.format(file_name), engine='xlsxwriter')
 
-    for relation, df in spia_data_dict:
+    for relation, df in spia_data_dict.items():
         df.to_excel(writer, sheet_name=relation)
 
     # The R import should add the values:
