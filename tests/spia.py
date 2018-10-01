@@ -7,9 +7,9 @@ import unittest
 
 from pandas import DataFrame
 
-from pybel.dsl import protein, pmod, rna
-from pybel.examples.sialic_acid_example import sialic_acid_graph
-from pybel_tools.analysis.spia import build_matrices, update_matrix, get_matrix_index, bel_to_spia, spia_to_excel
+from pybel.dsl import protein, pmod, rna, composite_abundance
+from pybel.examples.sialic_acid_example import sialic_acid_graph, sialic_acid_cd33_complex, cd33, trem2, shp1, shp2, citation, evidence_1, activity
+from pybel_tools.analysis.spia import build_matrices, update_matrix, get_matrix_index, bel_to_spia
 
 log = logging.getLogger(__name__)
 log.setLevel(10)
@@ -43,6 +43,7 @@ class TestSpia(unittest.TestCase):
         test_dict = {}
 
         test_matrix= DataFrame(0, index=index, columns=index)
+
         # Initialize matrix correctly
         self.assertEqual(test_matrix.values.all(), 0)
 
@@ -97,8 +98,6 @@ class TestSpia(unittest.TestCase):
 
     def test_update_matrix_activation_phosphorylation(self):
         """Test updating the matrix with an activation phosphorylation."""
-        data = bel_to_spia(self.sialic_acid_graph)
-        spia_to_excel(data, 'test')
 
         sub = protein(namespace='HGNC', name='A', identifier='1')
         obj = protein(namespace='HGNC', name='B', identifier='2', variants=[pmod('Ph')])
@@ -138,6 +137,27 @@ class TestSpia(unittest.TestCase):
         self.assertEqual(test_dict["expression"]['B']['A'], 0)
         self.assertEqual(test_dict["expression"]['B']['B'], 0)
 
+
+    def test_update_matrix_repression(self):
+        """Test updating the matrix with RNA repression."""
+        sub = protein(namespace='HGNC', name='A', identifier='1')
+        obj = rna(namespace='HGNC', name='B', identifier='2')
+
+        index = {'A', 'B'}
+
+        test_dict = {}
+
+        test_matrix= DataFrame(0, index=index, columns=index)
+
+        test_dict["repression"] = test_matrix
+
+        update_matrix(test_dict, sub, obj, {'relation': 'decreases'})
+
+        self.assertEqual(test_dict["repression"]['A']['B'], 1)
+        self.assertEqual(test_dict["repression"]['A']['A'], 0)
+        self.assertEqual(test_dict["repression"]['B']['A'], 0)
+        self.assertEqual(test_dict["repression"]['B']['B'], 0)
+
     def test_update_matrix_activation(self):
         """Test updating the matrix with activation."""
         sub = protein(namespace='HGNC', name='A', identifier='1')
@@ -158,6 +178,27 @@ class TestSpia(unittest.TestCase):
         self.assertEqual(test_dict["activation"]['B']['A'], 0)
         self.assertEqual(test_dict["activation"]['B']['B'], 0)
 
+
+    def test_update_matrix_inhibition(self):
+        """Test updating the matrix with activation."""
+        sub = protein(namespace='HGNC', name='A', identifier='1')
+        obj = protein(namespace='HGNC', name='B', identifier='2')
+
+        index = {'A', 'B'}
+
+        test_dict = {}
+
+        test_matrix= DataFrame(0, index=index, columns=index)
+
+        test_dict["inhibition"] = test_matrix
+
+        update_matrix(test_dict, sub, obj, {'relation': 'decreases'})
+
+        self.assertEqual(test_dict["inhibition"]['A']['B'], 1)
+        self.assertEqual(test_dict["inhibition"]['A']['A'], 0)
+        self.assertEqual(test_dict["inhibition"]['B']['A'], 0)
+        self.assertEqual(test_dict["inhibition"]['B']['B'], 0)
+
     def test_update_matrix_association(self):
         """Test updating the matrix with association."""
         sub = protein(namespace='HGNC', name='A', identifier='1')
@@ -177,3 +218,63 @@ class TestSpia(unittest.TestCase):
         self.assertEqual(test_dict["binding_association"]['A']['A'], 0)
         self.assertEqual(test_dict["binding_association"]['B']['A'], 0)
         self.assertEqual(test_dict["binding_association"]['B']['B'], 0)
+
+    def test_update_matrix_pmods(self):
+        """Test updating the matrix with multiple protein modifications."""
+        sub = protein(namespace='HGNC', name='A', identifier='1')
+        obj = protein(namespace='HGNC', name='B', identifier='2', variants=[pmod('Ub'), pmod('Ph')])
+
+        index = {'A', 'B'}
+
+        test_dict = {}
+
+        test_matrix= DataFrame(0, index=index, columns=index)
+
+        test_dict["activation_ubiquination"] = test_matrix
+        test_dict["activation_phosphorylation"] = test_matrix
+
+        update_matrix(test_dict, sub, obj, {'relation': 'increases'})
+
+        self.assertEqual(test_dict["activation_ubiquination"]['A']['B'], 1)
+        self.assertEqual(test_dict["activation_ubiquination"]['A']['A'], 0)
+        self.assertEqual(test_dict["activation_ubiquination"]['B']['A'], 0)
+        self.assertEqual(test_dict["activation_ubiquination"]['B']['B'], 0)
+
+        self.assertEqual(test_dict["activation_phosphorylation"]['A']['B'], 1)
+        self.assertEqual(test_dict["activation_phosphorylation"]['A']['A'], 0)
+        self.assertEqual(test_dict["activation_phosphorylation"]['B']['A'], 0)
+        self.assertEqual(test_dict["activation_phosphorylation"]['B']['B'], 0)
+
+    def test_spia_matrix_complexes(self):
+        """Test handling of complexes."""
+        self.sialic_acid_graph.add_increases(
+            sialic_acid_cd33_complex,
+            trem2,
+            citation=citation,
+            annotations={'Species': '9606', 'Confidence': 'High'},
+            evidence=evidence_1,
+            object_modifier=activity()
+        )
+
+        spia_matrix = bel_to_spia(self.sialic_acid_graph)
+
+        self.assertEqual(spia_matrix["activation"][cd33.name][trem2.name], 1)
+
+    def test_spia_matrix_composites(self):
+        """Test handling of composites."""
+        shp = composite_abundance([shp1, shp2])
+
+        self.sialic_acid_graph.add_increases(
+            shp,
+            trem2,
+            citation=citation,
+            annotations={'Species': '9606', 'Confidence': 'High'},
+            evidence=evidence_1,
+            object_modifier=activity()
+        )
+
+        spia_matrix = bel_to_spia(self.sialic_acid_graph)
+
+        self.assertEqual(spia_matrix["activation"][shp1.name][trem2.name], 1)
+        self.assertEqual(spia_matrix["activation"][shp2.name][trem2.name], 1)
+
