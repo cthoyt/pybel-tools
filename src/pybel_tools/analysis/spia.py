@@ -112,8 +112,8 @@ def bel_to_spia(graph: BELGraph) -> Dict:
     :param graph: BELGraph
     :return: dictionary with matrices
     """
-
-    matrix_dict = build_matrices(graph)
+    index_nodes = get_matrix_index(graph)
+    matrix_dict = build_matrices(index_nodes)
 
     for sub, obj, data in graph.edges(data=True):
 
@@ -154,7 +154,8 @@ def bel_to_spia(graph: BELGraph) -> Dict:
 
         # else Not valid edge
 
-    matrix_dict["nodes"] = node
-    # TODO: Add nodes, title, and number of reactions
+    matrix_dict["nodes"] = index_nodes
+    matrix_dict["title"] = graph.name
+    matrix_dict["NumberOfReactions"] = 0
 
     return matrix_dict
