@@ -58,7 +58,7 @@ def update_matrix(matrix_dict, sub, obj, data):
         if relation in {DIRECTLY_INCREASES, INCREASES}:
 
             # If it has pmod check which one and add it to the corresponding matrix
-            if any(isinstance(variant, ProteinModification) for variant in obj.variants):
+            if obj.variants and any(isinstance(variant, ProteinModification) for variant in obj.variants):
 
                 for variant in obj.variants:
 
@@ -80,7 +80,7 @@ def update_matrix(matrix_dict, sub, obj, data):
         if relation in {DIRECTLY_DECREASES, DECREASES}:
 
             # If it has pmod check which one and add it to the corresponding matrix
-            if any(isinstance(variant, ProteinModification) for variant in obj.variants):
+            if obj.variants and any(isinstance(variant, ProteinModification) for variant in obj.variants):
 
                 for variant in obj.variants:
 
