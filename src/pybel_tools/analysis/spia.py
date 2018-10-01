@@ -49,11 +49,7 @@ def update_matrix(matrix_dict, sub, obj, data):
     :param data:
     :return:
     """
-
-    if sub.namespace != 'HGNC' or obj.namespace != 'HGNC':
-        pass
-
-    else:
+    if sub.namespace == 'HGNC' or obj.namespace == 'HGNC':
         subject_name = sub.name
         object_name = obj.name
 
@@ -163,7 +159,6 @@ def spia_to_excel(spia_data_dict: Dict[str, pd.DataFrame], file_name: str):
     :param spia_data_dict: data coming from bel_to_spia
     :param file_name: file name
     """
-
     writer = pd.ExcelWriter('{}.xlsx'.format(file_name), engine='xlsxwriter')
 
     for relation, df in spia_data_dict.items():
