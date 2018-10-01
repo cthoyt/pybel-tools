@@ -1,0 +1,154 @@
+# -*- coding: utf-8 -*-
+
+"""This module contains the BEL exporter to SPIA format.
+(see: https://bioconductor.org/packages/release/bioc/html/SPIA.html)
+"""
+from itertools import product
+from typing import Dict
+
+from pandas import DataFrame
+
+from pybel import BELGraph
+from pybel.dsl.node_classes import BaseAbundance, CentralDogma, Gene, ListAbundance, Rna, ProteinModification
+from pybel_tools.constants import KEGG_RELATIONS
+
+
+def build_matrices(graph: BELGraph) -> Dict:
+    """Build adjencency matrices for each KEGG relationships.
+
+    :param graph: BELGraph
+    :return: Dictionary of adjency matrix for each relationship
+    """
+    # TODO: Using HGNC Symbols for now
+    nodes = {
+        node.name
+        for node in graph.nodes()
+        if issubclass(type(node), BaseAbundance) and node.namespace == 'HGNC'
+    }
+
+    matrix_dict = {
+        relation: DataFrame(0, index=nodes, columns=nodes)
+        for relation in KEGG_RELATIONS
+    }
+
+    return matrix_dict
+
+
+def update_matrix(matrix_dict, sub, obj, data):
+    """
+
+    :param matrix_dict:
+    :param sub:
+    :param obj:
+    :param data:
+    :return:
+    """
+
+    if sub.namespace != 'HGNC' or obj.namespace != 'HGNC':
+        pass
+
+    else:
+        subject_name = sub.name
+        object_name = obj.name
+
+        relation = data['relation']
+
+        if relation == 'increase':
+
+            # If it has pmod check which one and add it to the corresponding matrix
+            if any(isinstance(variant, ProteinModification) for variant in obj.variants):
+
+                for variant in obj.variants:
+
+                    if variant['identifier']['name'] == "Ub":
+                        matrix_dict["activation_ubiquination"][subject_name][object_name] = 1
+
+                    elif variant['identifier']['name'] == "Ph":
+                        matrix_dict["activation_phosphorylation"][subject_name][object_name] = 1
+
+            # Normal increase, add activation
+            else:
+
+                if isinstance(obj, Gene) or isinstance(obj, Rna):
+                    matrix_dict['expression'][subject_name][object_name] = 1
+
+                else:
+                    matrix_dict['activation'][subject_name][object_name] = 1
+
+        if relation == "decrease":
+
+            # If it has pmod check which one and add it to the corresponding matrix
+            if any(isinstance(variant, ProteinModification) for variant in obj.variants):
+
+                for variant in obj.variants:
+
+                    if variant['identifier']['name'] == "Ub":
+                        matrix_dict['inhibition_ubiquination'][subject_name][object_name] = 1
+
+                    elif variant['identifier']['name'] == "Ph":
+                        matrix_dict["inhibition_phosphorylation"][subject_name][object_name] = 1
+
+            # Normal decrease, check which matrix
+            else:
+
+                if isinstance(obj, Gene) or isinstance(obj, Rna):
+                    matrix_dict["repression"][subject_name][object_name] = 1
+
+                else:
+                    matrix_dict["inhibition"][subject_name][object_name] = 1
+
+        if relation == 'association':
+            matrix_dict["binding/association"][subject_name][object_name] = 1
+
+
+def bel_to_spia(graph: BELGraph) -> Dict:
+    """Create excel sheet ready to be used in SPIA software.
+
+    :param graph: BELGraph
+    :return:
+    """
+
+    matrix_dict = build_matrices(graph)
+
+    for sub, obj, data in graph.edges(data=True):
+
+        # Both nodes are CentralDogma abundances
+        if issubclass(type(sub), CentralDogma) and issubclass(type(obj), CentralDogma):
+            # Update matrix dict
+            update_matrix(matrix_dict, sub, obj, data)
+
+        # Subject is CentralDogmaAbundance and node is ListAbundance
+        elif issubclass(type(sub), CentralDogma) and issubclass(type(obj), ListAbundance):
+            # Add a relationship from subject to each of the members in the object
+            for node in obj.members:
+
+                # Skip if the member is not in CentralDogma
+                if not issubclass(type(node), CentralDogma):
+                    continue
+
+                update_matrix(matrix_dict, sub, node, data)
+
+        # Subject is ListAbundance and node is CentralDogmaAbundance
+        elif issubclass(type(sub), ListAbundance) and issubclass(type(obj), CentralDogma):
+            # Add a relationship from each of the members of the subject to the object
+            for node in sub.members:
+
+                # Skip if the member is not in CentralDogma
+                if not issubclass(type(node), CentralDogma):
+                    continue
+
+                update_matrix(matrix_dict, node, obj, data)
+
+        # Both nodes are ListAbundance
+        elif issubclass(type(sub), ListAbundance) and issubclass(type(obj), ListAbundance):
+            for sub_member, obj_member in product(sub.members, obj.members):
+
+                # Update matrix if both are CentralDogma
+                if issubclass(type(sub_member), CentralDogma) and issubclass(type(obj_member), CentralDogma):
+                    update_matrix(matrix_dict, sub_member, obj_member, data)
+
+        # else Not valid edge
+
+    # TODO: Add nodes, title, and number of reactions
+
+    return matrix_dict

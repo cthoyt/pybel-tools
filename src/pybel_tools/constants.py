@@ -42,3 +42,29 @@ BMS_BASE = 'BMS_BASE'
 
 DEFAULT_SERVICE_URL = 'https://pybel.scai.fraunhofer.de'
 
+KEGG_RELATIONS = {
+    "activation",
+    "compound",
+    "binding/association",
+    "expression",
+    "inhibition",
+    "activation_phosphorylation",
+    "phosphorylation",
+    "inhibition_phosphorylation",
+    "inhibition_dephosphorylation",
+    "dissociation", "dephosphorylation",
+    "activation_dephosphorylation",
+    "state change",
+    "activation_indirect effect",
+    "inhibition_ubiquination",
+    "ubiquination",
+    "expression_indirect effect",
+    "inhibition_indirect effect",
+    "repression",
+    "dissociation_phosphorylation",
+    "indirect effect_phosphorylation",
+    "activation_binding/association",
+    "indirect effect",
+    "activation_compound",
+    "activation_ubiquination"
+}
