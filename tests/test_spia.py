@@ -6,9 +6,18 @@ import logging
 import unittest
 
 from pandas import DataFrame
+from pybel.dsl import activity, composite_abundance, protein, pmod, rna
+from pybel.examples.sialic_acid_example import (
+    cd33,
+    citation,
+    evidence_1,
+    trem2,
+    shp1,
+    shp2,
+    sialic_acid_graph,
+    sialic_acid_cd33_complex,
+)
 
-from pybel.dsl import protein, pmod, rna, composite_abundance
-from pybel.examples.sialic_acid_example import sialic_acid_graph, sialic_acid_cd33_complex, cd33, trem2, shp1, shp2, citation, evidence_1, activity
 from pybel_tools.analysis.spia import build_matrices, update_matrix, get_matrix_index, bel_to_spia
 
 log = logging.getLogger(__name__)
@@ -42,7 +51,7 @@ class TestSpia(unittest.TestCase):
 
         test_dict = {}
 
-        test_matrix= DataFrame(0, index=index, columns=index)
+        test_matrix = DataFrame(0, index=index, columns=index)
 
         # Initialize matrix correctly
         self.assertEqual(test_matrix.values.all(), 0)
@@ -65,7 +74,7 @@ class TestSpia(unittest.TestCase):
 
         test_dict = {}
 
-        test_matrix= DataFrame(0, index=index, columns=index)
+        test_matrix = DataFrame(0, index=index, columns=index)
 
         test_dict["activation_ubiquination"] = test_matrix
 
@@ -85,7 +94,7 @@ class TestSpia(unittest.TestCase):
 
         test_dict = {}
 
-        test_matrix= DataFrame(0, index=index, columns=index)
+        test_matrix = DataFrame(0, index=index, columns=index)
 
         test_dict["inhibition_phosphorylation"] = test_matrix
 
@@ -106,7 +115,7 @@ class TestSpia(unittest.TestCase):
 
         test_dict = {}
 
-        test_matrix= DataFrame(0, index=index, columns=index)
+        test_matrix = DataFrame(0, index=index, columns=index)
 
         test_dict["activation_phosphorylation"] = test_matrix
 
@@ -126,7 +135,7 @@ class TestSpia(unittest.TestCase):
 
         test_dict = {}
 
-        test_matrix= DataFrame(0, index=index, columns=index)
+        test_matrix = DataFrame(0, index=index, columns=index)
 
         test_dict["expression"] = test_matrix
 
@@ -137,7 +146,6 @@ class TestSpia(unittest.TestCase):
         self.assertEqual(test_dict["expression"]['B']['A'], 0)
         self.assertEqual(test_dict["expression"]['B']['B'], 0)
 
-
     def test_update_matrix_repression(self):
         """Test updating the matrix with RNA repression."""
         sub = protein(namespace='HGNC', name='A', identifier='1')
@@ -147,7 +155,7 @@ class TestSpia(unittest.TestCase):
 
         test_dict = {}
 
-        test_matrix= DataFrame(0, index=index, columns=index)
+        test_matrix = DataFrame(0, index=index, columns=index)
 
         test_dict["repression"] = test_matrix
 
@@ -167,7 +175,7 @@ class TestSpia(unittest.TestCase):
 
         test_dict = {}
 
-        test_matrix= DataFrame(0, index=index, columns=index)
+        test_matrix = DataFrame(0, index=index, columns=index)
 
         test_dict["activation"] = test_matrix
 
@@ -178,7 +186,6 @@ class TestSpia(unittest.TestCase):
         self.assertEqual(test_dict["activation"]['B']['A'], 0)
         self.assertEqual(test_dict["activation"]['B']['B'], 0)
 
-
     def test_update_matrix_inhibition(self):
         """Test updating the matrix with activation."""
         sub = protein(namespace='HGNC', name='A', identifier='1')
@@ -188,7 +195,7 @@ class TestSpia(unittest.TestCase):
 
         test_dict = {}
 
-        test_matrix= DataFrame(0, index=index, columns=index)
+        test_matrix = DataFrame(0, index=index, columns=index)
 
         test_dict["inhibition"] = test_matrix
 
@@ -208,7 +215,7 @@ class TestSpia(unittest.TestCase):
 
         test_dict = {}
 
-        test_matrix= DataFrame(0, index=index, columns=index)
+        test_matrix = DataFrame(0, index=index, columns=index)
 
         test_dict["binding_association"] = test_matrix
 
@@ -228,7 +235,7 @@ class TestSpia(unittest.TestCase):
 
         test_dict = {}
 
-        test_matrix= DataFrame(0, index=index, columns=index)
+        test_matrix = DataFrame(0, index=index, columns=index)
 
         test_dict["activation_ubiquination"] = test_matrix
         test_dict["activation_phosphorylation"] = test_matrix
@@ -277,4 +284,3 @@ class TestSpia(unittest.TestCase):
 
         self.assertEqual(spia_matrix["activation"][shp1.name][trem2.name], 1)
         self.assertEqual(spia_matrix["activation"][shp2.name][trem2.name], 1)
-
