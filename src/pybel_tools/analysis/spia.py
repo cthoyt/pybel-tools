@@ -3,32 +3,28 @@
 """This module contains the BEL exporter to SPIA format.
 (see: https://bioconductor.org/packages/release/bioc/html/SPIA.html)
 """
+import typing
 from itertools import product
-from typing import Dict
 
 import pandas as pd
-
 from pybel import BELGraph
-from pybel.constants import ASSOCIATION, INCREASES, DECREASES, DIRECTLY_DECREASES, DIRECTLY_INCREASES
+from pybel.constants import ASSOCIATION, INCREASES, DECREASES, DIRECTLY_DECREASES, DIRECTLY_INCREASES, IDENTIFIER, NAME
 from pybel.dsl.node_classes import BaseAbundance, CentralDogma, Gene, ListAbundance, Rna, ProteinModification
+
 from pybel_tools.constants import KEGG_RELATIONS
 
 
-def get_matrix_index(graph: BELGraph) -> set:
-    """Return set of HGNC names from Proteins/Rnas/Genes/miRNA, nodes that can be used by SPIA.
-
-    :param graph: BELGraph
-    :return: node names
-    """
+def get_matrix_index(graph: BELGraph) -> typing.Set:
+    """Return set of HGNC names from Proteins/Rnas/Genes/miRNA, nodes that can be used by SPIA."""
     # TODO: Using HGNC Symbols for now
     return {
         node.name
         for node in graph.nodes()
-        if issubclass(type(node), BaseAbundance) and node.namespace == 'HGNC'
+        if isinstance(node, BaseAbundance) and node.namespace == 'HGNC'
     }
 
 
-def build_matrices(nodes: set) -> Dict[str, pd.DataFrame]:
+def build_matrices(nodes: typing.Set) -> typing.Dict[str, pd.DataFrame]:
     """Build adjacency matrices for each KEGG relationships.
 
     :param nodes: nodes to be included in the matrix
@@ -41,13 +37,12 @@ def build_matrices(nodes: set) -> Dict[str, pd.DataFrame]:
 
 
 def update_matrix(matrix_dict, sub, obj, data):
-    """
+    """Populate adjacency matrix.
 
-    :param matrix_dict:
-    :param sub:
-    :param obj:
-    :param data:
-    :return:
+    :param Dict[str, pd.DataFrame] matrix_dict:
+    :param sub: bel subject
+    :param obj: bel object
+    :param dict data: edge data
     """
     if sub.namespace == 'HGNC' or obj.namespace == 'HGNC':
         subject_name = sub.name
@@ -62,10 +57,10 @@ def update_matrix(matrix_dict, sub, obj, data):
 
                 for variant in obj.variants:
 
-                    if variant['identifier']['name'] == "Ub":
+                    if variant[IDENTIFIER][NAME] == "Ub":
                         matrix_dict["activation_ubiquination"][subject_name][object_name] = 1
 
-                    elif variant['identifier']['name'] == "Ph":
+                    elif variant[IDENTIFIER][NAME] == "Ph":
                         matrix_dict["activation_phosphorylation"][subject_name][object_name] = 1
 
             # Normal increase, add activation
@@ -84,10 +79,10 @@ def update_matrix(matrix_dict, sub, obj, data):
 
                 for variant in obj.variants:
 
-                    if variant['identifier']['name'] == "Ub":
+                    if variant[IDENTIFIER][NAME] == "Ub":
                         matrix_dict['inhibition_ubiquination'][subject_name][object_name] = 1
 
-                    elif variant['identifier']['name'] == "Ph":
+                    elif variant[IDENTIFIER][NAME] == "Ph":
                         matrix_dict["inhibition_phosphorylation"][subject_name][object_name] = 1
 
             # Normal decrease, check which matrix
@@ -103,7 +98,7 @@ def update_matrix(matrix_dict, sub, obj, data):
             matrix_dict["binding_association"][subject_name][object_name] = 1
 
 
-def bel_to_spia(graph: BELGraph) -> Dict:
+def bel_to_spia(graph: BELGraph) -> typing.Dict:
     """Create excel sheet ready to be used in SPIA software.
 
     :param graph: BELGraph
@@ -153,7 +148,7 @@ def bel_to_spia(graph: BELGraph) -> Dict:
     return matrix_dict
 
 
-def spia_to_excel(spia_data_dict: Dict[str, pd.DataFrame], file_name: str):
+def spia_to_excel(spia_data_dict: typing.Dict[str, pd.DataFrame], file_name: str):
     """Export SPIA data dictionary into an excel sheet.
 
     :param spia_data_dict: data coming from bel_to_spia
