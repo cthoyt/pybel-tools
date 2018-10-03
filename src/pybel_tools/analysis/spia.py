@@ -7,10 +7,10 @@ import typing
 from itertools import product
 
 import pandas as pd
+
 from pybel import BELGraph
 from pybel.constants import ASSOCIATION, INCREASES, DECREASES, DIRECTLY_DECREASES, DIRECTLY_INCREASES, IDENTIFIER, NAME
 from pybel.dsl.node_classes import BaseAbundance, CentralDogma, Gene, ListAbundance, Rna, ProteinModification
-
 from pybel_tools.constants import KEGG_RELATIONS
 
 
@@ -66,7 +66,7 @@ def update_matrix(matrix_dict, sub, obj, data):
             # Normal increase, add activation
             else:
 
-                if isinstance(obj, Gene) or isinstance(obj, Rna):
+                if isinstance(obj, (Gene, Rna)):
                     matrix_dict['expression'][subject_name][object_name] = 1
 
                 else:
