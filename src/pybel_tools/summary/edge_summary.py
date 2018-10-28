@@ -2,9 +2,10 @@
 
 """This module contains functions that provide summaries of the edges in a graph"""
 
-import itertools as itt
 from collections import Counter, defaultdict
 from typing import Iterable, List, Mapping, Optional, Set, Tuple
+
+import itertools as itt
 
 from pybel import BELGraph
 from pybel.constants import ANNOTATIONS, RELATION
@@ -12,8 +13,8 @@ from pybel.dsl import BaseEntity
 from pybel.struct.filters.edge_predicates import edge_has_annotation
 from pybel.struct.filters.node_predicates import keep_node_permissive
 from pybel.struct.summary import (
-    count_annotations, count_pathologies, count_relations, get_annotation_values, get_annotations,
-    get_unused_annotations, iter_annotation_value_pairs, iter_annotation_values,
+    count_annotations, count_pathologies, count_relations, get_annotations, get_unused_annotations,
+    get_unused_list_annotation_values, iter_annotation_value_pairs, iter_annotation_values,
 )
 from .contradictions import pair_has_contradiction
 from ..filters.typing import NodePredicate
@@ -69,21 +70,6 @@ def count_unique_relations(graph: BELGraph) -> Counter:
     :return: Counter from {relation type: frequency}
     """
     return Counter(itt.chain.from_iterable(get_edge_relations(graph).values()))
-
-
-def get_unused_list_annotation_values(graph: BELGraph) -> Mapping[str, Set[str]]:
-    """Get all of the unused values for list annotations
-    
-    :param graph: A BEL graph
-    :return: A dictionary of {str annotation: set of str values that aren't used}
-    """
-    result = {}
-    for annotation, values in graph.annotation_list.items():
-        used_values = get_annotation_values(graph, annotation)
-        if len(used_values) == len(values):  # all values have been used
-            continue
-        result[annotation] = set(values) - used_values
-    return result
 
 
 def get_annotations_containing_keyword(graph: BELGraph, keyword: str) -> List[Mapping[str, str]]:
