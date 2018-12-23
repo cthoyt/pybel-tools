@@ -7,21 +7,15 @@ from pybel.examples.various_example import (
     complex_example, composite_example, glycolisis_step_1, hk1, single_complex_graph, single_composite_graph,
     single_reaction_graph,
 )
-from pybel.testing.mock_manager import MockQueryManager
 from pybel_tools.mutation import enrich_complexes, enrich_composites, enrich_reactions, enrich_variants
 
 
-class TestBoundMutation(unittest.TestCase):
-    """Random test for mutation functions."""
-
+class TestEnrich(unittest.TestCase):
     def setUp(self):
         self.sialic_acid_graph = sialic_acid_graph.copy()
         self.single_reaction_graph = single_reaction_graph.copy()
         self.single_composite_graph = single_composite_graph.copy()
         self.single_complex_graph = single_complex_graph.copy()
-
-        self.manager = MockQueryManager()
-        self.network_id = self.manager.insert_graph(self.sialic_acid_graph).id
 
     def test_enrich_reactions(self):
         """Test enrich enrichment."""

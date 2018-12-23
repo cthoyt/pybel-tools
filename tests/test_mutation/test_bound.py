@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+"""Tests for bound mutation functions."""
+
 import unittest
 
 from pybel import Pipeline
