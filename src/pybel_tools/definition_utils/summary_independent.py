@@ -2,8 +2,6 @@
 
 """Utilities for serializing to BEL namespace and BEL annotation files"""
 
-from __future__ import print_function
-
 import logging
 
 from pybel.resources.definitions import get_bel_resource, write_namespace

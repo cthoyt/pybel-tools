@@ -50,11 +50,7 @@ def group_dict_set(iterator: Iterable) -> Mapping:
 
 
 def get_edge_relations(graph: BELGraph) -> Mapping[Tuple[BaseEntity, BaseEntity], Set[str]]:
-    """Build a dictionary of {node pair: set of edge types}
-
-    :param graph: A BEL graph
-    :return: A dictionary of {(node, node): set of edge types}
-    """
+    """Build a dictionary of {node pair: set of edge types}."""
     return group_dict_set(
         ((u, v), d[RELATION])
         for u, v, d in graph.edges(data=True)
@@ -77,7 +73,6 @@ def get_annotations_containing_keyword(graph: BELGraph, keyword: str) -> List[Ma
 
     :param graph: A BEL graph
     :param keyword: Search for annotations whose values have this as a substring
-    :rtype: list[dict[str,str]
     """
     return [
         {
@@ -99,8 +94,11 @@ def count_annotation_values(graph: BELGraph, annotation: str) -> Counter:
     return Counter(iter_annotation_values(graph, annotation))
 
 
-def count_annotation_values_filtered(graph: BELGraph, annotation: str, source_filter: Optional[NodePredicate] = None,
-                                     target_filter: Optional[NodePredicate] = None) -> Counter:
+def count_annotation_values_filtered(graph: BELGraph,
+                                     annotation: str,
+                                     source_filter: Optional[NodePredicate] = None,
+                                     target_filter: Optional[NodePredicate] = None,
+                                     ) -> Counter:
     """Count in how many edges each annotation appears in a graph, but filter out source nodes and target nodes.
 
     See :func:`pybel_tools.utils.keep_node` for a basic filter.
@@ -124,9 +122,6 @@ def count_annotation_values_filtered(graph: BELGraph, annotation: str, source_fi
 def pair_is_consistent(graph: BELGraph, u: BaseEntity, v: BaseEntity) -> Optional[str]:
     """Return if the edges between the given nodes are consistent, meaning they all have the same relation.
 
-    :param graph: A BEL graph
-    :param u: The source BEL node
-    :param v: The target BEL node
     :return: If the edges aren't consistent, return false, otherwise return the relation type
     """
     relations = {data[RELATION] for data in graph[u][v].values()}
@@ -140,7 +135,6 @@ def pair_is_consistent(graph: BELGraph, u: BaseEntity, v: BaseEntity) -> Optiona
 def get_contradictory_pairs(graph: BELGraph) -> Iterable[Tuple[BaseEntity, BaseEntity]]:
     """Iterates over contradictory node pairs in the graph based on their causal relationships
     
-    :param graph: A BEL graph
     :return: An iterator over (source, target) node pairs that have contradictory causal edges
     """
     for u, v in graph.edges():
@@ -151,7 +145,6 @@ def get_contradictory_pairs(graph: BELGraph) -> Iterable[Tuple[BaseEntity, BaseE
 def get_consistent_edges(graph: BELGraph) -> Iterable[Tuple[BaseEntity, BaseEntity]]:
     """Yield pairs of (source node, target node) for which all of their edges have the same type of relation.
 
-    :param graph: A BEL graph
     :return: An iterator over (source, target) node pairs corresponding to edges with many inconsistent relations
     """
     for u, v in graph.edges():

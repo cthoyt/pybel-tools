@@ -61,7 +61,7 @@ def node_inclusion_filter_builder(nodes: Iterable[BaseEntity]) -> NodePredicate:
     """
     node_set = set(nodes)
 
-    def inclusion_filter(graph: BELGraph, node: BaseEntity) -> bool:
+    def inclusion_filter(_: BELGraph, node: BaseEntity) -> bool:
         """Pass only for a node that is in the enclosed node list.
 
         :return: If the node is contained within the enclosed node list
@@ -75,7 +75,7 @@ def node_exclusion_filter_builder(nodes: Iterable[BaseEntity]) -> NodePredicate:
     """Build a filter that fails on nodes in the given list."""
     node_set = set(nodes)
 
-    def exclusion_filter(graph: BELGraph, node: BaseEntity) -> bool:
+    def exclusion_filter(_: BELGraph, node: BaseEntity) -> bool:
         """Pass only for a node that isn't in the enclosed node list
 
         :return: If the node isn't contained within the enclosed node list
@@ -86,12 +86,12 @@ def node_exclusion_filter_builder(nodes: Iterable[BaseEntity]) -> NodePredicate:
 
 
 def _single_function_inclusion_filter_builder(func: str) -> NodePredicate:
-    def function_inclusion_filter(graph: BELGraph, node: BaseEntity) -> bool:
+    def function_inclusion_filter(_: BELGraph, node: BaseEntity) -> bool:
         """Pass only for a node that has the enclosed function.
 
         :return: If the node doesn't have the enclosed function
         """
-        return node[FUNCTION] == func
+        return node.function == func
 
     return function_inclusion_filter
 
@@ -99,12 +99,12 @@ def _single_function_inclusion_filter_builder(func: str) -> NodePredicate:
 def _collection_function_inclusion_builder(funcs: Iterable[str]) -> NodePredicate:
     funcs = set(funcs)
 
-    def functions_inclusion_filter(graph: BELGraph, node: BaseEntity) -> bool:
+    def functions_inclusion_filter(_: BELGraph, node: BaseEntity) -> bool:
         """Pass only for a node that is one of the enclosed functions.
 
         :return: If the node doesn't have the enclosed functions
         """
-        return node[FUNCTION] in funcs
+        return node.function in funcs
 
     return functions_inclusion_filter
 
@@ -129,7 +129,7 @@ def function_exclusion_filter_builder(func: Strings) -> NodePredicate:
     :param func: A BEL Function or list/set/tuple of BEL functions
     """
     if isinstance(func, str):
-        def function_exclusion_filter(graph: BELGraph, node: BaseEntity) -> bool:
+        def function_exclusion_filter(_: BELGraph, node: BaseEntity) -> bool:
             """Pass only for a node that doesn't have the enclosed function.
 
             :return: If the node doesn't have the enclosed function
@@ -141,7 +141,7 @@ def function_exclusion_filter_builder(func: Strings) -> NodePredicate:
     elif isinstance(func, Iterable):
         functions = set(func)
 
-        def functions_exclusion_filter(graph: BELGraph, node: BaseEntity) -> bool:
+        def functions_exclusion_filter(_: BELGraph, node: BaseEntity) -> bool:
             """Pass only for a node that doesn't have the enclosed functions.
 
             :return: If the node doesn't have the enclosed functions
@@ -157,10 +157,10 @@ def function_namespace_inclusion_builder(func: str, namespace: Strings) -> NodeP
     """Build a filter function for matching the given BEL function with the given namespace or namespaces.
 
     :param func: A BEL function
-    :param namespace: The namespace to serach by
+    :param namespace: The namespace to search by
     """
     if isinstance(namespace, str):
-        def function_namespace_filter(graph: BELGraph, node: BaseEntity) -> bool:
+        def function_namespace_filter(_: BELGraph, node: BaseEntity) -> bool:
             """Pass only for nodes that have the enclosed function and enclosed namespace."""
             if func != node[FUNCTION]:
                 return False
@@ -171,7 +171,7 @@ def function_namespace_inclusion_builder(func: str, namespace: Strings) -> NodeP
     elif isinstance(namespace, Iterable):
         namespaces = set(namespace)
 
-        def function_namespaces_filter(graph: BELGraph, node: BaseEntity) -> bool:
+        def function_namespaces_filter(_: BELGraph, node: BaseEntity) -> bool:
             """Pass only for nodes that have the enclosed function and namespace in the enclose set."""
             if func != node[FUNCTION]:
                 return False
@@ -188,7 +188,7 @@ def data_contains_key_builder(key: str) -> NodePredicate:
     :param key: A key for the node's data dictionary
     """
 
-    def data_contains_key(graph: BELGraph, node: BaseEntity) -> bool:
+    def data_contains_key(_: BELGraph, node: BaseEntity) -> bool:
         """Pass only for a node that contains the enclosed key in its data dictionary.
 
         :return: If the node contains the enclosed key in its data dictionary
@@ -217,7 +217,9 @@ exclude_pathology_filter = function_exclusion_filter_builder(PATHOLOGY)
 
 
 def namespace_inclusion_builder(namespace) -> NodePredicate:
-    def has_namespace(graph: BELGraph, node: BaseEntity):
+    """"""
+
+    def has_namespace(_: BELGraph, node: BaseEntity):
         return node.get(NAMESPACE) == namespace
 
     return has_namespace

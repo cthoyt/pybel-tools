@@ -2,21 +2,24 @@
 
 """This module contains functions useful throughout PyBEL Tools"""
 
-import itertools as itt
-from collections import Counter, defaultdict
-
 import datetime
 import json
 import logging
-import networkx as nx
 import os
+from collections import Counter, defaultdict
 from operator import itemgetter
+from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Set, Sized, Tuple, TypeVar
 
+import itertools as itt
+import networkx as nx
+
+from pybel import BELGraph
 from .constants import VERSION
 
 log = logging.getLogger(__name__)
 
 CENTRALITY_SAMPLES = 200
+X = TypeVar('X')
 
 
 def pairwise(iterable):
@@ -26,38 +29,28 @@ def pairwise(iterable):
     return zip(a, b)
 
 
-def graph_edge_data_iter(graph):
+def graph_edge_data_iter(graph: BELGraph) -> Iterable[Dict]:
     """Iterate over the edge data dictionaries.
 
-    :type graph: pybel.BELGraph
     :return: An iterator over the edge dictionaries in the graph
-    :rtype: iter[dict]
     """
     for _, _, data in graph.edges(data=True):
         yield data
 
 
-def count_defaultdict(dict_of_lists):
-    """Takes a dictionary and applies a counter to each list
-
-    :param dict_of_lists: A dictionary of lists
-    :type dict_of_lists: dict or collections.defaultdict
-    :return: A dictionary of {key: Counter(values)}
-    :rtype: dict
-    """
+def count_defaultdict(dict_of_lists: Mapping[Any, List]) -> Mapping[Any, Counter]:
+    """Count the number of elements in each value of the dictionary."""
     return {
         k: Counter(v)
         for k, v in dict_of_lists.items()
     }
 
 
-def count_dict_values(dict_of_counters):
-    """Counts the number of elements in each value (can be list, Counter, etc)
+def count_dict_values(dict_of_counters: Mapping[Any, Sized]) -> Counter:
+    """Count the number of elements in each value (can be list, Counter, etc).
 
     :param dict_of_counters: A dictionary of things whose lengths can be measured (lists, Counters, dicts)
-    :type dict_of_counters: dict or collections.defaultdict
     :return: A Counter with the same keys as the input but the count of the length of the values list/tuple/set/Counter
-    :rtype: collections.Counter
     """
     return Counter({
         k: len(v)
@@ -65,13 +58,12 @@ def count_dict_values(dict_of_counters):
     })
 
 
-def set_percentage(x, y):
+def set_percentage(x, y) -> float:
     """What percentage of x is contained within y?
 
     :param set x: A set
     :param set y: Another set
     :return: The percentage of x contained within y
-    :rtype: float
     """
     a, b = set(x), set(y)
 
@@ -81,14 +73,8 @@ def set_percentage(x, y):
     return len(a & b) / len(a)
 
 
-def tanimoto_set_similarity(x, y):
-    """Calculates the tanimoto set similarity
-
-    :param set x: A set
-    :param set y: Another set
-    :return: The similarity between
-    :rtype: float
-    """
+def tanimoto_set_similarity(x: Iterable[X], y: Iterable[X]) -> float:
+    """Calculate the tanimoto set similarity."""
     a, b = set(x), set(y)
     union = a | b
 
@@ -98,13 +84,12 @@ def tanimoto_set_similarity(x, y):
     return len(a & b) / len(union)
 
 
-def min_tanimoto_set_similarity(x, y):
-    """Calculates the tanimoto set similarity using the minimum size
+def min_tanimoto_set_similarity(x: Iterable[X], y: Iterable[X]) -> float:
+    """Calculate the tanimoto set similarity using the minimum size.
 
     :param set x: A set
     :param set y: Another set
     :return: The similarity between
-    :rtype: float
         """
     a, b = set(x), set(y)
 
@@ -115,8 +100,9 @@ def min_tanimoto_set_similarity(x, y):
 
 
 def calculate_single_tanimoto_set_distances(target, dict_of_sets):
-    """Returns a dictionary of distances keyed by the keys in the given dict. Distances are calculated
-    based on pairwise tanimoto similarity of the sets contained
+    """Return a dictionary of distances keyed by the keys in the given dict.
+
+    Distances are calculated based on pairwise tanimoto similarity of the sets contained
 
     :param set target: A set
     :param dict_of_sets: A dict of {x: set of y}
@@ -133,16 +119,15 @@ def calculate_single_tanimoto_set_distances(target, dict_of_sets):
     }
 
 
-def calculate_tanimoto_set_distances(dict_of_sets):
-    """Returns a distance matrix keyed by the keys in the given dict. Distances are calculated
-    based on pairwise tanimoto similarity of the sets contained
+def calculate_tanimoto_set_distances(dict_of_sets: Mapping[X, Set]) -> Mapping[X, Mapping[X, float]]:
+    """Return a distance matrix keyed by the keys in the given dict.
+
+    Distances are calculated based on pairwise tanimoto similarity of the sets contained.
 
     :param dict_of_sets: A dict of {x: set of y}
-    :type dict_of_sets: dict
     :return: A similarity matrix based on the set overlap (tanimoto) score between each x as a dict of dicts
-    :rtype: dict
     """
-    result = defaultdict(dict)
+    result: Dict[X, Dict[X, float]] = defaultdict(dict)
 
     for x, y in itt.combinations(dict_of_sets, 2):
         result[x][y] = result[y][x] = tanimoto_set_similarity(dict_of_sets[x], dict_of_sets[y])
@@ -153,20 +138,18 @@ def calculate_tanimoto_set_distances(dict_of_sets):
     return dict(result)
 
 
-def calculate_global_tanimoto_set_distances(dict_of_sets):
-    """Calculates an alternative distance matrix based on the following equation:
+def calculate_global_tanimoto_set_distances(dict_of_sets: Mapping[X, Set]) -> Mapping[X, Mapping[X, float]]:
+    """Calculate an alternative distance matrix based on the following equation.
 
     .. math:: distance(A, B)=1- \|A \cup B\| / \| \cup_{s \in S} s\|
 
     :param dict_of_sets: A dict of {x: set of y}
-    :type dict_of_sets: dict
     :return: A similarity matrix based on the alternative tanimoto distance as a dict of dicts
-    :rtype: dict
     """
     universe = set(itt.chain.from_iterable(dict_of_sets.values()))
     universe_size = len(universe)
 
-    result = defaultdict(dict)
+    result: Dict[X, Dict[X, float]] = defaultdict(dict)
 
     for x, y in itt.combinations(dict_of_sets, 2):
         result[x][y] = result[y][x] = 1.0 - len(dict_of_sets[x] | dict_of_sets[y]) / universe_size
@@ -216,21 +199,15 @@ def safe_add_edge(graph, u, v, key, attr_dict, **attr):
         graph.add_edge(u, v, attr_dict=attr_dict, **attr)
 
 
-
-def prepare_c3(data, y_axis_label='y', x_axis_label='x'):
+def prepare_c3(data: Mapping[str, int], y_axis_label: str = 'y', x_axis_label: str = 'x') -> str:
     """Prepares C3 JSON for making a bar chart from a Counter
 
     :param data: A dictionary of {str: int} to display as bar chart
-    :type data: Counter or dict or collections.defaultdict
-    :param str y_axis_label: The Y axis label
-    :param str x_axis_label: X axis internal label. Should be left as default 'x')
+    :param y_axis_label: The Y axis label
+    :param x_axis_label: X axis internal label. Should be left as default 'x')
     :return: A JSON dictionary for making a C3 bar chart
-    :rtype: dict
     """
-    labels, values = [], []
-    for k, v in sorted(data.items(), key=itemgetter(1), reverse=True):
-        labels.append(k)
-        values.append(v)
+    labels, values = zip(*sorted(data.items(), key=itemgetter(1), reverse=True))
 
     return json.dumps([
         [x_axis_label] + list(labels),
@@ -238,15 +215,12 @@ def prepare_c3(data, y_axis_label='y', x_axis_label='x'):
     ])
 
 
-def prepare_c3_time_series(data, y_axis_label='y', x_axis_label='x'):
-    """Prepares C3 JSON for making a time series
+def prepare_c3_time_series(data: List[Tuple[int, int]], y_axis_label: str = 'y', x_axis_label: str = 'x') -> str:
+    """Prepare C3 JSON string dump for a time series.
 
     :param data: A list of tuples [(year, count)]
-    :type data: list
-    :param str y_axis_label: The Y axis label
-    :param str x_axis_label: X axis internal label. Should be left as default 'x')
-    :return: A JSON dictionary for making a C3 bar chart
-    :rtype: dict
+    :param y_axis_label: The Y axis label
+    :param x_axis_label: X axis internal label. Should be left as default 'x')
     """
     years, counter = zip(*data)
 
@@ -261,10 +235,10 @@ def prepare_c3_time_series(data, y_axis_label='y', x_axis_label='x'):
     ])
 
 
-def build_template_environment(here):
+def build_template_environment(here: str):
     """Builds a custom templating enviroment so Flask apps can get data from lots of different places
     
-    :param str here: Give this the result of :code:`os.path.dirname(os.path.abspath(__file__))`
+    :param here: Give this the result of :code:`os.path.dirname(os.path.abspath(__file__))`
     :rtype: jinja2.Environment
     """
     import jinja2
@@ -290,64 +264,57 @@ def build_template_renderer(file):
     here = os.path.dirname(os.path.abspath(file))
     template_environment = build_template_environment(here)
 
-    def render_template(template_filename, **context):
-        """Renders a template as a unicode string
+    def render_template(template_filename: str, **context: Mapping[str, Any]) -> str:
+        """Render a template as a unicode string.
 
-        :param str template_filename: The name of the file to render in the template directory
+        :param template_filename: The name of the file to render in the template directory
         :param dict context: The variables to template
-        :rtype: str
         """
         return template_environment.get_template(template_filename).render(context)
 
     return render_template
 
 
-def enable_cool_mode():
+def enable_cool_mode() -> None:
     log.info('enabled cool mode')
     logging.getLogger('urllib3.connectionpool').setLevel(logging.ERROR)
     logging.getLogger('pybel.parser').setLevel(logging.CRITICAL)
 
 
-def calculate_betweenness_centality(graph, k=CENTRALITY_SAMPLES):
-    """Calculates the betweenness centrality over nodes in the graph. Tries to do it with a certain number of samples,
-    but then tries a complete approach if it fails.
+def calculate_betweenness_centality(graph: BELGraph, number_samples: int = CENTRALITY_SAMPLES) -> Counter:
+    """Calculate the betweenness centrality over nodes in the graph.
 
-    :param pybel.BELGraph graph: A BEL graph
-    :param int k: The number of samples to use
-    :rtype: collections.Counter[tuple,float]
+    Tries to do it with a certain number of samples, but then tries a complete approach if it fails.
     """
     try:
-        res = Counter(nx.betweenness_centrality(graph, k=k))
-        return res
+        res = nx.betweenness_centrality(graph, k=number_samples)
     except Exception:
-        return Counter(nx.betweenness_centrality(graph))
+        res = nx.betweenness_centrality(graph)
+    return Counter(res)
 
 
-def get_circulations(t):
-    """Iterate over all possible circulations of an ordered collection (tuple or list)
+T = TypeVar('T', List, Tuple)
 
-    :param tuple or list t:
-    :rtype: iter
+
+def get_circulations(elements: T) -> Iterable[T]:
+    """Iterate over all possible circulations of an ordered collection (tuple or list).
+
+    Example:
+
+    >>> list(get_circulations([1, 2, 3]))
+    [[1, 2, 3], [2, 3, 1], [3, 1, 2]]
     """
-    for i in range(len(t)):
-        yield t[i:] + t[:i]
+    for i in range(len(elements)):
+        yield elements[i:] + elements[:i]
 
 
-def canonical_circulation(t, key=None):
+def canonical_circulation(elements: T, key: Optional[Callable[[T], bool]] = None) -> T:
     """Get get a canonical representation of the ordered collection by finding its minimum circulation with the
     given sort key
-
-    :param tuple or list t:
-    :param key: A function for sort
-    :return: The
     """
-    return min(get_circulations(t), key=key)
+    return min(get_circulations(elements), key=key)
 
 
-def get_version():
-    """Gets the current PyBEL Tools version
-
-    :return: The current PyBEL Tools version
-    :rtype: str
-    """
+def get_version() -> str:
+    """Get the current PyBEL Tools version."""
     return VERSION

@@ -1,23 +1,14 @@
 # -*- coding: utf-8 -*-
 
-import logging
 import unittest
 
-from pybel.examples.sialic_acid_example import sialic_acid_graph, cd33, cd33_phosphorylated
+from pybel.examples.sialic_acid_example import cd33, cd33_phosphorylated, sialic_acid_graph
 from pybel.examples.various_example import (
-    single_composite_graph,
-    single_complex_graph,
+    complex_example, composite_example, glycolisis_step_1, hk1, single_complex_graph, single_composite_graph,
     single_reaction_graph,
-    composite_example,
-    complex_example,
-    hk1,
-    glycolisis_step_1
 )
 from pybel.testing.mock_manager import MockQueryManager
 from pybel_tools.mutation import enrich_complexes, enrich_composites, enrich_reactions, enrich_variants
-
-log = logging.getLogger(__name__)
-log.setLevel(10)
 
 
 class TestBoundMutation(unittest.TestCase):

@@ -2,10 +2,8 @@
 
 """
 
-PyBEL Tools is tested on Python3 installations on Mac OS and Linux on 
+PyBEL Tools is tested on Python3 on Linux on
 `Travis CI <https://travis-ci.org/pybel/pybel-tools>`_.
-
-.. warning:: Python2 and Windows are not thoroughly tested
 
 Installation
 ------------
@@ -16,7 +14,7 @@ Download the latest stable code from `PyPI <https://pypi.python.org/pypi/pybel-t
 
 .. code-block:: sh
 
-   $ python3 -m pip install pybel_tools
+   $ pip install pybel_tools
 
 Get the Latest
 ~~~~~~~~~~~~~~~
@@ -24,7 +22,7 @@ Download the most recent code from `GitHub <https://github.com/pybel/pybel-tools
 
 .. code-block:: sh
 
-   $ python3 -m pip install git+https://github.com/pybel/pybel-tools.git@develop
+   $ pip install git+https://github.com/pybel/pybel-tools.git
    
    
 For Developers
@@ -33,9 +31,9 @@ Clone the repository from `GitHub <https://github.com/pybel/pybel-tools>`_ and i
 
 .. code-block:: sh
 
-   $ git clone https://github.com/pybel/pybel-tools.git@develop
+   $ git clone https://github.com/pybel/pybel-tools.git
    $ cd pybel-tools
-   $ python3 -m pip install -e .
+   $ pip install -e .
    
 Caveats
 -------
@@ -44,11 +42,7 @@ installation difficult for Windows users, for whom Python cannot easily build C 
 `Anaconda <https://www.continuum.io/downloads>`_ distribution of Python, which includes these precompiled.
 """
 
-from . import io, utils
-from .io import *
 from .utils import get_version
-
-__all__ = io.__all__ + ['get_version']
 
 __version__ = '0.7.1-dev'
 

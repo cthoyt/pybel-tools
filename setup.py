@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Setup.py for PyBEL-Tools."""
+"""Setup module."""
 
 import codecs
 import os
@@ -22,6 +22,7 @@ CLASSIFIERS = [
     'Programming Language :: Python',
     'Programming Language :: Python :: 3.5',
     'Programming Language :: Python :: 3.6',
+    'Programming Language :: Python :: 3.7',
     'Topic :: Scientific/Engineering :: Bio-Informatics'
 ]
 INSTALL_REQUIRES = [
@@ -35,6 +36,7 @@ INSTALL_REQUIRES = [
     'scipy',
     'numpy',
     'tqdm',
+    'bel_repository',
 ]
 
 EXTRAS_REQUIRE = {
@@ -42,7 +44,7 @@ EXTRAS_REQUIRE = {
         'sphinx',
         'sphinx-rtd-theme',
         'sphinx-click',
-        # 'sphinx-autodoc-typehints',
+        'sphinx-autodoc-typehints',
     ]
 }
 TESTS_REQUIRE = []
