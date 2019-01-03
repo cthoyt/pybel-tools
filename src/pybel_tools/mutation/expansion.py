@@ -46,9 +46,9 @@ def get_peripheral_successor_edges(graph: BELGraph, subgraph: BELGraph) -> EdgeI
     The source nodes in this iterable are all inside the sub-graph, while the targets are outside.
     """
     for u in subgraph:
-        for _, v, k, d in graph.out_edges(u, keys=True, data=True):
+        for _, v, k in graph.out_edges(u, keys=True):
             if v not in subgraph:
-                yield u, v, k, d
+                yield u, v, k
 
 
 def get_peripheral_predecessor_edges(graph: BELGraph, subgraph: BELGraph) -> EdgeIterator:
@@ -57,9 +57,9 @@ def get_peripheral_predecessor_edges(graph: BELGraph, subgraph: BELGraph) -> Edg
     The target nodes in this iterable are all inside the sub-graph, while the sources are outside.
     """
     for v in subgraph:
-        for u, _, k, d in graph.in_edges(v, keys=True, data=True):
+        for u, _, k in graph.in_edges(v, keys=True):
             if u not in subgraph:
-                yield u, v, k, d
+                yield u, v, k
 
 
 def count_sources(edge_iter: EdgeIterator) -> Counter:
@@ -67,7 +67,7 @@ def count_sources(edge_iter: EdgeIterator) -> Counter:
 
     :return: A counter of source nodes in the iterable
     """
-    return Counter(u for u, _, _, _ in edge_iter)
+    return Counter(u for u, _, _ in edge_iter)
 
 
 def count_targets(edge_iter: EdgeIterator) -> Counter:
@@ -75,7 +75,7 @@ def count_targets(edge_iter: EdgeIterator) -> Counter:
 
     :return: A counter of target nodes in the iterable
     """
-    return Counter(v for _, v, _, _ in edge_iter)
+    return Counter(v for _, v, _ in edge_iter)
 
 
 def count_possible_successors(graph: BELGraph, subgraph: BELGraph) -> Counter:

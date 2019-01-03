@@ -19,8 +19,8 @@ __all__ = [
 def compare(graph: BELGraph, annotation: str = 'Subgraph') -> Mapping[str, Mapping[str, float]]:
     """Compare generated mechanisms to actual ones.
 
-    1. Generates candidate mechanisms for each bioprocess
-    2. Gets subgraphs for all NeuroMMsig Subgraphs
+    1. Generates candidate mechanisms for each biological process
+    2. Gets sub-graphs for all NeuroMMSig signatures
     3. Make tanimoto similarity comparison for all sets
 
     :return: A dictionary table comparing the canonical subgraphs to generated ones

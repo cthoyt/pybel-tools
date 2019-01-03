@@ -1,22 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from pybel.constants import HAS_COMPONENT, HAS_PRODUCT, HAS_REACTANT, HAS_VARIANT, TRANSCRIBED_TO, TRANSLATED_TO
+"""Constants for PyBEL-Tools."""
 
-IS_PRODUCT_OF = 'isProductOf'
-IS_REACTANT_OF = 'isReactantOf'
-IS_VARIANT_OF = 'isVariantOf'
-IS_COMPONENT_OF = 'isComponentOf'
-TRANSCRIBED_FROM = 'transcribedFrom'
-TRANSLATED_FROM = 'translatedFrom'
-
-INFERRED_INVERSE = {
-    HAS_PRODUCT: IS_PRODUCT_OF,
-    HAS_REACTANT: IS_REACTANT_OF,
-    HAS_VARIANT: IS_VARIANT_OF,
-    HAS_COMPONENT: IS_COMPONENT_OF,
-    TRANSCRIBED_TO: TRANSCRIBED_FROM,
-    TRANSLATED_TO: TRANSLATED_FROM
-}
+VERSION = '0.7.1-dev'
 
 abstract_url_fmt = "http://togows.dbcls.jp/entry/ncbi-pubmed/{}/abstract"
 title_url_fmt = "http://togows.dbcls.jp/entry/ncbi-pubmed/{}/title"
@@ -24,20 +10,5 @@ title_url_fmt = "http://togows.dbcls.jp/entry/ncbi-pubmed/{}/title"
 so_url_fmt = "http://togows.dbcls.jp/entry/ncbi-pubmed/{}/so"
 
 WEIGHT = 'weight'
-
-VERSION = '0.7.1-dev'
-
-# Resources
-
-NAMED_COMPLEXES_URL = 'http://resources.openbel.org/belframework/20150611/resource/named-complexes.bel'
-
-#: Points to the env variable name for PyBEL resources
-PYBEL_RESOURCES_ENV = 'PYBEL_RESOURCES_BASE'
-
-#: Points to the env variable for ownCloud resources
-OWNCLOUD_ENV = 'OWNCLOUD_BASE'
-
-#: Points to the env variable for the biological model store repository
-BMS_BASE = 'BMS_BASE'
 
 DEFAULT_SERVICE_URL = 'https://pybel.scai.fraunhofer.de'

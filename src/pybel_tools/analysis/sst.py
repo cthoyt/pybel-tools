@@ -6,6 +6,7 @@
                   based on random walk sampling. <https://doi.org/10.1186/1756-0500-7-516>`_ BMC Research Notes, 7, 516.
 """
 
+
 def get_random_walk_spanning_tree(graph):
     """Generates a spanning tree from the directed graph using the random walk approach proposed independently by
     by Broder (1989) and Aldous (1990). It simply generates random walks until all nodes have been covered.

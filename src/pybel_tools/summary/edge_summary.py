@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-"""This module contains functions that provide summaries of the edges in a graph"""
+"""This module contains functions that provide summaries of the edges in a graph."""
 
 from collections import Counter, defaultdict
-from typing import Iterable, List, Mapping, Optional, Set, Tuple
+from typing import Iterable, List, Mapping, Optional, Set, Tuple, TypeVar
 
 import itertools as itt
 
@@ -36,13 +36,12 @@ __all__ = [
     'get_unused_list_annotation_values',
 ]
 
+A = TypeVar('A')
+B = TypeVar('B')
 
-def group_dict_set(iterator: Iterable) -> Mapping:
-    """Makes a dict that accumulates the values for each key in an iterator of doubles
 
-    :param iter[tuple[A,B]] iterator: An iterator
-    :rtype: dict[A,set[B]]
-    """
+def group_dict_set(iterator: Iterable[Tuple[A, B]]) -> Mapping[A, Set[B]]:
+    """Make a dict that accumulates the values for each key in an iterator of doubles."""
     d = defaultdict(set)
     for key, value in iterator:
         d[key].add(value)
@@ -61,9 +60,6 @@ def count_unique_relations(graph: BELGraph) -> Counter:
     """Return a histogram of the different types of relations present in a graph.
 
     Note: this operation only counts each type of edge once for each pair of nodes
-
-    :param graph: A BEL graph
-    :return: Counter from {relation type: frequency}
     """
     return Counter(itt.chain.from_iterable(get_edge_relations(graph).values()))
 

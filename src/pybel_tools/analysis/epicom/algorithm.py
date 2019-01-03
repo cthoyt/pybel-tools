@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+"""An implementation of a drug-target-based mechanism enrichment strategy."""
+
 import itertools as itt
 import logging
 import os
@@ -7,11 +9,11 @@ from typing import Iterable, List, Mapping, Optional, TextIO, Tuple, Union
 
 from tqdm import tqdm
 
-import pybel.dsl
+from pybel.dsl import Gene
 from pybel import BELGraph
 from pybel.struct.grouping import get_subgraphs_by_annotation
 from pybel.struct.summary import get_annotation_values
-from pybel_tools.analysis.neurommsig import get_neurommsig_score, neurommsig_graph_preprocessor
+from ..neurommsig import get_neurommsig_score, neurommsig_graph_preprocessor
 
 logger = logging.getLogger(__name__)
 
@@ -28,15 +30,15 @@ def _get_drug_target_interactions(manager: Optional['bio2bel_drugbank.manager'] 
     return manager.get_drug_to_hgnc_symbols()
 
 
-def _preprocess_dtis(dtis: Mapping[str, List[str]]) -> Mapping[str, List[pybel.dsl.Gene]]:
+def _preprocess_dtis(dtis: Mapping[str, List[str]]) -> Mapping[str, List[Gene]]:
     return {
-        drug: [pybel.dsl.Gene(namespace='HGNC', name=target) for target in targets]
+        drug: [Gene(namespace='HGNC', name=target) for target in targets]
         for drug, targets in dtis.items()
     }
 
 
 def epicom_on_graph(graph: BELGraph,
-                    dtis: Mapping[str, List[pybel.dsl.Gene]],
+                    dtis: Mapping[str, List[Gene]],
                     preprocess_graph: bool = True,
                     ) -> Iterable[Tuple[str, str, float]]:
     if preprocess_graph:
@@ -71,13 +73,13 @@ def _multi_run_helper(graphs: Iterable[BELGraph]) -> Iterable[Tuple[str, str, st
             yield graph.name, subgraph_name, drug, score
 
 
-def _multi_run_helper_file_wrapper(graphs: Iterable[BELGraph], file: Optional[TextIO] = None):
+def _multi_run_helper_file_wrapper(graphs: Iterable[BELGraph], file: Optional[TextIO] = None) -> None:
     for row in _multi_run_helper(graphs):
         print(*row, sep='\t', file=file)
 
 
-def multi_run_epicom(graphs: Iterable[BELGraph], path: Union[str, TextIO]):
-    """Run EpiCom analysis  on many graphs."""
+def multi_run_epicom(graphs: Iterable[BELGraph], path: Union[None, str, TextIO]) -> None:
+    """Run EpiCom analysis on many graphs."""
     if isinstance(path, str):
         with open(path, 'w') as file:
             _multi_run_helper_file_wrapper(graphs, file)

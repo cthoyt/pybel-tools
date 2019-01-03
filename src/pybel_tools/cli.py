@@ -119,7 +119,7 @@ def convert_to_namespace(file, output, keyword):
         namespace_domain=NAMESPACE_DOMAIN_OTHER,
         values=resource['Values'],
         citation_name=resource['Citation']['NameString'],
-        file=output
+        file=output,
     )
 
 
@@ -153,7 +153,7 @@ def boilerplate(name, contact, description, pmids, version, copyright, authors, 
         licenses=licenses,
         disclaimer=disclaimer,
         pmids=pmids,
-        file=output
+        file=output,
     )
 
 

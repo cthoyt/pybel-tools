@@ -12,7 +12,14 @@ import setuptools
 
 PACKAGES = setuptools.find_packages(where='src')
 META_PATH = os.path.join('src', 'pybel_tools', '__init__.py')
-KEYWORDS = ['Biological Expression Language', 'BEL', 'Systems Biology', 'Networks Biology']
+KEYWORDS = [
+    'Biological Expression Language',
+    'BEL',
+    'Domain Specific Language',
+    'DSL',
+    'Systems Biology',
+    'Networks Biology',
+]
 CLASSIFIERS = [
     'Development Status :: 1 - Planning',
     'Environment :: Console',
@@ -23,11 +30,13 @@ CLASSIFIERS = [
     'Programming Language :: Python :: 3.5',
     'Programming Language :: Python :: 3.6',
     'Programming Language :: Python :: 3.7',
-    'Topic :: Scientific/Engineering :: Bio-Informatics'
+    'Topic :: Scientific/Engineering :: Bio-Informatics',
+    'Topic :: Scientific/Engineering :: Chemistry',
 ]
 INSTALL_REQUIRES = [
     'pybel>=0.12.1',
     'pybel-artifactory',
+    'pybel-jupyter',
     'pandas',
     'networkx',
     'requests',

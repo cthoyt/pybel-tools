@@ -6,16 +6,15 @@ import enum
 import logging
 from collections import defaultdict
 from functools import partial
-from typing import Optional, Tuple, List
+from typing import List, Optional, Tuple
 
 from pybel import BELGraph
 from pybel.constants import (
     CAUSAL_DECREASE_RELATIONS, CAUSAL_INCREASE_RELATIONS, CAUSES_NO_CHANGE, NEGATIVE_CORRELATION, POSITIVE_CORRELATION,
-    RELATION,
+    RELATION
 )
 from pybel.struct import get_subgraphs_by_annotation
-from pybel.struct.mutation import collapse_to_genes
-from ..mutation import collapse_all_variants
+from pybel.struct.mutation import collapse_all_variants, collapse_to_genes
 from ..mutation.random import random_by_edges, shuffle_node_data, shuffle_relations
 
 __all__ = [
@@ -80,7 +79,6 @@ def edge_concords(graph, u, v, k, d, key, cutoff: Optional[float] = None) -> Con
     target_regulation = get_cutoff(graph.nodes[v][key], cutoff=cutoff)
 
     if source_regulation == 1:
-
         if target_regulation == 1 and relation in UP:
             return Concordance.correct
 
@@ -107,7 +105,6 @@ def edge_concords(graph, u, v, k, d, key, cutoff: Optional[float] = None) -> Con
             return Concordance.ambiguous
 
     elif source_regulation == -1:
-
         if target_regulation == 1 and relation in UP:
             return Concordance.incorrect
 
@@ -134,7 +131,6 @@ def edge_concords(graph, u, v, k, d, key, cutoff: Optional[float] = None) -> Con
             return Concordance.ambiguous
 
     else:  # source_regulation == 0
-
         if target_regulation == 0 and relation == CAUSES_NO_CHANGE:
             return Concordance.correct
 
@@ -167,7 +163,8 @@ def calculate_concordance_helper(graph: BELGraph,
     )
 
 
-def calculate_concordance(graph: BELGraph, key:str, cutoff: Optional[float]=None, use_ambiguous:bool=False) -> float:
+def calculate_concordance(graph: BELGraph, key: str, cutoff: Optional[float] = None,
+                          use_ambiguous: bool = False) -> float:
     """Calculates network-wide concordance.
 
     Assumes data already annotated with given key
@@ -192,12 +189,12 @@ def one_sided(value: float, distribution: List[float]) -> float:
 
 
 def calculate_concordance_probability(graph: BELGraph,
-                                      key:str,
-                                      cutoff:Optional[float]=None,
-                                      permutations:Optional[int]=None,
-                                      percentage:Optional[float]=None,
-                                      use_ambiguous:bool=False,
-                                      permute_type:str='shuffle_node_data',
+                                      key: str,
+                                      cutoff: Optional[float] = None,
+                                      permutations: Optional[int] = None,
+                                      percentage: Optional[float] = None,
+                                      use_ambiguous: bool = False,
+                                      permute_type: str = 'shuffle_node_data',
                                       ) -> Tuple[float, List[float], float]:
     """Calculates a graph's concordance as well as its statistical probability.
 

@@ -2,7 +2,7 @@
 
 """This module investigates the properties of paths of length two (A - B - C)."""
 
-from typing import Dict, Iterable, List, Tuple
+from typing import Dict, Iterable, List, Tuple, Mapping
 
 from pybel import BELGraph
 from pybel.constants import (
@@ -17,29 +17,25 @@ def self_edge_filter(_: BELGraph, source: BaseEntity, target: BaseEntity, __: st
     return source == target
 
 
-def has_protein_modification_increases_activity(graph: BELGraph, source: BaseEntity, target: BaseEntity,
-                                                key: str) -> bool:
+def has_protein_modification_increases_activity(graph: BELGraph,
+                                                source: BaseEntity,
+                                                target: BaseEntity,
+                                                key: str,
+                                                ) -> bool:
     """Check if pmod of source causes activity of target."""
     edge_data = graph[source][target][key]
-
     return has_protein_modification(graph, source) and part_has_modifier(edge_data, OBJECT, ACTIVITY)
 
 
 @edge_predicate
-def has_degradation_increases_activity(data) -> bool:
-    """Check if the degradation of source causes activity of target
-
-    :param dict data:
-    """
+def has_degradation_increases_activity(data: Dict) -> bool:
+    """Check if the degradation of source causes activity of target."""
     return part_has_modifier(data, SUBJECT, DEGRADATION) and part_has_modifier(data, OBJECT, ACTIVITY)
 
 
 @edge_predicate
-def has_translocation_increases_activity(data) -> bool:
-    """Check if the translocation of source causes activity of target
-
-    :param dict data:
-    """
+def has_translocation_increases_activity(data: Dict) -> bool:
+    """Check if the translocation of source causes activity of target."""
     return part_has_modifier(data, SUBJECT, TRANSLOCATION) and part_has_modifier(data, OBJECT, ACTIVITY)
 
 
@@ -55,9 +51,9 @@ def complex_has_member(graph: BELGraph, complex_node: ComplexAbundance, member_n
 def complex_increases_activity(graph: BELGraph, u: BaseEntity, v: BaseEntity, key: str) -> bool:
     """Return if the formation of a complex with u increases the activity of v."""
     return (
-            isinstance(u, (ComplexAbundance, NamedComplexAbundance)) and
-            complex_has_member(graph, u, v) and
-            part_has_modifier(graph[u][v][key], OBJECT, ACTIVITY)
+        isinstance(u, (ComplexAbundance, NamedComplexAbundance)) and
+        complex_has_member(graph, u, v) and
+        part_has_modifier(graph[u][v][key], OBJECT, ACTIVITY)
     )
 
 
@@ -68,7 +64,7 @@ def has_same_subject_object(graph: BELGraph, u: BaseEntity, v: BaseEntity, key: 
 
 def get_related_causal_out_edges(graph: BELGraph,
                                  u: BaseEntity,
-                                 edge_data,
+                                 edge_data: Dict,
                                  ) -> Iterable[Tuple[BaseEntity, Dict, str]]:
     for _, v, data in graph.out_edges(u, data=True):
         if data[RELATION] in CAUSAL_RELATIONS and data.get(SUBJECT) == edge_data:
@@ -84,7 +80,7 @@ def get_related_ish_causal_out_edges(graph: BELGraph,
             yield v, data, graph.edge_to_bel(u, v, data)
 
 
-def summarize_competeness(graph: BELGraph) -> List[Dict]:
+def summarize_completeness(graph: BELGraph) -> Mapping[str, List]:
     pmod_activity = []
     deg_activity = []
     tloc_activity = []
@@ -184,7 +180,7 @@ def summarize_competeness(graph: BELGraph) -> List[Dict]:
         tloc_activity=tloc_activity,
         comp_activity=comp_activity,
         same_sub_obj=same_sub_obj,
-        same_undefined=same_undefined
+        same_undefined=same_undefined,
     )
 
 

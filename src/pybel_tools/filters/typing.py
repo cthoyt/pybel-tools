@@ -2,10 +2,10 @@
 
 """Types for filters."""
 
-from typing import Callable, Iterable, Mapping, Tuple, Union
+import warnings
 
-from pybel import BELGraph
-from pybel.dsl import BaseEntity
+from pybel.struct.filters.typing import EdgeIterator, EdgePredicate, EdgePredicates, NodePredicate, NodePredicates
+from pybel.typing import Strings
 
 __all__ = [
     'NodePredicate',
@@ -16,12 +16,4 @@ __all__ = [
     'Strings',
 ]
 
-NodePredicate = Callable[[BELGraph, BaseEntity], bool]
-NodePredicates = Union[None, NodePredicate, Iterable[NodePredicate]]
-
-EdgeIterator = Iterable[Tuple[BaseEntity, BaseEntity, str, Mapping]]
-
-EdgePredicate = Callable[[BELGraph, BaseEntity, BaseEntity, str], bool]
-EdgePredicates = Union[None, EdgePredicate, Iterable[EdgePredicate]]
-
-Strings = Union[str, Iterable[str]]
+warnings.warn('pybel_tools.filters.typing has been moved to pybel.struct.filters.typing')
