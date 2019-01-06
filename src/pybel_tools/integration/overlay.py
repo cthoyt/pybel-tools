@@ -2,9 +2,9 @@
 
 """This module contains functions that help overlay tabular data to nodes in a graph"""
 
+import logging
 from collections import defaultdict
 
-import logging
 import numpy as np
 
 from pybel.constants import NAME

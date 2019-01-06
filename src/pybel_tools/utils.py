@@ -3,6 +3,7 @@
 """This module contains functions useful throughout PyBEL Tools"""
 
 import datetime
+import itertools as itt
 import json
 import logging
 import os
@@ -10,26 +11,27 @@ from collections import Counter, defaultdict
 from operator import itemgetter
 from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Set, Sized, Tuple, TypeVar
 
-import itertools as itt
 import networkx as nx
 
 from pybel import BELGraph
+from pybel.typing import EdgeData
 from .constants import VERSION
 
 log = logging.getLogger(__name__)
 
 CENTRALITY_SAMPLES = 200
 X = TypeVar('X')
+Y = TypeVar('Y')
 
 
-def pairwise(iterable):
+def pairwise(iterable: Iterable[X]) -> Iterable[Tuple[X, X]]:
     """Iterate over pairs in list s -> (s0,s1), (s1,s2), (s2, s3), ..."""
     a, b = itt.tee(iterable)
     next(b, None)
     return zip(a, b)
 
 
-def graph_edge_data_iter(graph: BELGraph) -> Iterable[Dict]:
+def graph_edge_data_iter(graph: BELGraph) -> Iterable[EdgeData]:
     """Iterate over the edge data dictionaries.
 
     :return: An iterator over the edge dictionaries in the graph
@@ -38,7 +40,7 @@ def graph_edge_data_iter(graph: BELGraph) -> Iterable[Dict]:
         yield data
 
 
-def count_defaultdict(dict_of_lists: Mapping[Any, List]) -> Mapping[Any, Counter]:
+def count_defaultdict(dict_of_lists: Mapping[X, List[Y]]) -> Mapping[X, Counter[Y]]:
     """Count the number of elements in each value of the dictionary."""
     return {
         k: Counter(v)
@@ -46,7 +48,7 @@ def count_defaultdict(dict_of_lists: Mapping[Any, List]) -> Mapping[Any, Counter
     }
 
 
-def count_dict_values(dict_of_counters: Mapping[Any, Sized]) -> Counter:
+def count_dict_values(dict_of_counters: Mapping[X, Sized]) -> Counter[X]:
     """Count the number of elements in each value (can be list, Counter, etc).
 
     :param dict_of_counters: A dictionary of things whose lengths can be measured (lists, Counters, dicts)
@@ -58,7 +60,7 @@ def count_dict_values(dict_of_counters: Mapping[Any, Sized]) -> Counter:
     })
 
 
-def set_percentage(x, y) -> float:
+def set_percentage(x: Iterable[X], y: Iterable[X]) -> float:
     """What percentage of x is contained within y?
 
     :param set x: A set
@@ -99,7 +101,7 @@ def min_tanimoto_set_similarity(x: Iterable[X], y: Iterable[X]) -> float:
     return len(a & b) / min(len(a), len(b))
 
 
-def calculate_single_tanimoto_set_distances(target, dict_of_sets):
+def calculate_single_tanimoto_set_distances(target: Iterable[X], dict_of_sets: Mapping[Y, Set[X]]) -> Mapping[Y, float]:
     """Return a dictionary of distances keyed by the keys in the given dict.
 
     Distances are calculated based on pairwise tanimoto similarity of the sets contained

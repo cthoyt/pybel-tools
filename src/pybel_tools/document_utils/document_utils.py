@@ -3,14 +3,14 @@
 """Utilities to merge multiple BEL documents on the same topic"""
 
 import logging
-from typing import Iterable, Mapping, Optional, Set, TextIO, Union
+from typing import Mapping, Optional, Set, TextIO, Union
 from xml.etree import ElementTree
 
 import requests
 
+from pybel.resources import make_knowledge_header
 from pybel.resources.constants import *
-from pybel.resources.document import make_knowledge_header
-from pybel_tools.constants import abstract_url_fmt, title_url_fmt
+from ..constants import abstract_url_fmt, title_url_fmt
 
 __all__ = [
     'write_boilerplate',
