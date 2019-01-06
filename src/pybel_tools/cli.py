@@ -20,10 +20,10 @@ from typing import TextIO
 
 import click
 
+from bel_resources import parse_bel_resource, write_annotation, write_namespace
 from pybel import BELGraph, Manager, from_lines
 from pybel.cli import connection_option, graph_pickle_argument
 from pybel.constants import NAMESPACE_DOMAIN_OTHER
-from pybel.resources.definitions import parse_bel_resource, write_annotation, write_namespace
 from pybel.struct import get_pubmed_identifiers
 from pybel.utils import get_version as pybel_version
 from .utils import get_version

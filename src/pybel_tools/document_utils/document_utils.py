@@ -3,13 +3,12 @@
 """Utilities to merge multiple BEL documents on the same topic"""
 
 import logging
-from typing import Mapping, Optional, Set, TextIO, Union
+from typing import Iterable, Mapping, Optional, Set, TextIO, Union
 from xml.etree import ElementTree
 
 import requests
 
-from pybel.resources import make_knowledge_header
-from pybel.resources.constants import *
+from bel_resources import make_knowledge_header
 from ..constants import abstract_url_fmt, title_url_fmt
 
 __all__ = [
@@ -31,12 +30,12 @@ def make_pubmed_abstract_group(pmids: Iterable[Union[str, int]]) -> Iterable[str
         res = requests.get(title_url_fmt.format(pmid))
         title = res.content.decode('utf-8').strip()
 
-        yield citation_format.format(title, pmid)
+        yield 'SET Citation = {{"{}", "{}"}}'.format(title, pmid)
 
         res = requests.get(abstract_url_fmt.format(pmid))
         abstract = res.content.decode('utf-8').strip()
 
-        yield evidence_format.format(abstract)
+        yield 'SET Evidence = "{}"'.format(abstract)
         yield '\nUNSET Evidence\nUNSET Citation'
 
 

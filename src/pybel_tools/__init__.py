@@ -43,15 +43,3 @@ installation difficult for Windows users, for whom Python cannot easily build C 
 """
 
 from .utils import get_version
-
-__version__ = '0.7.1-dev'
-
-__title__ = 'pybel_tools'
-__description__ = 'Tools for using BEL documents in Python'
-__url__ = 'https://github.com/pybel/pybel-tools'
-
-__author__ = 'Charles Tapley Hoyt'
-__email__ = 'cthoyt@gmail.com'
-
-__license__ = 'Apache License 2.0'
-__copyright__ = 'Copyright (c) 2016-2018 Charles Tapley Hoyt'

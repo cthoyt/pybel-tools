@@ -15,10 +15,9 @@ from typing import Mapping
 
 import pandas as pd
 
+from bel_resources import get_bel_resource, make_knowledge_header
 from pybel import BELGraph
 from pybel.dsl import Abundance, Gene
-from pybel.resources.definitions import get_bel_resource
-from pybel.resources.document import make_knowledge_header
 from pybel.utils import ensure_quotes
 
 log = logging.getLogger(__name__)

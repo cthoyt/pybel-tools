@@ -4,7 +4,7 @@
 
 import logging
 
-from pybel.resources import get_bel_resource, write_namespace
+from bel_resources import get_bel_resource, write_namespace
 
 __all__ = [
     'get_merged_namespace_names',
