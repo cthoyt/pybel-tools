@@ -160,13 +160,11 @@ def function_namespace_inclusion_builder(func: str, namespace: Strings) -> NodeP
     :param namespace: The namespace to search by
     """
     if isinstance(namespace, str):
-        def function_namespace_filter(_: BELGraph, node: BaseEntity) -> bool:
+        def function_namespaces_filter(_: BELGraph, node: BaseEntity) -> bool:
             """Pass only for nodes that have the enclosed function and enclosed namespace."""
             if func != node[FUNCTION]:
                 return False
             return NAMESPACE in node and node[NAMESPACE] == namespace
-
-        return function_namespace_filter
 
     elif isinstance(namespace, Iterable):
         namespaces = set(namespace)
@@ -177,12 +175,13 @@ def function_namespace_inclusion_builder(func: str, namespace: Strings) -> NodeP
                 return False
             return NAMESPACE in node and node[NAMESPACE] in namespaces
 
-        return function_namespaces_filter
+    else:
+        raise ValueError('Invalid type for argument: {}'.format(namespace))
 
-    raise ValueError('Invalid type for argument: {}'.format(namespace))
+    return function_namespaces_filter
 
 
-def data_contains_key_builder(key: str) -> NodePredicate:
+def data_contains_key_builder(key: str) -> NodePredicate:  # noqa: D202
     """Build a filter that passes only on nodes that have the given key in their data dictionary.
 
     :param key: A key for the node's data dictionary
@@ -216,7 +215,7 @@ exclude_pathology_filter = function_exclusion_filter_builder(PATHOLOGY)
 # TODO node filter that is false for abundances with no in-edges
 
 
-def namespace_inclusion_builder(namespace) -> NodePredicate:
+def namespace_inclusion_builder(namespace) -> NodePredicate:  # noqa: D202
     """"""
 
     def has_namespace(_: BELGraph, node: BaseEntity):
