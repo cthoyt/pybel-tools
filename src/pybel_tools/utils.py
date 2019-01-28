@@ -3,14 +3,15 @@
 """This module contains functions useful throughout PyBEL Tools"""
 
 import datetime
-import itertools as itt
 import json
 import logging
 import os
+import typing
 from collections import Counter, defaultdict
 from operator import itemgetter
 from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Set, Sized, Tuple, TypeVar
 
+import itertools as itt
 import networkx as nx
 
 from pybel import BELGraph
@@ -40,7 +41,7 @@ def graph_edge_data_iter(graph: BELGraph) -> Iterable[EdgeData]:
         yield data
 
 
-def count_defaultdict(dict_of_lists: Mapping[X, List[Y]]) -> Mapping[X, Counter[Y]]:
+def count_defaultdict(dict_of_lists: Mapping[X, List[Y]]) -> Mapping[X, typing.Counter[Y]]:
     """Count the number of elements in each value of the dictionary."""
     return {
         k: Counter(v)
@@ -48,7 +49,7 @@ def count_defaultdict(dict_of_lists: Mapping[X, List[Y]]) -> Mapping[X, Counter[
     }
 
 
-def count_dict_values(dict_of_counters: Mapping[X, Sized]) -> Counter[X]:
+def count_dict_values(dict_of_counters: Mapping[X, Sized]) -> typing.Counter[X]:
     """Count the number of elements in each value (can be list, Counter, etc).
 
     :param dict_of_counters: A dictionary of things whose lengths can be measured (lists, Counters, dicts)
