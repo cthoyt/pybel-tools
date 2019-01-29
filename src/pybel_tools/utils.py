@@ -238,46 +238,6 @@ def prepare_c3_time_series(data: List[Tuple[int, int]], y_axis_label: str = 'y',
     ])
 
 
-def build_template_environment(here: str):
-    """Builds a custom templating enviroment so Flask apps can get data from lots of different places
-    
-    :param here: Give this the result of :code:`os.path.dirname(os.path.abspath(__file__))`
-    :rtype: jinja2.Environment
-    """
-    import jinja2
-
-    template_environment = jinja2.Environment(
-        autoescape=False,
-        loader=jinja2.FileSystemLoader(os.path.join(here, 'templates')),
-        trim_blocks=False
-    )
-
-    template_environment.globals['STATIC_PREFIX'] = here + '/static/'
-
-    return template_environment
-
-
-def build_template_renderer(file):
-    """In your file, give this function the current file
-
-    :param str file: The location of the current file. Pass it :code:`__file__` like in the example below.
-    
-    >>> render_template = build_template_renderer(__file__)
-    """
-    here = os.path.dirname(os.path.abspath(file))
-    template_environment = build_template_environment(here)
-
-    def render_template(template_filename: str, **context: Mapping[str, Any]) -> str:
-        """Render a template as a unicode string.
-
-        :param template_filename: The name of the file to render in the template directory
-        :param dict context: The variables to template
-        """
-        return template_environment.get_template(template_filename).render(context)
-
-    return render_template
-
-
 def enable_cool_mode() -> None:
     log.info('enabled cool mode')
     logging.getLogger('urllib3.connectionpool').setLevel(logging.ERROR)
