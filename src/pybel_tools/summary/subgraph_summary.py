@@ -2,14 +2,14 @@
 
 """This module contains functions that handle and summarize subgraphs of graphs."""
 
+import itertools as itt
 from collections import defaultdict
 from operator import itemgetter
-from typing import Iterable, List, Union
-
-import itertools as itt
+from typing import Counter, Iterable, List, Mapping, Set, Tuple, Union
 
 from pybel import BELGraph
-from pybel.constants import *
+from pybel.constants import ANNOTATIONS
+from pybel.dsl import BaseEntity
 from pybel.struct.filters.edge_predicates import edge_has_annotation
 from pybel.struct.filters.typing import NodePredicate
 from ..selection.group_nodes import group_nodes_by_annotation, group_nodes_by_annotation_filtered
@@ -24,23 +24,32 @@ __all__ = [
 ]
 
 
-def count_subgraph_sizes(graph: BELGraph, annotation: str = 'Subgraph'):
-    """Counts the number of nodes in each subgraph induced by an anotation
+def count_subgraph_sizes(graph: BELGraph, annotation: str = 'Subgraph') -> Counter[int]:
+    """Count the number of nodes in each subgraph induced by an annotation.
 
     :param annotation: The annotation to group by and compare. Defaults to 'Subgraph'
     :return: A dictionary from {annotation value: number of nodes}
-    :rtype: dict[str, int]
     """
     return count_dict_values(group_nodes_by_annotation(graph, annotation))
 
 
-def calculate_subgraph_edge_overlap(graph: BELGraph, annotation: str = 'Subgraph'):
-    """Build a dataframe to show the overlap between different sub-graphs.
+EdgeSet = Set[Tuple[BaseEntity, BaseEntity]]
+
+
+def calculate_subgraph_edge_overlap(
+        graph: BELGraph,
+        annotation: str = 'Subgraph'
+) -> Tuple[
+    Mapping[str, EdgeSet],
+    Mapping[str, Mapping[str, EdgeSet]],
+    Mapping[str, Mapping[str, EdgeSet]],
+    Mapping[str, Mapping[str, float]],
+]:
+    """Build a DatafFame to show the overlap between different sub-graphs.
 
     Options:
     1. Total number of edges overlap (intersection)
     2. Percentage overlap (tanimoto similarity)
-
 
     :param graph: A BEL graph
     :param annotation: The annotation to group by and compare. Defaults to 'Subgraph'
@@ -66,8 +75,8 @@ def calculate_subgraph_edge_overlap(graph: BELGraph, annotation: str = 'Subgraph
     return sg2edge, subgraph_intersection, subgraph_union, result
 
 
-def summarize_subgraph_edge_overlap(graph: BELGraph, annotation: str = 'Subgraph'):
-    """Returns a similarity matrix between all subgraphs (or other given annotation)
+def summarize_subgraph_edge_overlap(graph: BELGraph, annotation: str = 'Subgraph') -> Mapping[str, Mapping[str, float]]:
+    """Return a similarity matrix between all subgraphs (or other given annotation).
 
     :param annotation: The annotation to group by and compare. Defaults to :code:`"Subgraph"`
     :return: A similarity matrix in a dict of dicts
@@ -78,20 +87,19 @@ def summarize_subgraph_edge_overlap(graph: BELGraph, annotation: str = 'Subgraph
 
 
 def summarize_subgraph_node_overlap(graph: BELGraph, node_predicates=None, annotation: str = 'Subgraph'):
-    """Calculates the subgraph similarity tanimoto similarity in nodes passing the given filter
+    """Calculate the subgraph similarity tanimoto similarity in nodes passing the given filter.
 
     Provides an alternate view on subgraph similarity, from a more node-centric view
     """
     r1 = group_nodes_by_annotation_filtered(graph, node_predicates=node_predicates, annotation=annotation)
-    r2 = calculate_tanimoto_set_distances(r1)
-    return r2
+    return calculate_tanimoto_set_distances(r1)
 
 
 def rank_subgraph_by_node_filter(graph: BELGraph,
                                  node_predicates: Union[NodePredicate, Iterable[NodePredicate]],
                                  annotation: str = 'Subgraph',
                                  reverse: bool = True,
-                                 ) -> List:
+                                 ) -> List[Tuple[str, int]]:
     """Rank sub-graphs by which have the most nodes matching an given filter.
 
     A use case for this function would be to identify which subgraphs contain the most differentially expressed
@@ -110,4 +118,5 @@ def rank_subgraph_by_node_filter(graph: BELGraph,
     """
     r1 = group_nodes_by_annotation_filtered(graph, node_predicates=node_predicates, annotation=annotation)
     r2 = count_dict_values(r1)
+    # TODO use instead: r2.most_common()
     return sorted(r2.items(), key=itemgetter(1), reverse=reverse)

@@ -19,8 +19,8 @@ from getpass import getuser
 from typing import TextIO
 
 import click
-
 from bel_resources import parse_bel_resource, write_annotation, write_namespace
+
 from pybel import BELGraph, Manager, from_lines
 from pybel.cli import connection_option, graph_pickle_argument
 from pybel.constants import NAMESPACE_DOMAIN_OTHER
@@ -61,11 +61,8 @@ def namespace():
 @click.option('--contact')
 @click.option('--license')
 @click.option('--values', default=sys.stdin, help="A file containing the list of names")
-@click.option('--functions')
 @click.option('--output', type=click.File('w'), default=sys.stdout)
-@click.option('--value-prefix', default='')
-def write(name, keyword, domain, citation, author, description, species, version, contact, license, values,
-          functions, output, value_prefix):
+def write(name, keyword, domain, citation, author, description, species, version, contact, license, values, output):
     """Build a namespace from items."""
     write_namespace(
         name, keyword, domain, author, citation, values,
@@ -74,9 +71,7 @@ def write(name, keyword, domain, citation, author, description, species, version
         namespace_version=version,
         author_contact=contact,
         author_copyright=license,
-        functions=functions,
         file=output,
-        value_prefix=value_prefix,
     )
 
 
@@ -106,7 +101,7 @@ def annotation():
 @click.option('-f', '--file', type=click.File('r'), default=sys.stdin, help="Path to input BEL Namespace file")
 @click.option('-o', '--output', type=click.File('w'), default=sys.stdout,
               help="Path to output converted BEL Namespace file")
-@click.option('--keyword', help="Set custom keyword. useful if the annotion keyword is too long")
+@click.option('--keyword', help="Set custom keyword. useful if the annotation keyword is too long")
 def convert_to_namespace(file, output, keyword):
     """Convert an annotation file to a namespace file."""
     resource = parse_bel_resource(file)
