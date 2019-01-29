@@ -28,7 +28,7 @@ log = logging.getLogger(__name__)
 
 @in_place_transformation
 def overlay_data(graph: BELGraph,
-                 data: Mapping[BaseEntity: Any],
+                 data: Mapping[BaseEntity, Any],
                  label: Optional[str] = None,
                  overwrite: bool = False,
                  ) -> None:
@@ -61,7 +61,7 @@ def overlay_type_data(graph: BELGraph,
                       namespace: str,
                       label: Optional[str] = None,
                       overwrite: bool = False,
-                      impute: Optional[float] = None
+                      impute: Optional[float] = None,
                       ) -> None:
     """Overlay tabular data on the network for data that comes from an data set with identifiers that lack
     namespaces.
