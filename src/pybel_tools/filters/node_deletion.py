@@ -5,8 +5,8 @@ from pybel.struct.filters.node_predicate_builders import function_inclusion_filt
 from pybel.struct.mutation import remove_filtered_nodes
 from pybel.struct.pipeline import in_place_transformation
 from pybel.struct.pipeline.decorators import register_deprecated
+from pybel.typing import Strings
 from .node_filters import function_namespace_inclusion_builder, namespace_inclusion_builder
-from .typing import Strings
 
 __all__ = [
     'remove_nodes_by_function',

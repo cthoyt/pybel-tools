@@ -4,11 +4,12 @@ import networkx as nx
 
 from pybel import BELGraph
 from pybel.struct.filters import filter_nodes, is_causal_relation
+from pybel.struct.filters.typing import NodePredicates
 from pybel.struct.mutation import get_subgraph_by_edge_filter, get_subgraph_by_induction
 from pybel.struct.operations import subgraph
 from pybel.struct.pipeline import transformation
+from pybel.typing import Strings
 from .search import search_node_names
-from ..filters.typing import NodePredicates, Strings
 
 __all__ = [
     'get_subgraph_by_node_filter',

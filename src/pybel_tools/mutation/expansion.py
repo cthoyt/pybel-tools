@@ -14,8 +14,8 @@ from pybel.dsl import BaseEntity
 from pybel.struct.filters import and_edge_predicates, concatenate_node_predicates, get_nodes_by_function
 from pybel.struct.filters.edge_predicates import edge_has_annotation, is_causal_relation
 from pybel.struct.filters.node_predicates import keep_node_permissive
+from pybel.struct.filters.typing import EdgeIterator, EdgePredicates, NodePredicates
 from pybel.struct.pipeline import uni_in_place_transformation
-from ..filters.typing import EdgeIterator, EdgePredicates, NodePredicates
 from ..utils import safe_add_edge
 
 __all__ = [

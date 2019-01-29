@@ -8,7 +8,7 @@ from pybel.constants import *
 from pybel.dsl import BaseEntity
 from pybel.struct.filters.edge_predicates import edge_has_annotation
 from pybel.struct.filters.node_filters import concatenate_node_predicates
-from ..filters.typing import NodePredicates
+from pybel.struct.filters.typing import NodePredicates
 
 __all__ = [
     'group_nodes_by_annotation',

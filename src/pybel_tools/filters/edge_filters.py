@@ -23,8 +23,9 @@ from pybel.struct.filters import (
     build_annotation_dict_all_filter, build_annotation_dict_any_filter, count_passed_edge_filter,
 )
 from pybel.struct.filters.edge_predicates import edge_predicate, has_authors, has_pathology_causal, has_pubmed
+from pybel.struct.filters.typing import EdgePredicate, EdgePredicates
+from pybel.typing import Strings
 from pybel.utils import subdict_matches
-from .typing import EdgePredicate, EdgePredicates, Strings
 
 __all__ = [
     'summarize_edge_filter',

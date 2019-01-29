@@ -21,7 +21,8 @@ from pybel.dsl import BaseEntity
 from pybel.struct.filters import (
     build_node_data_search, build_node_key_search, count_passed_node_filter, data_missing_key_builder,
 )
-from .typing import NodePredicate, NodePredicates, Strings
+from pybel.struct.filters.typing import NodePredicate, NodePredicates
+from pybel.typing import Strings
 
 __all__ = [
     'summarize_node_filter',

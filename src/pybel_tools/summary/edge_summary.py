@@ -12,12 +12,12 @@ from pybel.constants import ANNOTATIONS, RELATION
 from pybel.dsl import BaseEntity
 from pybel.struct.filters.edge_predicates import edge_has_annotation
 from pybel.struct.filters.node_predicates import keep_node_permissive
+from pybel.struct.filters.typing import NodePredicate
 from pybel.struct.summary import (
     count_annotations, count_pathologies, count_relations, get_annotations, get_unused_annotations,
     get_unused_list_annotation_values, iter_annotation_value_pairs, iter_annotation_values,
 )
 from .contradictions import pair_has_contradiction
-from ..filters.typing import NodePredicate
 
 __all__ = [
     'count_relations',

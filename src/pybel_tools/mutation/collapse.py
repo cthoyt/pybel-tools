@@ -8,11 +8,13 @@ from pybel import BELGraph
 from pybel.constants import EQUIVALENT_TO, GENE, HAS_VARIANT, ORTHOLOGOUS, PROTEIN, RELATION
 from pybel.dsl import BaseEntity, Gene, Protein
 from pybel.struct.filters import build_relation_predicate, filter_edges, has_polarity
+from pybel.struct.filters.typing import EdgePredicates
 from pybel.struct.mutation import collapse_nodes, collapse_pair, collapse_to_genes, get_subgraph_by_edge_filter
 from pybel.struct.pipeline import in_place_transformation, transformation
+from pybel.typing import Strings
 from ..filters.edge_filters import build_source_namespace_filter, build_target_namespace_filter
 from ..summary.edge_summary import pair_is_consistent
-from ..filters.typing import EdgePredicates, Strings
+
 __all__ = [
     'collapse_nodes',
     'rewire_variants_to_genes',

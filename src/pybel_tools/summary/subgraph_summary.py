@@ -11,7 +11,7 @@ import itertools as itt
 from pybel import BELGraph
 from pybel.constants import *
 from pybel.struct.filters.edge_predicates import edge_has_annotation
-from ..filters.typing import NodePredicate
+from pybel.struct.filters.typing import NodePredicate
 from ..selection.group_nodes import group_nodes_by_annotation, group_nodes_by_annotation_filtered
 from ..utils import calculate_tanimoto_set_distances, count_dict_values
 
