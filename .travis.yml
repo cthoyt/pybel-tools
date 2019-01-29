@@ -29,6 +29,15 @@ jobs:
     - env: TOXENV=readme
     - env: TOXENV=docs
 
+    # test stage
+    - stage: test
+      env: TOXENV=py
+      python: "3.6"
+    - env: TOXENV=py
+      sudo: true
+      python: "3.7"
+      dist: xenial
+
 matrix:
   allow_failures:
       - env: TOXENV=flake8
