@@ -2,6 +2,7 @@
 
 """Utilities to assemble a BEL graph as bipartite graph of nodes and reified edges."""
 
+from itertools import count
 import logging
 import unittest
 
@@ -43,15 +44,12 @@ class IntermediateConverter(ReifiedConverter):
 
     @classmethod
     def convert(cls, u: BaseEntity, v: BaseEntity, key: str, edge_data: Dict) \
-            -> Tuple[BaseEntity, Tuple[int, str], BaseEntity]:
-        # TODO create vertex X
-        # TODO i need an autoincrement somewhere
-        pred_vertex = (0, cls.target_relation)
-        # TODO v loses pmod(Ph)?
+            -> Tuple[BaseEntity, str, BaseEntity]:
+        pred_vertex = cls.target_relation
+        # TODO ASK v loses pmod(Ph)?
         # mod_v = v.deepcopy()
         object_edge = (pred_vertex, OBJECT, v)
-        # TODO ask what to do if it is a decrease of the phosphorylation
-
+        # TODO ASK what to do if it is a decrease of the phosphorylation (dephosphorylation or -1 phosphorylation)
         return u, pred_vertex, v
 
 
@@ -62,14 +60,14 @@ class PhosphorylationConverter(IntermediateConverter):
 
     @classmethod
     def predicate(cls, u: BaseEntity, v: BaseEntity, key: str, edge_data: Dict) -> bool:
-        if "variant" in v:
-            print("there is a variant")
-
-        return "relation" in edge_data and edge_data['relation'] in ['directlyIncreases', 'increases']
+        return ("relation" in edge_data and
+                edge_data['relation'] in ['directlyIncreases', 'increases'] and
+                "variants" in v and
+                pmod('Ph') in v["variants"])
 
 
 def reify_edge(u: BaseEntity, v: BaseEntity, key: str, edge_data: Dict) \
-    -> Optional[Tuple[BaseEntity, Tuple[int, str], BaseEntity]]:
+    -> Optional[Tuple[BaseEntity, str, BaseEntity]]:
 
     converters = [
         PhosphorylationConverter
@@ -88,24 +86,19 @@ def reify_bel_graph(bel_graph: BELGraph) -> nx.DiGraph:
     """Generate a new graph with reified edges."""
 
     reified_graph = nx.DiGraph()
+    gen = count()
 
     for edge in bel_graph.edges(keys=True):
-        if len(edge) == 2:
-            (u, v) = edge
-            key = None
-            data = bel_graph[u][v]
-        elif len(edge) == 3:
-            (u, v, key) = edge
-            data = bel_graph[u][v][key]
-        print(u)
-        print(v)
-        print(data)
+        (u, v, key) = edge
+        data = bel_graph[u][v][key]
 
         reified_edge = reify_edge(u, v, key, data)
         if reified_edge:
-            new_u, reif_edge, new_v = reified_edge
-            reified_graph.add_edge(new_u, reif_edge, label=SUBJECT)
-            reified_graph.add_edge(reif_edge, new_v, label=OBJECT)
+            new_u, reif_edge_label, new_v = reified_edge
+            reif_edge_num = next(gen)
+            reified_graph.add_node(reif_edge_num, label=reif_edge_label)
+            reified_graph.add_edge(new_u, reif_edge_num, label=SUBJECT)
+            reified_graph.add_edge(new_v, reif_edge_num, label=OBJECT)
 
     return reified_graph
 
@@ -127,8 +120,10 @@ class TestAssembleReifiedGraph(unittest.TestCase):
         for node in expected:
             self.assertIn(node, actual)
 
+        actual_edges_list = [(u_, expected.nodes[v_]) for u_, v_ in actual.edges]
         for u, v in expected.edges():
-            self.assertIn((u, v), actual.edges)
+            self.assertIn((u, expected.nodes[v]), actual_edges_list)
+        # TODO should the reified graph become a class, the edge comparison can be a method
 
     def test_convert_phosphorylates(self):
         """Test the conversion of a BEL statement like ``act(p(X)) -> p(Y, pmod(Ph))."""
@@ -174,8 +169,6 @@ class TestAssembleReifiedGraph(unittest.TestCase):
 
         reified_graph = reify_bel_graph(bel_graph)
         self.help_test_graphs_equal(expected_reified_graph, reified_graph)
-
-        # FIXME how to test the reified edges that have random numbers on them?
 
 
 if __name__ == '__main__':
