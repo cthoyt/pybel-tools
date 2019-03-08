@@ -2,17 +2,17 @@
 
 """Utilities to assemble a BEL graph as bipartite graph of nodes and reified edges."""
 
-from itertools import count
 import logging
 import unittest
+from abc import ABC, abstractmethod
+from itertools import count
+from typing import Dict, Optional, Tuple
 
 import networkx as nx
 
-from abc import ABC, abstractmethod
 from pybel import BELGraph
-from pybel.dsl import activity, pmod, protein, BaseEntity
+from pybel.dsl import BaseEntity, activity, pmod, protein
 from pybel.testing.utils import n
-from typing import Dict, Optional, Tuple
 
 __all__ = [
     'reify_bel_graph',
@@ -38,13 +38,17 @@ class ReifiedConverter(ABC):
 
 
 class IntermediateConverter(ReifiedConverter):
-    """Implements the convert method"""
+    """Implements the convert method."""
 
     target_relation = ...
 
     @classmethod
-    def convert(cls, u: BaseEntity, v: BaseEntity, key: str, edge_data: Dict) \
-            -> Tuple[BaseEntity, str, BaseEntity]:
+    def convert(cls,
+                u: BaseEntity,
+                v: BaseEntity,
+                key: str,
+                edge_data: Dict,
+                ) -> Tuple[BaseEntity, str, BaseEntity]:
         pred_vertex = cls.target_relation
         # TODO ASK v loses pmod(Ph)?
         # mod_v = v.deepcopy()
@@ -54,7 +58,7 @@ class IntermediateConverter(ReifiedConverter):
 
 
 class PhosphorylationConverter(IntermediateConverter):
-    """Converts BEL statements of the form A B p(C, pmod(Ph))"""
+    """Converts BEL statements of the form A B p(C, pmod(Ph))."""
 
     target_relation = "phosphorylates"
 
@@ -66,9 +70,11 @@ class PhosphorylationConverter(IntermediateConverter):
                 pmod('Ph') in v["variants"])
 
 
-def reify_edge(u: BaseEntity, v: BaseEntity, key: str, edge_data: Dict) \
-    -> Optional[Tuple[BaseEntity, str, BaseEntity]]:
-
+def reify_edge(u: BaseEntity,
+               v: BaseEntity,
+               key: str,
+               edge_data: Dict,
+               ) -> Optional[Tuple[BaseEntity, str, BaseEntity]]:
     converters = [
         PhosphorylationConverter
     ]
@@ -84,7 +90,6 @@ def reify_edge(u: BaseEntity, v: BaseEntity, key: str, edge_data: Dict) \
 
 def reify_bel_graph(bel_graph: BELGraph) -> nx.DiGraph:
     """Generate a new graph with reified edges."""
-
     reified_graph = nx.DiGraph()
     gen = count()
 
