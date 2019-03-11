@@ -10,9 +10,10 @@ import networkx as nx
 
 from abc import ABC, abstractmethod
 from pybel import BELGraph
-from pybel.dsl import activity, pmod, protein, BaseEntity
+from pybel.constants import CAUSAL_INCREASE_RELATIONS
+from pybel.dsl import abundance, activity, BaseEntity, pmod, protein
 from pybel.testing.utils import n
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional, Tuple, re
 
 __all__ = [
     'reify_bel_graph',
@@ -20,6 +21,14 @@ __all__ = [
 
 SUBJECT = 'subject'
 OBJECT = 'object'
+
+ACTIVATES = 'activates'
+PHOSPHORYLATES = 'phosphorylates'
+INCREASES_ABUNDANCE = "increasesAbundanceOf"
+
+REIFIED_RELATIONS = [
+    ACTIVATES, PHOSPHORYLATES, INCREASES_ABUNDANCE
+]
 
 
 class ReifiedConverter(ABC):
@@ -46,9 +55,7 @@ class IntermediateConverter(ReifiedConverter):
     def convert(cls, u: BaseEntity, v: BaseEntity, key: str, edge_data: Dict) \
             -> Tuple[BaseEntity, str, BaseEntity]:
         pred_vertex = cls.target_relation
-        # TODO ASK v loses pmod(Ph)?
-        # mod_v = v.deepcopy()
-        object_edge = (pred_vertex, OBJECT, v)
+        # TODO ASK if v loses pmod(Ph), we won't be able to capture paths like X -> p(Y, pmod(Ph)) -> Z
         # TODO ASK what to do if it is a decrease of the phosphorylation (dephosphorylation or -1 phosphorylation)
         return u, pred_vertex, v
 
@@ -61,16 +68,44 @@ class PhosphorylationConverter(IntermediateConverter):
     @classmethod
     def predicate(cls, u: BaseEntity, v: BaseEntity, key: str, edge_data: Dict) -> bool:
         return ("relation" in edge_data and
-                edge_data['relation'] in ['directlyIncreases', 'increases'] and
+                edge_data['relation'] in CAUSAL_INCREASE_RELATIONS and
                 "variants" in v and
                 pmod('Ph') in v["variants"])
+
+
+class AbundanceIncreaseConverter(IntermediateConverter):
+    """Converts BEL statements of the form A B C, where B in [->, =>] and A and C
+    don't fall in another special case (pmod, act, ...)
+    """
+
+    target_relation = INCREASES_ABUNDANCE
+
+    @classmethod
+    def predicate(cls, u: BaseEntity, v: BaseEntity, key: str, edge_data: Dict) -> bool:
+        return ("relation" in edge_data and
+                edge_data['relation'] in CAUSAL_INCREASE_RELATIONS)
+
+
+class ActivationConverter(IntermediateConverter):
+    """Converts BEL statements of the form A B act(C)"""
+
+    target_relation = "activates"
+
+    @classmethod
+    def predicate(cls, u: BaseEntity, v: BaseEntity, key: str, edge_data: Dict) -> bool:
+        raise NotImplementedError()
+        # return ("relation" in edge_data and
+        # edge_data['relation'] in CAUSAL_INCREASE_RELATIONS and
+        # "variants" in v and
+        # pmod('Ph') in v["variants"])
 
 
 def reify_edge(u: BaseEntity, v: BaseEntity, key: str, edge_data: Dict) \
     -> Optional[Tuple[BaseEntity, str, BaseEntity]]:
 
     converters = [
-        PhosphorylationConverter
+        PhosphorylationConverter,
+        AbundanceIncreaseConverter
     ]
     for converter in converters:
         if converter.predicate(u, v, key, edge_data):
@@ -106,6 +141,16 @@ def reify_bel_graph(bel_graph: BELGraph) -> nx.DiGraph:
 cdk5 = protein('HGNC', 'CDK5', 'HGNC:1774')
 gsk3b = protein('HGNC', 'GSK3B', 'HGNC:4617')
 p_tau = protein('HGNC', 'MAPT', 'HGNC:6893', variants=pmod('Ph'))
+# act(p(HGNC:FAS), ma(cat)) increases act(p(HGNC:CASP8), ma(cat))
+fas = protein('HGNC', 'FAS', 'HGNC:11920', variants=pmod('ma(cat)'))
+# TODO ^ ma = molecular_activity ? cat = GO:0003824 (catalytic activity)
+# TODO variable for act(CASP8)
+fas_a = activity(fas)  # act(p(HGNC:CASP8), ma(cat))???
+
+# a(CHEBI:oxaliplatin) increases a(MESHC:"Reactive Oxygen Species")
+oxaliplatin = abundance('CHEBI', 'oxaliplatin', 'CHEBI:31941')
+reactive_o_species = abundance('MESHC', 'Reactive Oxygen Species', 'D017382')
+# p(HGNC:MYC) decreases r(HGNC:CCNB1)
 
 
 class TestAssembleReifiedGraph(unittest.TestCase):
@@ -125,6 +170,7 @@ class TestAssembleReifiedGraph(unittest.TestCase):
             self.assertIn((u, expected.nodes[v]), actual_edges_list)
         # TODO should the reified graph become a class, the edge comparison can be a method
 
+    # TODO repeat for acetylation, activation, increases, decreases
     def test_convert_phosphorylates(self):
         """Test the conversion of a BEL statement like ``act(p(X)) -> p(Y, pmod(Ph))."""
         bel_graph = BELGraph()
@@ -165,6 +211,71 @@ class TestAssembleReifiedGraph(unittest.TestCase):
 
         expected_reified_graph.add_node(re2, label='phosphorylates')
         expected_reified_graph.add_edge(gsk3b, re2, label=SUBJECT)
+        expected_reified_graph.add_edge(p_tau, re2, label=OBJECT)
+
+        reified_graph = reify_bel_graph(bel_graph)
+        self.help_test_graphs_equal(expected_reified_graph, reified_graph)
+
+    def planned_test_convert_activates(self):
+        """Test the conversion of a bel statement like p(x) -> act(p(y))"""
+
+        bel_graph = BELGraph()
+        # bel_graph.add_increases(            fas_a        )
+
+        expected_reified_graph = nx.DiGraph()
+        expected_reified_graph.add_node(0, label=ACTIVATES)
+        expected_reified_graph.add_edge(cdk5, 0, label=SUBJECT)
+        expected_reified_graph.add_edge(p_tau, 0, label=OBJECT)
+
+        reified_graph = reify_bel_graph(bel_graph)
+        self.help_test_graphs_equal(expected_reified_graph, reified_graph)
+
+    def test_convert_increases_abundance(self):
+        """Test the conversion of a bel statement like A X B, when X in [->, =>]
+        and A and B don't fall in any special case (activity, pmod, ...)"""
+
+        bel_graph = BELGraph()
+        bel_graph.add_increases(
+            oxaliplatin,
+            reactive_o_species,
+            evidence='10.1093/jnci/djv394',
+            citation='PubMed:26719345'
+        )
+
+        expected_reified_graph = nx.DiGraph()
+        expected_reified_graph.add_node(0, label=INCREASES_ABUNDANCE)
+        expected_reified_graph.add_edge(oxaliplatin, 0, label=SUBJECT)
+        expected_reified_graph.add_edge(reactive_o_species, 0, label=OBJECT)
+
+        reified_graph = reify_bel_graph(bel_graph)
+        self.help_test_graphs_equal(expected_reified_graph, reified_graph)
+
+    def test_convert_increases_abundance_then_phosphorylates(self):
+        """Test the conversion of a bel graph containing one increases
+        abundance and one phosphorylates relationship"""
+
+        bel_graph = BELGraph()
+        bel_graph.add_increases(
+            oxaliplatin,
+            reactive_o_species,
+            evidence='10.1093/jnci/djv394',
+            citation='PubMed:26719345'
+        )
+        bel_graph.add_directly_increases(
+            reactive_o_species,
+            p_tau,
+            evidence=n(),
+            citation=n()
+        )
+
+        expected_reified_graph = nx.DiGraph()
+        re1, re2 = 0, 1
+        expected_reified_graph.add_node(re1, label=INCREASES_ABUNDANCE)
+        expected_reified_graph.add_edge(oxaliplatin, re1, label=SUBJECT)
+        expected_reified_graph.add_edge(reactive_o_species, re1, label=OBJECT)
+
+        expected_reified_graph.add_node(re2, label=PHOSPHORYLATES)
+        expected_reified_graph.add_edge(reactive_o_species, re2, label=SUBJECT)
         expected_reified_graph.add_edge(p_tau, re2, label=OBJECT)
 
         reified_graph = reify_bel_graph(bel_graph)
