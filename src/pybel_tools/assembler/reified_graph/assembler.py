@@ -42,7 +42,7 @@ REIFIED_RELATIONS = [
 
 
 class ReifiedConverter(ABC):
-    """Base class for BEL -> Reified edges graph conversion"""
+    """Base class for BEL -> Reified edges graph conversion."""
 
     target_relation = ...
 
@@ -52,31 +52,21 @@ class ReifiedConverter(ABC):
                   key: str, edge_data: Dict) -> bool:
         """Test if a BEL edge corresponds to the converter."""
 
-    @staticmethod
-    @abstractmethod
-    def convert(u: BaseEntity, v: BaseEntity, key: str, edge_data: Dict) \
-            -> Tuple[BaseEntity, Tuple[int, str], BaseEntity]:
-        """Convert a BEL edge to a reified edge."""
-
-
-class IntermediateConverter(ReifiedConverter):
-    """Implements the convert method."""
-
-    target_relation = ...
-
     @classmethod
     def convert(cls,
                 u: BaseEntity,
                 v: BaseEntity,
                 key: str,
-                edge_data: Dict,
+                edge_data: Dict
                 ) -> Tuple[BaseEntity, str, BaseEntity]:
+        """Convert a BEL edge to a reified edge."""
+
         pred_vertex = cls.target_relation
         return u, pred_vertex, v
 
 
 class PhosphorylationConverter(ReifiedConverter):
-    """Converts BEL statements of the form A B p(C, pmod(Ph))"""
+    """Converts BEL statements of the form A B p(C, pmod(Ph))."""
 
     target_relation = "phosphorylates"
 
@@ -88,9 +78,10 @@ class PhosphorylationConverter(ReifiedConverter):
                 "variants" in v and
                 pmod('Ph') in v["variants"])
 
+
 class AbundanceIncreaseConverter(ReifiedConverter):
     """Converts BEL statements of the form A B C, where B in [->, =>]
-    and A and C don't fall in another special case (pmod, act, ...)
+    and A and C don't fall in another special case (pmod, act, ...).
     """
 
     target_relation = INCREASES_ABUNDANCE
@@ -103,7 +94,7 @@ class AbundanceIncreaseConverter(ReifiedConverter):
 
 
 class ActivationConverter(ReifiedConverter):
-    """Converts BEL statements of the form A B act(C)"""
+    """Converts BEL statements of the form A B act(C)."""
 
     target_relation = "activates"
 
@@ -118,8 +109,11 @@ class ActivationConverter(ReifiedConverter):
         )
 
 
-def reify_edge(u: BaseEntity, v: BaseEntity, key: str, edge_data: Dict) \
-        -> Optional[Tuple[BaseEntity, str, BaseEntity]]:
+def reify_edge(u: BaseEntity,
+               v: BaseEntity,
+               key: str,
+               edge_data: Dict
+               ) -> Optional[Tuple[BaseEntity, str, BaseEntity]]:
     converters = [
         PhosphorylationConverter,
         AbundanceIncreaseConverter
@@ -170,8 +164,10 @@ reactive_o_species = abundance('MESHC', 'Reactive Oxygen Species', 'D017382')
 class TestAssembleReifiedGraph(unittest.TestCase):
     """Test assembly of reified graphs."""
 
-    def help_test_graphs_equal(self, expected: nx.DiGraph, actual: nx.DiGraph)\
-            -> None:
+    def help_test_graphs_equal(self,
+                               expected: nx.DiGraph,
+                               actual: nx.DiGraph
+                               ) -> None:
         """Test that two DiGraphs are equal."""
         self.assertIsNotNone(actual)
         self.assertIsInstance(actual, nx.DiGraph)
@@ -187,7 +183,7 @@ class TestAssembleReifiedGraph(unittest.TestCase):
         # TODO if the reified graph was a class,edge comparison can be a method
 
     # TODO repeat for acetylation, activation, increases, decreases
-    def atest_convert_phosphorylates(self):
+    def test_convert_phosphorylates(self):
         """Test the conversion of a BEL statement like
         ``act(p(X)) -> p(Y, pmod(Ph))."""
         bel_graph = BELGraph()
@@ -211,7 +207,7 @@ class TestAssembleReifiedGraph(unittest.TestCase):
         reified_graph = reify_bel_graph(bel_graph)
         self.help_test_graphs_equal(expected_reified_graph, reified_graph)
 
-    def atest_convert_two_phosphorylates(self):
+    def test_convert_two_phosphorylates(self):
         """Test that two phosphorylations of the same object get
         different reified nodes."""
         bel_graph = BELGraph()
@@ -255,7 +251,7 @@ class TestAssembleReifiedGraph(unittest.TestCase):
         reified_graph = reify_bel_graph(bel_graph)
         self.help_test_graphs_equal(expected_reified_graph, reified_graph)
 
-    def atest_convert_increases_abundance(self):
+    def test_convert_increases_abundance(self):
         """Test the conversion of a bel statement like A X B, when
         X in [->, =>] and A and B don't fall in any special case
         (activity, pmod, ...)
@@ -280,7 +276,7 @@ class TestAssembleReifiedGraph(unittest.TestCase):
         reified_graph = reify_bel_graph(bel_graph)
         self.help_test_graphs_equal(expected_reified_graph, reified_graph)
 
-    def atest_convert_increases_abundance_then_phosphorylates(self):
+    def test_convert_increases_abundance_then_phosphorylates(self):
         """Test the conversion of a bel graph containing one increases
         abundance and one phosphorylates relationship"""
 
