@@ -21,10 +21,10 @@ import networkx as nx
 from pybel import BELGraph
 from pybel.constants import (
     ACTIVITY, CAUSAL_DECREASE_RELATIONS, CAUSAL_INCREASE_RELATIONS,
-    CAUSAL_RELATIONS, MODIFIER, OBJECT, DEGRADATION
+    CAUSAL_RELATIONS, DEGRADATION, HAS_VARIANT, MODIFIER, OBJECT
 )
 from pybel.dsl import (
-    abundance, activity, BaseEntity, pmod, protein, degradation
+    abundance, activity, BaseEntity, degradation, pmod, protein, rna
 )
 from pybel.testing.utils import n
 
@@ -39,9 +39,11 @@ ACTIVATES = 'activates'
 PHOSPHORYLATES = 'phosphorylates'
 INCREASES_ABUNDANCE = "increasesAbundanceOf"
 DEGRADATES = "degradates"
+PROMOTES_TRANSLATION = "translates"
 
 REIFIED_RELATIONS = [
-    ACTIVATES, PHOSPHORYLATES, INCREASES_ABUNDANCE, DEGRADATES
+    ACTIVATES, DEGRADATES, INCREASES_ABUNDANCE, PHOSPHORYLATES,
+    PROMOTES_TRANSLATION
 ]
 
 
@@ -64,7 +66,7 @@ class ReifiedConverter(ABC):
                 v: BaseEntity,
                 key: str,
                 edge_data: Dict
-                ) -> Tuple[BaseEntity, str, BaseEntity]:
+                ) -> Optional[Tuple[BaseEntity, str, BaseEntity]]:
         """Convert a BEL edge to a reified edge. Increase relations are
         represented with a different label as its corresponding decrease
         relations."""
@@ -98,6 +100,40 @@ class PhosphorylationConverter(ReifiedConverter):
                 edge_data['relation'] in CAUSAL_RELATIONS and
                 "variants" in v and
                 pmod('Ph') in v["variants"])
+
+
+class HasVariantConverter(ReifiedConverter):
+    """Identifies edges of the form A hasvariant B. Do not convert them to
+    reified edges."""
+
+
+    @classmethod
+    def predicate(cls, u: BaseEntity, v: BaseEntity,
+                  key: str, edge_data: Dict) -> bool:
+        return ("relation" in edge_data and
+                edge_data['relation'] == HAS_VARIANT)
+
+    @classmethod
+    def convert(cls,
+                u: BaseEntity,
+                v: BaseEntity,
+                key: str,
+                edge_data: Dict
+                ) -> Optional[Tuple[BaseEntity, str, BaseEntity]]:
+        return None
+
+class TranslationConverter(ReifiedConverter):
+    """Converts BEL statements of the form A B r(C)."""
+
+    target_relation = PROMOTES_TRANSLATION
+    target_default_relation = "promotesTranslation"
+
+    @classmethod
+    def predicate(cls, u: BaseEntity, v: BaseEntity,
+                  key: str, edge_data: Dict) -> bool:
+        return ("relation" in edge_data and
+                edge_data['relation'] in CAUSAL_RELATIONS and
+                isinstance(v, rna))
 
 
 class PositivePhosphorylationConverter(PhosphorylationConverter):
@@ -188,7 +224,9 @@ def reify_edge(u: BaseEntity,
         PhosphorylationConverter,
         ActivationConverter,
         DegradationConverter,
-        AbundanceIncreaseConverter
+        TranslationConverter,
+        AbundanceIncreaseConverter,
+        HasVariantConverter
     ]
     for converter in converters:
         if converter.predicate(u, v, key, edge_data):
@@ -248,7 +286,7 @@ class TestAssembleReifiedGraph(unittest.TestCase):
         self.assertIsInstance(actual, nx.DiGraph)
         self.assertEqual(expected.number_of_nodes(), actual.number_of_nodes())
         self.assertEqual(expected.number_of_edges(), actual.number_of_edges())
-        # TODO Compare labels instead of values
+
         for node in expected:
             self.assertIn(node, actual)
 
@@ -281,8 +319,6 @@ class TestAssembleReifiedGraph(unittest.TestCase):
             )
 
         reified_graph = reify_bel_graph(bel_graph)
-        for i in reified_graph.edges():
-            print(i)
         self.help_test_graphs_equal(expected_reified_graph, reified_graph)
 
     def test_convert_two_phosphorylates(self):
@@ -387,6 +423,37 @@ class TestAssembleReifiedGraph(unittest.TestCase):
                 0
             )
 
+        reified_graph = reify_bel_graph(bel_graph)
+        self.help_test_graphs_equal(expected_reified_graph, reified_graph)
+
+
+    def test_convert_transcription(self):
+        """Test the conversion of a bel statement like A X r(B), when
+        X in [->, =>, reg]
+        """
+
+        # example from Colorectal Cancer Model v2.0.6 @ scai
+        # act(p(HGNC:CTNNB1), ma(tscript)) increases r(HGNC:BIRC5)
+        ctnnb1 = protein('HGNC', 'CTNNB1', '')
+        birc5 = rna('HGNC', 'BIRC5', '')
+
+        # a(MESH:Microglia) reg deg(a(CHEBI:"amyloid-beta"))
+        bel_graph = BELGraph()
+        bel_graph.add_increases(
+            ctnnb1,
+            birc5,
+            evidence='10.1038/s41586-018-0368-8',
+            citation='PMID:18075512',
+            subject_modifier=activity('tscript')
+        )
+
+        expected_reified_graph = \
+            TestAssembleReifiedGraph.help_make_simple_expected_graph(
+                ctnnb1,
+                birc5,
+                PROMOTES_TRANSLATION,
+                0
+            )
         reified_graph = reify_bel_graph(bel_graph)
 
         self.help_test_graphs_equal(expected_reified_graph, reified_graph)
