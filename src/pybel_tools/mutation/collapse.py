@@ -1,17 +1,22 @@
 # -*- coding: utf-8 -*-
 
+"""Collapse functions to supplement :mod:`pybel.struct.mutation.collapse`."""
+
+import itertools as itt
 import logging
+from collections import defaultdict
 
 import networkx as nx
-
 from pybel import BELGraph
-from pybel.constants import EQUIVALENT_TO, GENE, HAS_VARIANT, ORTHOLOGOUS, PROTEIN, RELATION
+from pybel.constants import EQUIVALENT_TO, GENE, HAS_VARIANT, NAME, NAMESPACE, ORTHOLOGOUS, PROTEIN, RELATION
 from pybel.dsl import BaseEntity, Gene, Protein
 from pybel.struct.filters import build_relation_predicate, filter_edges, has_polarity
 from pybel.struct.filters.typing import EdgePredicates
 from pybel.struct.mutation import collapse_nodes, collapse_pair, collapse_to_genes, get_subgraph_by_edge_filter
 from pybel.struct.pipeline import in_place_transformation, transformation
 from pybel.typing import Strings
+from tqdm import tqdm
+
 from ..filters.edge_filters import build_source_namespace_filter, build_target_namespace_filter
 from ..summary.edge_summary import pair_is_consistent
 
@@ -24,6 +29,7 @@ __all__ = [
     'collapse_equivalencies_by_namespace',
     'collapse_orthologies_by_namespace',
     'collapse_to_protein_interactions',
+    'collapse_nodes_with_same_names',
 ]
 
 log = logging.getLogger(__name__)
@@ -71,7 +77,7 @@ def rewire_variants_to_genes(graph: BELGraph) -> None:
     nx.relabel_nodes(graph, mapping, copy=False)
 
 
-def _collapse_edge_passing_predicates(graph:BELGraph, edge_predicates:EdgePredicates=None) -> None:
+def _collapse_edge_passing_predicates(graph: BELGraph, edge_predicates: EdgePredicates = None) -> None:
     """Collapse all edges passing the given edge predicates."""
     for u, v, _ in filter_edges(graph, edge_predicates=edge_predicates):
         collapse_pair(graph, survivor=u, victim=v)
@@ -203,3 +209,33 @@ def collapse_to_protein_interactions(graph: BELGraph) -> BELGraph:
         return isinstance(u, Gene) and isinstance(v, Gene)
 
     return get_subgraph_by_edge_filter(rv, edge_predicates=[has_polarity, is_edge_ppi])
+
+
+@in_place_transformation
+def collapse_nodes_with_same_names(graph: BELGraph) -> None:
+    """Collapse all nodes with the same name, merging namespaces by picking first alphabetical one."""
+    survivor_mapping = defaultdict(set) # Collapse mapping dict
+    victims = set() # Things already mapped while iterating
+
+    it = tqdm(itt.combinations(graph, r=2), total=graph.number_of_nodes() * (graph.number_of_nodes() - 1) / 2)
+    for a, b in it:
+        if b in victims:
+            continue
+
+        a_name, b_name = a.get(NAME), b.get(NAME)
+        if not a_name or not b_name or a_name.lower() != b_name.lower():
+            continue
+
+        if a.keys() != b.keys():  # not same version (might have variants)
+            continue
+
+        # Ensure that the values in the keys are also the same
+        for k in set(a.keys()) - {NAME, NAMESPACE}:
+            if a[k] != b[k]:  # something different
+                continue
+
+        survivor_mapping[a].add(b)
+        # Keep track of things that has been already mapped
+        victims.add(b)
+
+    collapse_nodes(graph, survivor_mapping)
