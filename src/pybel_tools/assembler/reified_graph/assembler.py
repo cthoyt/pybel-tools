@@ -15,11 +15,11 @@ import networkx as nx
 from pybel import BELGraph
 from pybel.constants import (
     ACTIVITY, CAUSAL_DECREASE_RELATIONS, CAUSAL_INCREASE_RELATIONS,
-    CAUSAL_RELATIONS, DEGRADATION, HAS_VARIANT, MODIFIER, OBJECT, REGULATES,
-    TRANSCRIBED_TO, TRANSLATED_TO
+    CAUSAL_RELATIONS, DEGRADATION, HAS_COMPONENT, HAS_VARIANT, MODIFIER,
+    OBJECT, REGULATES, TRANSCRIBED_TO, TRANSLATED_TO
 )
 from pybel.dsl import (
-    abundance, activity, BaseEntity, degradation, gene, pmod, protein, rna
+    abundance, activity, BaseEntity, ComplexAbundance, degradation, gene, pmod, protein, rna
 )
 from pybel.testing.utils import n
 
@@ -31,13 +31,16 @@ REIF_SUBJECT = 'subject'
 REIF_OBJECT = 'object'
 
 ACTIVATES = 'activates'
+COMPLEX = 'hasComponent'
 PHOSPHORYLATES = 'phosphorylates'
+FRAGMENTS = 'fragments'
 HYDROXYLATES = 'hydroxylates'
 INCREASES_ABUNDANCE = 'abundance'
 DEGRADATES = 'degradates'
 PROMOTES_TRANSLATION = 'translates'
 TRANSCRIBES_TO = 'transcribesTo'
 TRANSLATES_TO = 'translatesTo'
+UBIQUITINATION = 'ubiquitinates'
 
 
 class ReifiedConverter(ABC):
@@ -113,6 +116,21 @@ class ActivationConverter(ReifiedConverter):
         )
 
 
+class ComplexConverter(ReifiedConverter):
+    """Converts BEL statements of the form complex(A [, **B]])."""
+
+    target_relation = "hasComponent"
+
+    @classmethod
+    def predicate(cls, u: BaseEntity, v: BaseEntity,
+                  key: str, edge_data: Dict) -> bool:
+        return (
+            isinstance(u, ComplexAbundance) and
+            "relation" in edge_data and
+            edge_data['relation'] in HAS_COMPONENT
+        )
+
+
 class DegradationConverter(ReifiedConverter):
     """Converts BEL statements of the form A B act(C), when B in
     {CAUSAL RELATIONS}."""
@@ -150,6 +168,24 @@ class HasVariantConverter(ReifiedConverter):
         return None
 
 
+class FragmentationConverter(ReifiedConverter):
+    """Converts BEL statements of the form A B p(C, pmod(Hy))."""
+
+    target_relation = FRAGMENTS
+
+    @classmethod
+    def predicate(cls, u: BaseEntity, v: BaseEntity,
+                  key: str, edge_data: Dict) -> bool:
+        return (
+                "relation" in edge_data and
+                edge_data['relation'] in CAUSAL_RELATIONS and
+                "variants" in v and
+                any([var_['identifier']['name'] == 'frag'
+                     for var_ in v["variants"]
+                     if isinstance(var_, pmod)])
+        )
+
+
 class HydroxylationConverter(ReifiedConverter):
     """Converts BEL statements of the form A B p(C, pmod(Hy))."""
 
@@ -158,10 +194,14 @@ class HydroxylationConverter(ReifiedConverter):
     @classmethod
     def predicate(cls, u: BaseEntity, v: BaseEntity,
                   key: str, edge_data: Dict) -> bool:
-        return ("relation" in edge_data and
+        return (
+                "relation" in edge_data and
                 edge_data['relation'] in CAUSAL_RELATIONS and
                 "variants" in v and
-                pmod('Hy') in v["variants"])
+                any([var_['identifier']['name'] == 'Hy'
+                     for var_ in v["variants"]
+                     if isinstance(var_, pmod)])
+        )
 
 
 class PhosphorylationConverter(ReifiedConverter):
@@ -172,10 +212,14 @@ class PhosphorylationConverter(ReifiedConverter):
     @classmethod
     def predicate(cls, u: BaseEntity, v: BaseEntity,
                   key: str, edge_data: Dict) -> bool:
-        return ("relation" in edge_data and
-                edge_data['relation'] in CAUSAL_RELATIONS and
-                "variants" in v and
-                pmod('Ph') in v["variants"])
+        return (
+            "relation" in edge_data and
+            edge_data['relation'] in CAUSAL_RELATIONS and
+            "variants" in v and
+            any([var_['identifier']['name'] == 'Ph'
+                 for var_ in v["variants"]
+                 if isinstance(var_, pmod)])
+        )
 
 
 class PromotesTranslationConverter(ReifiedConverter):
@@ -220,6 +264,24 @@ class TranslationConverter(ReifiedConverter):
                 )
 
 
+class UbiquitinationConverter(ReifiedConverter):
+    """Converts BEL statements of the form A B p(C, pmod(Ph))."""
+
+    target_relation = UBIQUITINATION
+
+    @classmethod
+    def predicate(cls, u: BaseEntity, v: BaseEntity,
+                  key: str, edge_data: Dict) -> bool:
+        return (
+            "relation" in edge_data and
+            edge_data['relation'] in CAUSAL_RELATIONS and
+            "variants" in v and
+            any([var_['identifier']['name'] == 'Ub'
+                 for var_ in v["variants"]
+                 if isinstance(var_, pmod)])
+        )
+
+
 def reify_edge(u: BaseEntity,
                v: BaseEntity,
                key: str,
@@ -228,7 +290,10 @@ def reify_edge(u: BaseEntity,
     converters = [
         TranslationConverter,
         TranscriptionConverter,
+        ComplexConverter,
+        FragmentationConverter,
         PhosphorylationConverter,
+        UbiquitinationConverter,
         HydroxylationConverter,
         ActivationConverter,
         DegradationConverter,
