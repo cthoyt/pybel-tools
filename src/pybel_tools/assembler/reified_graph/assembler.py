@@ -19,7 +19,8 @@ from pybel.constants import (
     OBJECT, REGULATES, TRANSCRIBED_TO, TRANSLATED_TO
 )
 from pybel.dsl import (
-    abundance, activity, BaseEntity, ComplexAbundance, degradation, gene, pmod, protein, rna
+    abundance, activity, BaseEntity, ComplexAbundance, degradation, fragment,
+    gene, pmod, protein, rna
 )
 from pybel.testing.utils import n
 
@@ -180,9 +181,7 @@ class FragmentationConverter(ReifiedConverter):
                 "relation" in edge_data and
                 edge_data['relation'] in CAUSAL_RELATIONS and
                 "variants" in v and
-                any([var_['identifier']['name'] == 'frag'
-                     for var_ in v["variants"]
-                     if isinstance(var_, pmod)])
+                any([isinstance(var_, fragment) for var_ in v["variants"]])
         )
 
 
@@ -529,6 +528,34 @@ class TestAssembleReifiedGraph(unittest.TestCase):
                 microglia,
                 abeta,
                 DEGRADATES,
+                0,
+                self.help_causal_increases
+            )
+
+        reified_graph = reify_bel_graph(bel_graph)
+        self.help_test_graphs_equal(expected_reified_graph, reified_graph)
+
+    def test_convert_fragments(self):
+        """Test the conversion of a bel statement like A -> p(B, frag(?)).
+        """
+
+        casp3 = abundance('HGNC', 'CASP3', 'MeSH:D017628')
+        tau = protein('HGNC', 'MAPT', 'HGNC:6893', variants=fragment())
+
+        # act(p(HGNC:CASP3), ma(pep)) increases p(HGNC:MAPT, frag("?"))
+        bel_graph = BELGraph()
+        bel_graph.add_increases(
+            casp3,
+            tau,
+            evidence='10.1038/s41586-018-0368-8',
+            citation='PubMed:30046111'
+        )
+
+        expected_reified_graph = \
+            TestAssembleReifiedGraph.help_make_simple_expected_graph(
+                casp3,
+                tau,
+                FRAGMENTS,
                 0,
                 self.help_causal_increases
             )
