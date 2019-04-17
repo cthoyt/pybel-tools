@@ -45,21 +45,21 @@ TRANSLATES_TO = 'translatesTo'
 PHOSPHORYLATES = 'phosphorylates'
 HYDROXYLATES = 'hydroxylates'
 UBIQUITINATES = 'ubiquitinates'
-ACETYLATION = "acetylation"
-ADP_RIBOSYLATION = "ADP - ribosylation"
-FARNESYLATION = "farnesylation"
-GERANYLGERANYLATION = "geranylgeranylation"
-GLYCOSYLATION = "glycosylation"
-ISGYLATION = "ISGylation"
-METHYLATION = "methylation"
-MYRISTOYLATION = "myristoylation"
-NEDDYLATION = "neddylation"
-NGLYCO = "glycosylation"
-OGLYCO = "glycosylation"
-NITROSYLATION = "Nitrosylation"
-PALMITOYLATION = "palmitoylation"
-SULPHATION = "sulphation"
-SUMOYLATION = "SUMOylation"
+ACETYLATION = "acetylates"
+ADP_RIBOSYLATION = "ADP - ribosylates"
+FARNESYLATION = "farnesylates"
+GERANYLGERANYLATION = "geranylgeranylates"
+GLYCOSYLATION = "glycosylates"
+ISGYLATION = "ISGylates"
+METHYLATION = "methylates"
+MYRISTOYLATION = "myristoylates"
+NEDDYLATION = "neddylates"
+NGLYCO = "glycosylates"
+OGLYCO = "glycosylates"
+NITROSYLATION = "Nitrosylates"
+PALMITOYLATION = "palmitoylates"
+SULPHATION = "sulphates"
+SUMOYLATION = "SUMOylates"
 
 
 class ReifiedConverter(ABC):
@@ -93,7 +93,7 @@ class ReifiedConverter(ABC):
                 v: BaseEntity,
                 key: str,
                 edge_data: Dict
-                ) -> Tuple[BaseEntity, str, bool, bool, BaseEntity]:
+                ) -> Optional[Tuple[BaseEntity, str, bool, bool, BaseEntity]]:
         """Convert a BEL edge to a reified edge. Increase and decrease
         relations have same label, but different sign (positive and negative
         respectively)."""
@@ -103,6 +103,22 @@ class ReifiedConverter(ABC):
                 cls.is_causal_increase(edge_data),
                 cls.is_causal_decrease(edge_data),
                 v)
+
+
+class PTMConverter(ReifiedConverter):
+    """Converts BEL statements of the form A X p(B, pmod(*))."""
+
+    synonyms = ...
+
+    @classmethod
+    def predicate(cls, u: BaseEntity, v: BaseEntity,
+                  key: str, edge_data: Dict) -> bool:
+        return ("relation" in edge_data and
+                edge_data['relation'] in CAUSAL_RELATIONS and
+                "variants" in v and
+                any([var_['identifier']['name'] in cls.synonyms
+                     for var_ in v["variants"]
+                     if isinstance(var_, pmod)]))
 
 
 class AbundanceConverter(ReifiedConverter):
@@ -117,6 +133,25 @@ class AbundanceConverter(ReifiedConverter):
                   key: str, edge_data: Dict) -> bool:
         return ("relation" in edge_data and
                 edge_data['relation'] in CAUSAL_RELATIONS)
+
+
+class AcetylationConverter(PTMConverter):
+    """Converts BEL statements of the form A B p(C, pmod(Ac)) or
+    synonyms."""
+
+    synonyms = ["Ac", "acetylation"]
+    target_relation = ACETYLATION
+
+
+class ADPRibConverter(PTMConverter):
+    """Converts BEL statements of the form A B p(C, pmod(ADPRib)) or
+    synonyms."""
+
+    synonyms = [
+        "ADPRib", "ADP - ribosylation", "ADP - rybosylation",
+        "adenosine diphosphoribosyl"
+    ]
+    target_relation = ADP_RIBOSYLATION
 
 
 class ActivationConverter(ReifiedConverter):
@@ -167,6 +202,22 @@ class DegradationConverter(ReifiedConverter):
         )
 
 
+class FarnesylationConverter(PTMConverter):
+    """Converts BEL statements of the form A B p(C, pmod(Farn)) or
+    synonyms."""
+
+    synonyms = ["Farn", "farnesylation"]
+    target_relation = FARNESYLATION
+
+
+class GeranylgeranylationConverter(PTMConverter):
+    """Converts BEL statements of the form A B p(C, pmod(Gerger)) or
+    synonyms."""
+
+    synonyms = ["Gerger", "geranylgeranylation"]
+    target_relation = GERANYLGERANYLATION
+
+
 class HasVariantConverter(ReifiedConverter):
     """Identifies edges of the form A hasvariant B. Do not convert them to
     reified edges."""
@@ -183,7 +234,7 @@ class HasVariantConverter(ReifiedConverter):
                 v: BaseEntity,
                 key: str,
                 edge_data: Dict
-                ) -> Tuple[BaseEntity, str, bool, bool, BaseEntity]:
+                ) -> Optional[Tuple[BaseEntity, str, bool, bool, BaseEntity]]:
         return None
 
 
@@ -203,40 +254,83 @@ class FragmentationConverter(ReifiedConverter):
         )
 
 
-class HydroxylationConverter(ReifiedConverter):
-    """Converts BEL statements of the form A B p(C, pmod(Hy))."""
+class GlycosylationConverter(PTMConverter):
+    """Converts BEL statements of the form A B p(C, pmod(Glyco)) or
+    synonyms."""
 
+    synonyms = [
+        "Glyco", "glycosylation", "NGlyco", "N - linked glycosylation",
+        "OGlyco", "O - linked glycosylation"
+    ]
+    target_relation = GLYCOSYLATION
+
+
+class HydroxylationConverter(PTMConverter):
+    """Converts BEL statements of the form A B p(C, pmod(Hy)) or
+    synonyms."""
+
+    synonyms = ["Hy", "hydroxylation"]
     target_relation = HYDROXYLATES
 
-    @classmethod
-    def predicate(cls, u: BaseEntity, v: BaseEntity,
-                  key: str, edge_data: Dict) -> bool:
-        return (
-                "relation" in edge_data and
-                edge_data['relation'] in CAUSAL_RELATIONS and
-                "variants" in v and
-                any([var_['identifier']['name'] == 'Hy'
-                     for var_ in v["variants"]
-                     if isinstance(var_, pmod)])
-        )
+
+class ISGylationConverter(PTMConverter):
+    """Converts BEL statements of the form A B p(C, pmod(ISG)) or
+    synonyms."""
+
+    synonyms = ["ISG", "ISGylation", "ISG15 - protein conjugation"]
+    target_relation = ISGYLATION
 
 
-class PhosphorylationConverter(ReifiedConverter):
-    """Converts BEL statements of the form A B p(C, pmod(Ph))."""
+class MethylationConverter(PTMConverter):
+    """Converts BEL statements of the form A B p(C, pmod(Me)) or
+    synonyms."""
 
+    synonyms = [
+        "Me", "methylation", "Me1", "monomethylation", "mono - methylation",
+        "Me2", "dimethylation", "di - methylation", "Me3", "trimethylation",
+        "tri - methylation"
+    ]
+    target_relation = METHYLATION
+
+
+class MyristoylationConverter(PTMConverter):
+    """Converts BEL statements of the form A B p(C, pmod(Myr)) or
+    synonyms."""
+
+    synonyms = ["Myr", "myristoylation"]
+    target_relation = MYRISTOYLATION
+
+
+class NeddylationConverter(PTMConverter):
+    """Converts BEL statements of the form A B p(C, pmod(Nedd)) or
+    synonyms."""
+
+    synonyms = ["Nedd", "neddylation"]
+    target_relation = NEDDYLATION
+
+
+class NitrosylationConverter(PTMConverter):
+    """Converts BEL statements of the form A B p(C, pmod(NO)) or
+    synonyms."""
+
+    synonyms = ["NO", "Nitrosylation"]
+    target_relation = NITROSYLATION
+
+
+class PalmitoylationConverter(PTMConverter):
+    """Converts BEL statements of the form A B p(C, pmod(Palm)) or
+    synonyms."""
+
+    synonyms = ["Palm", "palmitoylation"]
+    target_relation = PALMITOYLATION
+
+
+class PhosphorylationConverter(PTMConverter):
+    """Converts BEL statements of the form A B p(C, pmod(Ph)) or
+    synonyms."""
+
+    synonyms = ["Ph", "phosphorylation"]
     target_relation = PHOSPHORYLATES
-
-    @classmethod
-    def predicate(cls, u: BaseEntity, v: BaseEntity,
-                  key: str, edge_data: Dict) -> bool:
-        return (
-            "relation" in edge_data and
-            edge_data['relation'] in CAUSAL_RELATIONS and
-            "variants" in v and
-            any([var_['identifier']['name'] == 'Ph'
-                 for var_ in v["variants"]
-                 if isinstance(var_, pmod)])
-        )
 
 
 class PromotesTranslationConverter(ReifiedConverter):
@@ -252,100 +346,23 @@ class PromotesTranslationConverter(ReifiedConverter):
                 isinstance(v, rna))
 
 
-class ProteinModificationConverter(ReifiedConverter):
-    """Converts BEL statements of the form A X p(B, pmod(*))."""
+class SulphationConverter(PTMConverter):
+    """Converts BEL statements of the form A B p(C, pmod(Sulf)) or
+    synonyms."""
 
-    target_relation = {
-        "Ac": ACETYLATION,
-        "acetylation": ACETYLATION,
-        "ADPRib": 1,
-        "ADP - ribosylation": ADP_RIBOSYLATION,
-        "ADP - rybosylation": ADP_RIBOSYLATION,
-        "adenosine diphosphoribosyl": ADP_RIBOSYLATION,
-        "Farn": FARNESYLATION,
-        "farnesylation": FARNESYLATION,
-        "Gerger": GERANYLGERANYLATION,
-        "geranylgeranylation": GERANYLGERANYLATION,
-        "Glyco": GLYCOSYLATION,
-        "glycosylation": GLYCOSYLATION,
-        "NGlyco": GLYCOSYLATION,
-        "N - linked glycosylation": GLYCOSYLATION,
-        "OGlyco": GLYCOSYLATION,
-        "O - linked glycosylation": GLYCOSYLATION,
-        "Hy": HYDROXYLATES,
-        "hydroxylation": HYDROXYLATES,
-        "ISG": ISGYLATION,
-        "ISGylation": ISGYLATION,
-        "ISG15 - protein conjugation": ISGYLATION,
-        "Me": METHYLATION,
-        "methylation": METHYLATION,
-        "Me1": METHYLATION,
-        "monomethylation": METHYLATION,
-        "mono - methylation": METHYLATION,
-        "Me2": METHYLATION,
-        "dimethylation": METHYLATION,
-        "di - methylation": METHYLATION,
-        "Me3": METHYLATION,
-        "trimethylation": METHYLATION,
-        "tri - methylation": METHYLATION,
-        "Myr": MYRISTOYLATION,
-        "myristoylation": MYRISTOYLATION,
-        "Nedd": NEDDYLATION,
-        "neddylation": NEDDYLATION,
-        "NO": NITROSYLATION,
-        "Nitrosylation": NITROSYLATION,
-        "Palm": PALMITOYLATION,
-        "palmitoylation": PALMITOYLATION,
-        "Sulf": SULPHATION,
-        "sulfation": SULPHATION,
-        "sulphation": SULPHATION,
-        "sulfur addition": SULPHATION,
-        "sulphur addition": SULPHATION,
-        "sulfonation": SULPHATION,
-        "sulphonation": SULPHATION,
-        "Sumo": SUMOYLATION,
-        "SUMOylation": SUMOYLATION,
-        "Ub": UBIQUITINATES,
-        "ubiquitination": UBIQUITINATES,
-        "ubiquitinylation": UBIQUITINATES,
-        "ubiquitylation": UBIQUITINATES,
-        "UbK48": UBIQUITINATES,
-        "Lysine 48 - linked polyubiquitination": UBIQUITINATES,
-        "UbK63": UBIQUITINATES,
-        "Lysine 63 - linked polyubiquitination": UBIQUITINATES,
-        "UbMono": UBIQUITINATES,
-        "monoubiquitination": UBIQUITINATES,
-        "UbPoly": UBIQUITINATES,
-        "Ph": PHOSPHORYLATES,
-        "phosphorylation": PHOSPHORYLATES
-    }
+    synonyms = [
+        "Sulf", "sulfation", "sulphation", "sulfur addition",
+        "sulphur addition", "sulfonation", "sulphonation"
+    ]
+    target_relation = SULPHATION
 
-    @classmethod
-    def predicate(cls, u: BaseEntity, v: BaseEntity,
-                  key: str, edge_data: Dict) -> bool:
-        return ("relation" in edge_data and
-                edge_data['relation'] in CAUSAL_RELATIONS and
-                "variants" in v and
-                any([var_['identifier']['name'] in cls.target_relation
-                     for var_ in v["variants"]
-                     if isinstance(var_, pmod)]))
 
-    @classmethod
-    def convert(cls,
-                u: BaseEntity,
-                v: BaseEntity,
-                key: str,
-                edge_data: Dict
-                ) -> Tuple[BaseEntity, str, bool, bool, BaseEntity]:
+class SUMOylationConverter(PTMConverter):
+    """Converts BEL statements of the form A B p(C, pmod(SUMO)) or
+    synonyms."""
 
-        for var_ in v["variants"]:
-            if (isinstance(var_, pmod) and
-                    var_['identifier']['name'] in cls.target_relation):
-                return (u,
-                        cls.target_relation[var_['identifier']['name']],
-                        cls.is_causal_increase(edge_data),
-                        cls.is_causal_decrease(edge_data),
-                        v)
+    synonyms = ["Sumo", "SUMOylation"]
+    target_relation = SUMOYLATION
 
 
 class TranscriptionConverter(ReifiedConverter):
@@ -377,22 +394,16 @@ class TranslationConverter(ReifiedConverter):
                 )
 
 
-class UbiquitinationConverter(ReifiedConverter):
-    """Converts BEL statements of the form A B p(C, pmod(Ph))."""
+class UbiquitinationConverter(PTMConverter):
+    """Converts BEL statements of the form A B p(C, pmod(Ub)) or
+    synonyms."""
 
+    synonyms = [
+        "Ub", "ubiquitination", "ubiquitinylation", "ubiquitylation", "UbK48",
+        "Lysine 48 - linked polyubiquitination", "UbK63", "UbMono", "UbPoly",
+        "Lysine 63 - linked polyubiquitination", "monoubiquitination"
+    ]
     target_relation = UBIQUITINATES
-
-    @classmethod
-    def predicate(cls, u: BaseEntity, v: BaseEntity,
-                  key: str, edge_data: Dict) -> bool:
-        return (
-            "relation" in edge_data and
-            edge_data['relation'] in CAUSAL_RELATIONS and
-            "variants" in v and
-            any([var_['identifier']['name'] == 'Ub'
-                 for var_ in v["variants"]
-                 if isinstance(var_, pmod)])
-        )
 
 
 def reify_edge(u: BaseEntity,
@@ -401,13 +412,24 @@ def reify_edge(u: BaseEntity,
                edge_data: Dict
                ) -> Optional[Tuple[BaseEntity, str, bool, bool, BaseEntity]]:
     converters = [
-        ProteinModificationConverter,
         TranslationConverter,
         TranscriptionConverter,
         ComplexConverter,
         FragmentationConverter,
+        ADPRibConverter,
+        FarnesylationConverter,
+        GeranylgeranylationConverter,
+        GlycosylationConverter,
+        ISGylationConverter,
+        MethylationConverter,
+        MyristoylationConverter,
+        NeddylationConverter,
+        NitrosylationConverter,
+        PalmitoylationConverter,
         PhosphorylationConverter,
         UbiquitinationConverter,
+        SulphationConverter,
+        SUMOylationConverter,
         HydroxylationConverter,
         ActivationConverter,
         DegradationConverter,
