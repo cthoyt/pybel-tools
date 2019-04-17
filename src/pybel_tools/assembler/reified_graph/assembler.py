@@ -33,15 +33,33 @@ REIF_OBJECT = 'object'
 
 ACTIVATES = 'activates'
 COMPLEX = 'hasComponent'
-PHOSPHORYLATES = 'phosphorylates'
 FRAGMENTS = 'fragments'
-HYDROXYLATES = 'hydroxylates'
 INCREASES_ABUNDANCE = 'abundance'
 DEGRADATES = 'degradates'
 PROMOTES_TRANSLATION = 'translates'
 TRANSCRIBES_TO = 'transcribesTo'
 TRANSLATES_TO = 'translatesTo'
-UBIQUITINATION = 'ubiquitinates'
+
+# Predicates for PTMs
+
+PHOSPHORYLATES = 'phosphorylates'
+HYDROXYLATES = 'hydroxylates'
+UBIQUITINATES = 'ubiquitinates'
+ACETYLATION = "acetylation"
+ADP_RIBOSYLATION = "ADP - ribosylation"
+FARNESYLATION = "farnesylation"
+GERANYLGERANYLATION = "geranylgeranylation"
+GLYCOSYLATION = "glycosylation"
+ISGYLATION = "ISGylation"
+METHYLATION = "methylation"
+MYRISTOYLATION = "myristoylation"
+NEDDYLATION = "neddylation"
+NGLYCO = "glycosylation"
+OGLYCO = "glycosylation"
+NITROSYLATION = "Nitrosylation"
+PALMITOYLATION = "palmitoylation"
+SULPHATION = "sulphation"
+SUMOYLATION = "SUMOylation"
 
 
 class ReifiedConverter(ABC):
@@ -165,7 +183,7 @@ class HasVariantConverter(ReifiedConverter):
                 v: BaseEntity,
                 key: str,
                 edge_data: Dict
-                ) -> Optional[Tuple[BaseEntity, str, BaseEntity]]:
+                ) -> Tuple[BaseEntity, str, bool, bool, BaseEntity]:
         return None
 
 
@@ -234,6 +252,102 @@ class PromotesTranslationConverter(ReifiedConverter):
                 isinstance(v, rna))
 
 
+class ProteinModificationConverter(ReifiedConverter):
+    """Converts BEL statements of the form A X p(B, pmod(*))."""
+
+    target_relation = {
+        "Ac": ACETYLATION,
+        "acetylation": ACETYLATION,
+        "ADPRib": 1,
+        "ADP - ribosylation": ADP_RIBOSYLATION,
+        "ADP - rybosylation": ADP_RIBOSYLATION,
+        "adenosine diphosphoribosyl": ADP_RIBOSYLATION,
+        "Farn": FARNESYLATION,
+        "farnesylation": FARNESYLATION,
+        "Gerger": GERANYLGERANYLATION,
+        "geranylgeranylation": GERANYLGERANYLATION,
+        "Glyco": GLYCOSYLATION,
+        "glycosylation": GLYCOSYLATION,
+        "NGlyco": GLYCOSYLATION,
+        "N - linked glycosylation": GLYCOSYLATION,
+        "OGlyco": GLYCOSYLATION,
+        "O - linked glycosylation": GLYCOSYLATION,
+        "Hy": HYDROXYLATES,
+        "hydroxylation": HYDROXYLATES,
+        "ISG": ISGYLATION,
+        "ISGylation": ISGYLATION,
+        "ISG15 - protein conjugation": ISGYLATION,
+        "Me": METHYLATION,
+        "methylation": METHYLATION,
+        "Me1": METHYLATION,
+        "monomethylation": METHYLATION,
+        "mono - methylation": METHYLATION,
+        "Me2": METHYLATION,
+        "dimethylation": METHYLATION,
+        "di - methylation": METHYLATION,
+        "Me3": METHYLATION,
+        "trimethylation": METHYLATION,
+        "tri - methylation": METHYLATION,
+        "Myr": MYRISTOYLATION,
+        "myristoylation": MYRISTOYLATION,
+        "Nedd": NEDDYLATION,
+        "neddylation": NEDDYLATION,
+        "NO": NITROSYLATION,
+        "Nitrosylation": NITROSYLATION,
+        "Palm": PALMITOYLATION,
+        "palmitoylation": PALMITOYLATION,
+        "Sulf": SULPHATION,
+        "sulfation": SULPHATION,
+        "sulphation": SULPHATION,
+        "sulfur addition": SULPHATION,
+        "sulphur addition": SULPHATION,
+        "sulfonation": SULPHATION,
+        "sulphonation": SULPHATION,
+        "Sumo": SUMOYLATION,
+        "SUMOylation": SUMOYLATION,
+        "Ub": UBIQUITINATES,
+        "ubiquitination": UBIQUITINATES,
+        "ubiquitinylation": UBIQUITINATES,
+        "ubiquitylation": UBIQUITINATES,
+        "UbK48": UBIQUITINATES,
+        "Lysine 48 - linked polyubiquitination": UBIQUITINATES,
+        "UbK63": UBIQUITINATES,
+        "Lysine 63 - linked polyubiquitination": UBIQUITINATES,
+        "UbMono": UBIQUITINATES,
+        "monoubiquitination": UBIQUITINATES,
+        "UbPoly": UBIQUITINATES,
+        "Ph": PHOSPHORYLATES,
+        "phosphorylation": PHOSPHORYLATES
+    }
+
+    @classmethod
+    def predicate(cls, u: BaseEntity, v: BaseEntity,
+                  key: str, edge_data: Dict) -> bool:
+        return ("relation" in edge_data and
+                edge_data['relation'] in CAUSAL_RELATIONS and
+                "variants" in v and
+                any([var_['identifier']['name'] in cls.target_relation
+                     for var_ in v["variants"]
+                     if isinstance(var_, pmod)]))
+
+    @classmethod
+    def convert(cls,
+                u: BaseEntity,
+                v: BaseEntity,
+                key: str,
+                edge_data: Dict
+                ) -> Tuple[BaseEntity, str, bool, bool, BaseEntity]:
+
+        for var_ in v["variants"]:
+            if (isinstance(var_, pmod) and
+                    var_['identifier']['name'] in cls.target_relation):
+                return (u,
+                        cls.target_relation[var_['identifier']['name']],
+                        cls.is_causal_increase(edge_data),
+                        cls.is_causal_decrease(edge_data),
+                        v)
+
+
 class TranscriptionConverter(ReifiedConverter):
     """Converts BEL statements of the form g(A) :> r(C)."""
 
@@ -266,7 +380,7 @@ class TranslationConverter(ReifiedConverter):
 class UbiquitinationConverter(ReifiedConverter):
     """Converts BEL statements of the form A B p(C, pmod(Ph))."""
 
-    target_relation = UBIQUITINATION
+    target_relation = UBIQUITINATES
 
     @classmethod
     def predicate(cls, u: BaseEntity, v: BaseEntity,
@@ -287,6 +401,7 @@ def reify_edge(u: BaseEntity,
                edge_data: Dict
                ) -> Optional[Tuple[BaseEntity, str, bool, bool, BaseEntity]]:
     converters = [
+        ProteinModificationConverter,
         TranslationConverter,
         TranscriptionConverter,
         ComplexConverter,
