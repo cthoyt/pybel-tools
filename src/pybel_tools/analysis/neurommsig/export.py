@@ -165,7 +165,7 @@ def write_neurommsig_bel(
     :param nift_values: a dictionary of lower-cased to normal names in NIFT
     """
     graph = get_neurommsig_bel(df, disease, nift_values)
-    pybel.to_bel(graph, file)
+    pybel.to_bel_script(graph, file)
 
 
 def get_neurommsig_bel(
