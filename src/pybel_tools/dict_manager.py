@@ -13,12 +13,10 @@ class _Namespace:
     id: int
 
 
-class DictManager(Manager):
+class DictManager:
     """A dictionary-based implementation of the PyBEL Manager."""
 
-    def __init__(self, connection: Optional[str] = None):
-        super().__init__(connection=connection)
-
+    def __init__(self):
         self.universe = None
         self.networks = {}
         self.disease_to_id = {}
