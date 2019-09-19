@@ -14,7 +14,8 @@ from pybel.struct.filters.typing import NodePredicates
 __all__ = [
     'group_nodes_by_annotation',
     'average_node_annotation',
-    'group_nodes_by_annotation_filtered'
+    'group_nodes_by_annotation_filtered',
+    'get_mapped_nodes',
 ]
 
 X = TypeVar('X')
