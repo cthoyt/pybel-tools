@@ -178,8 +178,3 @@ def replace_selventa_namespaces(path: str) -> None:
     with open(path, 'w') as file:
         for line in lines:
             print(line, file=file)
-
-
-if __name__ == '__main__':
-    replace_selventa_namespaces(
-        '/home/ddomingofernandez/Projects/neurommsig_data/neurommsig-parkinsons/neurommsig_parkinsons_knowledge/parkinsons.bel')
