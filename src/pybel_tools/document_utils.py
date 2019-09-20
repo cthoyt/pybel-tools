@@ -6,8 +6,8 @@ import logging
 from typing import Iterable, Mapping, Optional, Set, TextIO, Union
 from xml.etree import ElementTree
 
+import pandas as pd
 import requests
-
 from bel_resources import make_knowledge_header
 
 __all__ = [
@@ -147,3 +147,35 @@ def write_boilerplate(
     if entrez_ids is not None:
         for line in make_pubmed_gene_group(entrez_ids):
             print(line, file=file)
+
+
+from pybel.utils import ensure_quotes
+
+
+def replace_selventa_namespaces(path: str) -> None:
+    """Update SFAM/SCOM namespaces to FamPlex."""
+    df = pd.read_csv(
+        'https://raw.githubusercontent.com/johnbachman/famplex/master/equivalences.csv',
+        names=['namespace', 'label', 'famplex']
+    )
+    # Filter to namespace BEL
+    df = df[df.namespace == 'BEL']
+
+    mapping_dict = {}
+    for _, label, famplex in df.values:
+        for p in 'SCOMP', 'SFAM':
+            mapping_dict[f'{p}:{ensure_quotes(label)}'] = f'FPLX:{ensure_quotes(famplex)}'
+
+    lines = []
+    with open(path) as file:
+        for line in file:
+            for k, v in mapping_dict.items():
+                if k in line:
+                    print(f'Upgrating line {k} to {v}')
+                    line = line.replace(k, v)
+            lines.append(line.strip('\n'))
+
+    with open(path, 'w') as file:
+        for line in lines:
+            print(line, file=file)
+
