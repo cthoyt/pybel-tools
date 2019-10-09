@@ -3,9 +3,9 @@
 """This class contains an alternate implementation of the PyBEL database manager that only stores graphs in memory."""
 
 from dataclasses import dataclass
-from typing import Iterable, List, Optional
+from typing import Iterable, List
 
-from pybel import BELGraph, Manager
+from pybel import BELGraph
 
 
 @dataclass

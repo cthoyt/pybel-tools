@@ -5,14 +5,14 @@
 import random
 from typing import Any, Mapping, Optional, TextIO
 
-import bio2bel_hgnc
 from IPython.display import Javascript
+
+import bio2bel_hgnc
 from bio2bel_entrez.parser import get_human_refseq_slim_df
 from bio2bel_hgnc.models import HumanGene
 from pybel import BELGraph
 from pybel.dsl import CentralDogma
-
-from ..jinja_utils import build_template_renderer, build_template_environment
+from ..jinja_utils import build_template_renderer
 
 __all__ = [
     'to_html',
@@ -25,7 +25,6 @@ COLUMNS = [
     'start_position_on_the_genomic_accession',
     'end_position_on_the_genomic_accession',
 ]
-
 
 render_template = build_template_renderer(__file__)
 
@@ -94,7 +93,8 @@ def prerender(graph: BELGraph, hgnc_manager=None) -> Mapping[str, Mapping[str, A
     }
 
     human_genes = (
-        hgnc_manager.session
+        hgnc_manager
+        .session
         .query(HumanGene.symbol, HumanGene.location)
         .filter(HumanGene.symbol.in_(hgnc_symbols))
         .all()

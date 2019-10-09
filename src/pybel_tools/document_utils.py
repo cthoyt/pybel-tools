@@ -8,13 +8,15 @@ from xml.etree import ElementTree
 
 import pandas as pd
 import requests
+
 from bel_resources import make_knowledge_header
+from pybel.utils import ensure_quotes
 
 __all__ = [
     'write_boilerplate',
 ]
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 abstract_url_fmt = "http://togows.dbcls.jp/entry/ncbi-pubmed/{}/abstract"
 title_url_fmt = "http://togows.dbcls.jp/entry/ncbi-pubmed/{}/title"
@@ -85,22 +87,22 @@ def make_pubmed_gene_group(entrez_ids: Iterable[Union[str, int]]) -> Iterable[st
 
 
 def write_boilerplate(
-        name: str,
-        version: Optional[str] = None,
-        description: Optional[str] = None,
-        authors: Optional[str] = None,
-        contact: Optional[str] = None,
-        copyright: Optional[str] = None,
-        licenses: Optional[str] = None,
-        disclaimer: Optional[str] = None,
-        namespace_url: Optional[Mapping[str, str]] = None,
-        namespace_patterns: Optional[Mapping[str, str]] = None,
-        annotation_url: Optional[Mapping[str, str]] = None,
-        annotation_patterns: Optional[Mapping[str, str]] = None,
-        annotation_list: Optional[Mapping[str, Set[str]]] = None,
-        pmids: Optional[Iterable[Union[str, int]]] = None,
-        entrez_ids: Optional[Iterable[Union[str, int]]] = None,
-        file: Optional[TextIO] = None,
+    name: str,
+    version: Optional[str] = None,
+    description: Optional[str] = None,
+    authors: Optional[str] = None,
+    contact: Optional[str] = None,
+    copyright: Optional[str] = None,
+    licenses: Optional[str] = None,
+    disclaimer: Optional[str] = None,
+    namespace_url: Optional[Mapping[str, str]] = None,
+    namespace_patterns: Optional[Mapping[str, str]] = None,
+    annotation_url: Optional[Mapping[str, str]] = None,
+    annotation_patterns: Optional[Mapping[str, str]] = None,
+    annotation_list: Optional[Mapping[str, Set[str]]] = None,
+    pmids: Optional[Iterable[Union[str, int]]] = None,
+    entrez_ids: Optional[Iterable[Union[str, int]]] = None,
+    file: Optional[TextIO] = None,
 ) -> None:
     """Write a boilerplate BEL document, with standard document metadata, definitions.
 
@@ -147,9 +149,6 @@ def write_boilerplate(
     if entrez_ids is not None:
         for line in make_pubmed_gene_group(entrez_ids):
             print(line, file=file)
-
-
-from pybel.utils import ensure_quotes
 
 
 def replace_selventa_namespaces(path: str) -> None:

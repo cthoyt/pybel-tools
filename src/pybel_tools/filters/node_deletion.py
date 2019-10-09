@@ -7,7 +7,6 @@ from pybel.struct.filters.node_predicate_builders import function_inclusion_filt
 from pybel.struct.mutation import remove_filtered_nodes
 from pybel.struct.pipeline import in_place_transformation
 from pybel.typing import Strings
-
 from .node_filters import function_namespace_inclusion_builder, namespace_inclusion_builder
 
 __all__ = [
