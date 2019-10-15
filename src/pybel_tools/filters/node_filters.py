@@ -2,7 +2,7 @@
 
 """Node filters to supplement :mod:`pybel.struct.filters.node_filters`."""
 
-from typing import Collection, Iterable, Mapping, Optional, Set
+from typing import Collection, Iterable, Mapping, Optional, Set, Union
 
 import pybel
 from pybel import BELGraph
