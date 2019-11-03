@@ -6,10 +6,11 @@ from collections import defaultdict
 from typing import Callable, Iterable, List, Mapping, Optional, Set, TypeVar
 
 from pybel import BELGraph, BaseEntity
-from pybel.constants import ANNOTATIONS, HAS_COMPONENT, HAS_MEMBER, HAS_VARIANT, NAME, NAMESPACE, ORTHOLOGOUS, RELATION
+from pybel.constants import ANNOTATIONS, HAS_VARIANT, IS_A, NAME, NAMESPACE, ORTHOLOGOUS, PART_OF, RELATION
 from pybel.struct.filters.edge_predicates import edge_has_annotation
 from pybel.struct.filters.node_filters import concatenate_node_predicates
 from pybel.struct.filters.typing import NodePredicates
+from ..utils import group_as_sets
 
 __all__ = [
     'group_nodes_by_annotation',
@@ -22,8 +23,8 @@ X = TypeVar('X')
 
 
 def group_nodes_by_annotation(
-        graph: BELGraph,
-        annotation: str = 'Subgraph',
+    graph: BELGraph,
+    annotation: str = 'Subgraph',
 ) -> Mapping[str, Set[BaseEntity]]:
     """Group the nodes occurring in edges by the given annotation."""
     result = defaultdict(set)
@@ -39,10 +40,10 @@ def group_nodes_by_annotation(
 
 
 def average_node_annotation(
-        graph: BELGraph,
-        key: str,
-        annotation: str = 'Subgraph',
-        aggregator: Optional[Callable[[Iterable[X]], X]] = None,
+    graph: BELGraph,
+    key: str,
+    annotation: str = 'Subgraph',
+    aggregator: Optional[Callable[[Iterable[X]], X]] = None,
 ) -> Mapping[str, X]:
     """Group a graph into sub-graphs and calculate an aggregate score for all nodes in each.
 
@@ -70,9 +71,9 @@ def average_node_annotation(
 
 
 def group_nodes_by_annotation_filtered(
-        graph: BELGraph,
-        node_predicates: NodePredicates = None,
-        annotation: str = 'Subgraph',
+    graph: BELGraph,
+    node_predicates: NodePredicates = None,
+    annotation: str = 'Subgraph',
 ) -> Mapping[str, Set[BaseEntity]]:
     """Group the nodes occurring in edges by the given annotation, with a node filter applied.
 
@@ -94,9 +95,9 @@ def group_nodes_by_annotation_filtered(
 
 
 def get_mapped_nodes(
-        graph: BELGraph,
-        namespace: str,
-        names: Iterable[str],
+    graph: BELGraph,
+    namespace: str,
+    names: Iterable[str],
 ) -> Mapping[BaseEntity, Set[BaseEntity]]:
     """Get the nodes mapped to this node's concept.
 
@@ -109,17 +110,14 @@ def get_mapped_nodes(
     :param names: List or set of values from which we want to map nodes from
     :return: Main node to variants/groups.
     """
-    parent_to_variants = defaultdict(set)
     names = set(names)
 
-    for u, v, d in graph.edges(data=True):
-        if d[RELATION] in {HAS_MEMBER, HAS_COMPONENT} and v.get(NAMESPACE) == namespace and v.get(NAME) in names:
-            parent_to_variants[v].add(u)
-
-        elif d[RELATION] == HAS_VARIANT and u.get(NAMESPACE) == namespace and u.get(NAME) in names:
-            parent_to_variants[u].add(v)
-
-        elif d[RELATION] == ORTHOLOGOUS and u.get(NAMESPACE) == namespace and u.get(NAME) in names:
-            parent_to_variants[u].add(v)
-
-    return dict(parent_to_variants)
+    return group_as_sets(
+        (parent_node, mapped_node)
+        for parent_node, mapped_node, d in graph.edges(data=True)
+        if (
+            parent_node.get(NAMESPACE) == namespace
+            and parent_node.get(NAME) in names
+            and d[RELATION] in {IS_A, PART_OF, HAS_VARIANT, ORTHOLOGOUS}
+        )
+    )

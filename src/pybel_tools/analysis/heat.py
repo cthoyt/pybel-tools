@@ -115,12 +115,12 @@ SubgraphScores = Mapping[H, Tuple[float, float, float, float, int, int]]
 
 
 def calculate_average_scores_on_graph(
-        graph: BELGraph,
-        key: Optional[str] = None,
-        tag: Optional[str] = None,
-        default_score: Optional[float] = None,
-        runs: Optional[int] = None,
-        use_tqdm: bool = False,
+    graph: BELGraph,
+    key: Optional[str] = None,
+    tag: Optional[str] = None,
+    default_score: Optional[float] = None,
+    runs: Optional[int] = None,
+    use_tqdm: bool = False,
 ) -> SubgraphScores:
     """Calculate the scores over all biological processes in the sub-graph.
 
@@ -157,13 +157,13 @@ def calculate_average_scores_on_graph(
 
 
 def calculate_average_scores_on_subgraphs(
-        subgraphs: Mapping[H, BELGraph],
-        key: Optional[str] = None,
-        tag: Optional[str] = None,
-        default_score: Optional[float] = None,
-        runs: Optional[int] = None,
-        use_tqdm: bool = False,
-        tqdm_kwargs: Optional[Mapping[str, Any]] = None,
+    subgraphs: Mapping[H, BELGraph],
+    key: Optional[str] = None,
+    tag: Optional[str] = None,
+    default_score: Optional[float] = None,
+    runs: Optional[int] = None,
+    use_tqdm: bool = False,
+    tqdm_kwargs: Optional[Mapping[str, Any]] = None,
 ) -> SubgraphScores:
     """Calculate the scores over precomputed candidate mechanisms.
 
@@ -238,13 +238,13 @@ def calculate_average_scores_on_subgraphs(
 
 
 def workflow(
-        graph: BELGraph,
-        node: BaseEntity,
-        key: Optional[str] = None,
-        tag: Optional[str] = None,
-        default_score: Optional[float] = None,
-        runs: Optional[int] = None,
-        minimum_nodes: int = 1,
+    graph: BELGraph,
+    node: BaseEntity,
+    key: Optional[str] = None,
+    tag: Optional[str] = None,
+    default_score: Optional[float] = None,
+    runs: Optional[int] = None,
+    minimum_nodes: int = 1,
 ) -> List[Runner]:
     """Generate candidate mechanisms and run the heat diffusion workflow.
 
@@ -274,13 +274,13 @@ def workflow(
 
 
 def multirun(
-        graph: BELGraph,
-        node: BaseEntity,
-        key: Optional[str] = None,
-        tag: Optional[str] = None,
-        default_score: Optional[float] = None,
-        runs: Optional[int] = None,
-        use_tqdm: bool = False,
+    graph: BELGraph,
+    node: BaseEntity,
+    key: Optional[str] = None,
+    tag: Optional[str] = None,
+    default_score: Optional[float] = None,
+    runs: Optional[int] = None,
+    use_tqdm: bool = False,
 ) -> Iterable[Runner]:
     """Run the heat diffusion workflow multiple times, each time yielding a :class:`Runner` object upon completion.
 
@@ -310,12 +310,12 @@ class Runner:
     """This class houses the data related to a single run of the heat diffusion workflow."""
 
     def __init__(
-            self,
-            graph: BELGraph,
-            target_node: BaseEntity,
-            key: Optional[str] = None,
-            tag: Optional[str] = None,
-            default_score: Optional[float] = None,
+        self,
+        graph: BELGraph,
+        target_node: BaseEntity,
+        key: Optional[str] = None,
+        tag: Optional[str] = None,
+        default_score: Optional[float] = None,
     ) -> None:
         """Initialize the heat diffusion runner class.
 
@@ -507,13 +507,13 @@ class Runner:
 
 
 def workflow_aggregate(
-        graph: BELGraph,
-        node: BaseEntity,
-        key: Optional[str] = None,
-        tag: Optional[str] = None,
-        default_score: Optional[float] = None,
-        runs: Optional[int] = None,
-        aggregator: Optional[Callable[[Iterable[float]], float]] = None,
+    graph: BELGraph,
+    node: BaseEntity,
+    key: Optional[str] = None,
+    tag: Optional[str] = None,
+    default_score: Optional[float] = None,
+    runs: Optional[int] = None,
+    aggregator: Optional[Callable[[Iterable[float]], float]] = None,
 ) -> Optional[float]:
     """Get the average score over multiple runs.
 
@@ -574,12 +574,12 @@ def workflow_all(graph: BELGraph,
 
 
 def workflow_all_aggregate(
-        graph: BELGraph,
-        key: Optional[str] = None,
-        tag: Optional[str] = None,
-        default_score: Optional[float] = None,
-        runs: Optional[int] = None,
-        aggregator: Optional[Callable[[Iterable[float]], float]] = None,
+    graph: BELGraph,
+    key: Optional[str] = None,
+    tag: Optional[str] = None,
+    default_score: Optional[float] = None,
+    runs: Optional[int] = None,
+    aggregator: Optional[Callable[[Iterable[float]], float]] = None,
 ):
     """Run the heat diffusion workflow to get average score for every possible candidate mechanism.
 
@@ -623,11 +623,11 @@ def workflow_all_aggregate(
 
 # TODO reinvestigate statistical bootstrapping/resampling/distribution normalization
 def calculate_average_score_by_annotation(
-        graph: BELGraph,
-        annotation: str,
-        key: Optional[str] = None,
-        runs: Optional[int] = None,
-        use_tqdm: bool = False,
+    graph: BELGraph,
+    annotation: str,
+    key: Optional[str] = None,
+    runs: Optional[int] = None,
+    use_tqdm: bool = False,
 ) -> Mapping[str, float]:
     """Calculate the average score for all biological processes for each subgraph.
 

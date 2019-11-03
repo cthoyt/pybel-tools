@@ -11,7 +11,7 @@ from typing import Iterable, List, Mapping, Optional, Set, Tuple, Union
 
 from pybel import BELGraph
 from pybel.constants import (
-    ANNOTATIONS, CITATION, CITATION_AUTHORS, CITATION_DATE, CITATION_REFERENCE, CITATION_TYPE, EVIDENCE,
+    ANNOTATIONS, CITATION, CITATION_AUTHORS, CITATION_DATE, CITATION_DB, CITATION_IDENTIFIER, EVIDENCE,
 )
 from pybel.dsl import BaseEntity
 from pybel.struct.filters import filter_edges
@@ -51,15 +51,15 @@ def _generate_citation_dict(graph: BELGraph) -> Mapping[str, Mapping[Tuple[BaseE
     for u, v, data in graph.edges(data=True):
         if CITATION not in data:
             continue
-        results[data[CITATION][CITATION_TYPE]][u, v].add(data[CITATION][CITATION_REFERENCE].strip())
+        results[data[CITATION][CITATION_DB]][u, v].add(data[CITATION][CITATION_IDENTIFIER].strip())
 
     return dict(results)
 
 
 def get_pmid_by_keyword(
-        keyword: str,
-        graph: Optional[BELGraph] = None,
-        pubmed_identifiers: Optional[Set[str]] = None,
+    keyword: str,
+    graph: Optional[BELGraph] = None,
+    pubmed_identifiers: Optional[Set[str]] = None,
 ) -> Set[str]:
     """Get the set of PubMed identifiers beginning with the given keyword string.
 
@@ -105,7 +105,7 @@ def count_citations(graph: BELGraph, **annotations) -> Counter:
     citations = defaultdict(set)
     for u, v, _, d in filter_edges(graph, annotation_dict_filter):
         if CITATION in d:
-            citations[u, v].add((d[CITATION][CITATION_TYPE], d[CITATION][CITATION_REFERENCE].strip()))
+            citations[u, v].add((d[CITATION][CITATION_DB], d[CITATION][CITATION_IDENTIFIER].strip()))
 
     return Counter(itt.chain.from_iterable(citations.values()))
 
@@ -124,7 +124,7 @@ def count_citations_by_annotation(graph: BELGraph, annotation: str) -> Mapping[s
 
         k = data[ANNOTATIONS][annotation]
 
-        citations[k][u, v].add((data[CITATION][CITATION_TYPE], data[CITATION][CITATION_REFERENCE].strip()))
+        citations[k][u, v].add((data[CITATION][CITATION_DB], data[CITATION][CITATION_IDENTIFIER].strip()))
 
     return {
         k: Counter(itt.chain.from_iterable(v.values()))
@@ -150,7 +150,7 @@ def _iter_author_publiations(graph: BELGraph) -> Iterable[Tuple[str, Tuple[str, 
         for author in data[CITATION][CITATION_AUTHORS]:
             yield (
                 author,
-                (data[CITATION][CITATION_TYPE], data[CITATION][CITATION_REFERENCE])
+                (data[CITATION][CITATION_DB], data[CITATION][CITATION_IDENTIFIER])
             )
 
 
@@ -214,7 +214,7 @@ def get_evidences_by_pmid(graph: BELGraph, pmids: Strings) -> Mapping[str, Set[s
     :rtype: dict
     """
     return group_as_sets(
-        (data[CITATION][CITATION_REFERENCE], data[EVIDENCE])
+        (data[CITATION][CITATION_DB], data[CITATION][CITATION_IDENTIFIER], data[EVIDENCE])
         for _, _, _, data in filter_edges(graph, build_pmid_inclusion_filter(pmids))
     )
 
@@ -233,7 +233,7 @@ def count_citation_years(graph: BELGraph) -> typing.Counter[int]:
         except ValueError:
             continue
         else:
-            result[dt.year].add((data[CITATION][CITATION_TYPE], data[CITATION][CITATION_REFERENCE]))
+            result[dt.year].add((data[CITATION][CITATION_DB], data[CITATION][CITATION_IDENTIFIER]))
 
     return count_dict_values(result)
 

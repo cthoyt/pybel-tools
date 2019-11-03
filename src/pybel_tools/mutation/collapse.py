@@ -84,10 +84,10 @@ def _collapse_edge_passing_predicates(graph: BELGraph, edge_predicates: EdgePred
 
 
 def _collapse_edge_by_namespace(
-        graph: BELGraph,
-        victim_namespaces: Strings,
-        survivor_namespaces: str,
-        relations: Strings,
+    graph: BELGraph,
+    victim_namespaces: Strings,
+    survivor_namespaces: str,
+    relations: Strings,
 ) -> None:
     """Collapse pairs of nodes with the given namespaces that have the given relationship.
 
@@ -214,8 +214,10 @@ def collapse_to_protein_interactions(graph: BELGraph) -> BELGraph:
 
 
 @in_place_transformation
-def collapse_nodes_with_same_names(graph: BELGraph, use_tqdm: bool = False) -> None:
+def collapse_nodes_with_same_names(graph: BELGraph, priority, use_tqdm: bool = False) -> None:
     """Collapse all nodes with the same name, merging namespaces by picking first alphabetical one."""
+    p = {namespace: i for i, namespace in enumerate(reversed(priority))}
+
     survivor_mapping = defaultdict(set)  # Collapse mapping dict
     victims = set()  # Things already mapped while iterating
 
@@ -223,26 +225,33 @@ def collapse_nodes_with_same_names(graph: BELGraph, use_tqdm: bool = False) -> N
     if use_tqdm:
         it = tqdm(use_tqdm, total=graph.number_of_nodes() * (graph.number_of_nodes() - 1) / 2)
     for a, b in it:
-        if b in victims:
+        if not _can_map(a, b):
             continue
 
-        a_name, b_name = a.get(NAME), b.get(NAME)
-        if not a_name or not b_name or a_name.lower() != b_name.lower():
-            continue
+        a_priority = p.get(a.namespace)
+        b_priority = p.get(b.namespace)
 
-        if a.keys() != b.keys():  # not same version (might have variants)
-            continue
-
-        # Ensure that the values in the keys are also the same
-        for k in set(a.keys()) - {NAME, NAMESPACE}:
-            if a[k] != b[k]:  # something different
-                continue
-
-        if a.namespace < b.namespace:
-            a, b = b, a
-
-        survivor_mapping[a].add(b)
-        # Keep track of things that has been already mapped
-        victims.add(b)
+        if a_priority > b_priority:
+            survivor_mapping[a].add(b)
+            victims.add(b)
+        else:
+            survivor_mapping[b].add(a)
+            victims.add(a)
 
     collapse_nodes(graph, survivor_mapping)
+
+
+def _can_map(a: BaseEntity, b: BaseEntity) -> bool:
+    a_name, b_name = a.get(NAME), b.get(NAME)
+    if not a_name or not b_name or a_name.lower() != b_name.lower():
+        return False
+
+    if a.keys() != b.keys():  # not same version (might have variants)
+        return False
+
+    # Ensure that the values in the keys are also the same
+    for k in set(a.keys()) - {NAME, NAMESPACE}:
+        if a[k] != b[k]:  # something different
+            return False
+
+    return True

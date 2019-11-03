@@ -10,6 +10,7 @@ import pybel_tools.assembler.html
 import pybel_tools.assembler.ideogram
 from pybel.examples import sialic_acid_graph
 
+
 class TestSummaryAssembler(unittest.TestCase):
     """Tests for the assemblers."""
 

@@ -8,32 +8,31 @@ from pybel import BELGraph
 from pybel.constants import (
     ASSOCIATION, DECREASES, DIRECTLY_INCREASES, INCREASES, POSITIVE_CORRELATION,
 )
-from pybel.dsl import Gene, Protein, abundance, mirna, pathology, rna
+from pybel.dsl import Abundance, Gene, MicroRna, Pathology, Protein, Rna
 from pybel.testing.utils import n
-
 from pybel_tools.mutation.collapse import collapse_to_protein_interactions
 
 HGNC = 'HGNC'
 GO = 'GO'
 CHEBI = 'CHEBI'
 
-g1 = Gene(HGNC, '1')
-r1 = rna(HGNC, '1')
-p1 = Protein(HGNC, '1')
+g1 = Gene(namespace=HGNC, name='1')
+r1 = Rna(namespace=HGNC, name='1')
+p1 = Protein(HGNC, name='1')
 
-g2 = Gene(HGNC, '2')
-r2 = rna(HGNC, '2')
-p2 = Protein(HGNC, '2')
+g2 = Gene(HGNC, name='2')
+r2 = Rna(HGNC, name='2')
+p2 = Protein(HGNC, name='2')
 
-g3 = Gene(HGNC, '3')
-r3 = rna(HGNC, '3')
-p3 = Protein(HGNC, '3')
+g3 = Gene(namespace=HGNC, name='3')
+r3 = Rna(namespace=HGNC, name='3')
+p3 = Protein(namespace=HGNC, name='3')
 
-g4 = Gene(HGNC, '4')
-m4 = mirna(HGNC, '4')
+g4 = Gene(namespace=HGNC, name='4')
+m4 = MicroRna(namespace=HGNC, name='4')
 
-a5 = abundance(CHEBI, '5')
-p5 = pathology(GO, '5')
+a5 = Abundance(namespace=CHEBI, name='5')
+p5 = Pathology(namespace=GO, name='5')
 
 
 class TestCollapseProteinInteractions(unittest.TestCase):

@@ -7,7 +7,7 @@ import unittest
 from pybel import BELGraph
 from pybel.constants import INCREASES
 from pybel.dsl import ComplexAbundance as g, CompositeAbundance as c, Protein, Reaction
-from pybel.examples.various_example import single_reaction_graph, glucose_6_phosphate, glucose, hk1, atp, phosphate, adp
+from pybel.examples.various_example import adp, atp, glucose, glucose_6_phosphate, hk1, phosphate, single_reaction_graph
 from pybel.testing.utils import n
 from pybel_tools.mutation.collapse import collapse_nodes_with_same_names
 from pybel_tools.node_utils import flatten_list_abundance, reaction_cartesian_expansion
@@ -114,14 +114,17 @@ class TestNodeUtils(unittest.TestCase):
 
     def test_merge_nodes_by_name(self):
         graph = BELGraph()
+        priority = ['ncbigene', 'hgnc']
         a_hgnc, a_entrez = [Protein(namespace, 'a') for namespace in ('hgnc', 'ncbigene')]
         b = Protein('ncbigene', 'b')
         graph.add_increases(a_hgnc, b, citation=n(), evidence=n())
         graph.add_increases(a_entrez, b, citation=n(), evidence=n())
+
         self.assertEqual(3, graph.number_of_nodes())
         self.assertEqual(2, graph.number_of_edges())
-        collapse_nodes_with_same_names(graph)
-        self.assertEqual(2, graph.number_of_nodes(), msg='Wrong number remaining nodes')
+
+        collapse_nodes_with_same_names(graph, priority=priority, use_tqdm=False)
+        self.assertEqual(2, graph.number_of_nodes(), msg='Wrong number remaining nodes: {}'.format(graph.nodes()))
         self.assertEqual(2, graph.number_of_edges(), msg=f'Wrong number remaining edges: {graph.edges()}')
         self.assertIn(a_entrez, graph, msg=f'Nodes: {list(graph)}')
         self.assertIn(b, graph)

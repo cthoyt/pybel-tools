@@ -6,7 +6,7 @@ import unittest
 
 from pybel import BELGraph
 from pybel.constants import GENE
-from pybel.dsl import gene, protein, rna
+from pybel.dsl import Gene, Protein, Rna
 from pybel_tools.integration import overlay_type_data
 
 HGNC = 'HGNC'
@@ -19,12 +19,12 @@ class TestIntegrate(unittest.TestCase):
         """Test overlaying data in a BEL graph."""
         g = BELGraph()
 
-        g1 = gene(HGNC, 'a')
-        g2 = gene(HGNC, 'b')
-        g3 = gene(HGNC, 'c')
-        g4 = gene(HGNC, 'd')
-        r1 = rna(HGNC, 'e')
-        p1 = protein(HGNC, 'f')
+        g1 = Gene(HGNC, 'a')
+        g2 = Gene(HGNC, 'b')
+        g3 = Gene(HGNC, 'c')
+        g4 = Gene(HGNC, 'd')
+        r1 = Rna(HGNC, 'e')
+        p1 = Protein(HGNC, 'f')
 
         g.add_node_from_data(g1)
         g.add_node_from_data(g2)

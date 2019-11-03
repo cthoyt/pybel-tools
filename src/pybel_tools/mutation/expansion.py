@@ -99,11 +99,11 @@ def count_peripheral_predecessors(graph: BELGraph, subgraph: BELGraph) -> typing
 
 
 def get_subgraph_edges(
-        graph: BELGraph,
-        annotation: str,
-        value: str,
-        source_filter: Optional[NodePredicates] = None,
-        target_filter: Optional[NodePredicates] = None,
+    graph: BELGraph,
+    annotation: str,
+    value: str,
+    source_filter: Optional[NodePredicates] = None,
+    target_filter: Optional[NodePredicates] = None,
 ) -> Iterable[Tuple[BaseEntity, BaseEntity, str, EdgeData]]:
     """Get all edges from a given subgraph whose source and target nodes pass all of the given filters.
 
@@ -129,10 +129,10 @@ def get_subgraph_edges(
 
 
 def get_subgraph_peripheral_nodes(
-        graph: BELGraph,
-        subgraph: Collection[BaseEntity],
-        node_predicates: Optional[NodePredicates] = None,
-        edge_predicates: Optional[EdgePredicates] = None,
+    graph: BELGraph,
+    subgraph: Collection[BaseEntity],
+    node_predicates: Optional[NodePredicates] = None,
+    edge_predicates: Optional[EdgePredicates] = None,
 ):
     """Get a summary dictionary of all peripheral nodes to a given sub-graph.
 
@@ -174,11 +174,11 @@ def get_subgraph_peripheral_nodes(
 
 @uni_in_place_transformation
 def expand_periphery(
-        universe: BELGraph,
-        graph: BELGraph,
-        node_predicates: Optional[NodePredicates] = None,
-        edge_predicates: Optional[EdgePredicates] = None,
-        threshold: int = 2,
+    universe: BELGraph,
+    graph: BELGraph,
+    node_predicates: Optional[NodePredicates] = None,
+    edge_predicates: Optional[EdgePredicates] = None,
+    threshold: int = 2,
 ) -> None:
     """Iterate over all possible edges, peripheral to a given subgraph, that could be added from the given graph.
 
@@ -225,7 +225,7 @@ def enrich_complexes(graph: BELGraph) -> None:
         if not isinstance(u, ComplexAbundance):
             continue
         for v in u.members:
-            graph.add_has_component(u, v)
+            graph.add_part_of(v, u)
 
 
 @uni_in_place_transformation
@@ -235,7 +235,7 @@ def enrich_composites(graph: BELGraph) -> None:
         if not isinstance(u, CompositeAbundance):
             continue
         for v in u.members:
-            graph.add_has_component(u, v)
+            graph.add_part_of(v, u)
 
 
 @uni_in_place_transformation
@@ -297,8 +297,8 @@ def enrich_unqualified(graph: BELGraph) -> None:
 
 @uni_in_place_transformation
 def expand_internal(
-        universe: BELGraph,
-        graph: BELGraph,
+    universe: BELGraph,
+    graph: BELGraph,
 ) -> None:
     """Expand on edges between entities in the sub-graph that pass the given filters.
 

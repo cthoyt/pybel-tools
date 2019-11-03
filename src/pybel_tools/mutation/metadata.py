@@ -6,7 +6,7 @@ import logging
 from typing import Set
 
 from pybel import BELGraph, Manager
-from pybel.constants import CITATION, CITATION_REFERENCE
+from pybel.constants import CITATION, CITATION_IDENTIFIER
 from pybel.manager.citation_utils import get_citations_by_pmids
 from pybel.struct.filters import filter_edges, has_pubmed
 from pybel.struct.pipeline import in_place_transformation, uni_in_place_transformation
@@ -29,7 +29,7 @@ def enrich_pubmed_citations(graph: BELGraph, manager: Manager) -> Set[str]:
     pmid_data, errors = get_citations_by_pmids(manager=manager, pmids=pmids)
 
     for u, v, k in filter_edges(graph, has_pubmed):
-        pmid = graph[u][v][k][CITATION][CITATION_REFERENCE].strip()
+        pmid = graph[u][v][k][CITATION][CITATION_IDENTIFIER].strip()
 
         if pmid not in pmid_data:
             log.warning('Missing data for PubMed identifier: %s', pmid)

@@ -27,8 +27,8 @@ DEFAULT_NS_DESCRIPTION = 'This namespace was serialized by PyBEL Tools'
 
 
 def get_merged_namespace_names(
-        locations: Iterable[str],
-        check_keywords: bool = True,
+    locations: Iterable[str],
+    check_keywords: bool = True,
 ) -> Mapping[str, str]:
     """Load many namespaces and combines their names.
 
@@ -61,28 +61,28 @@ def get_merged_namespace_names(
 
 
 def merge_namespaces(
-        input_locations,
-        output_path,
-        namespace_name,
-        namespace_keyword,
-        namespace_domain,
-        author_name,
-        citation_name,
-        namespace_description=None,
-        namespace_species=None,
-        namespace_version=None,
-        namespace_query_url=None,
-        namespace_created=None,
-        author_contact=None,
-        author_copyright=None,
-        citation_description=None,
-        citation_url=None,
-        citation_version=None,
-        citation_date=None,
-        case_sensitive=True,
-        delimiter='|',
-        cacheable=True,
-        check_keywords=True,
+    input_locations,
+    output_path,
+    namespace_name,
+    namespace_keyword,
+    namespace_domain,
+    author_name,
+    citation_name,
+    namespace_description=None,
+    namespace_species=None,
+    namespace_version=None,
+    namespace_query_url=None,
+    namespace_created=None,
+    author_contact=None,
+    author_copyright=None,
+    citation_description=None,
+    citation_url=None,
+    citation_version=None,
+    citation_date=None,
+    case_sensitive=True,
+    delimiter='|',
+    cacheable=True,
+    check_keywords=True,
 ) -> None:
     """Merge namespaces from multiple locations to one.
 
@@ -141,10 +141,10 @@ def merge_namespaces(
 
 
 def export_namespace(
-        graph: BELGraph,
-        namespace: str,
-        directory: Optional[str] = None,
-        cacheable: bool = False,
+    graph: BELGraph,
+    namespace: str,
+    directory: Optional[str] = None,
+    cacheable: bool = False,
 ) -> None:
     """Export all names and missing names from the given namespace to its own BELNS file in the given directory.
 
@@ -188,10 +188,10 @@ def export_namespace(
 
 
 def export_namespaces(
-        graph: BELGraph,
-        namespaces: Iterable[str],
-        directory: Optional[str] = None,
-        cacheable: bool = False,
+    graph: BELGraph,
+    namespaces: Iterable[str],
+    directory: Optional[str] = None,
+    cacheable: bool = False,
 ) -> None:
     """Wrap :func:`export_namespace` for an iterable of namespaces (thinly).
 

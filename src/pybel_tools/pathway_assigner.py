@@ -12,6 +12,7 @@ from typing import List, Optional
 import bio2bel_hgnc
 import bio2bel_mgi
 import bio2bel_rgd
+
 from pybel import BELGraph
 from pybel.dsl import BaseAbundance, ListAbundance
 

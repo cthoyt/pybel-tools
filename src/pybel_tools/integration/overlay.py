@@ -10,7 +10,6 @@ import numpy as np
 import pandas as pd
 
 from pybel import BELGraph
-from pybel.constants import NAME
 from pybel.dsl import BaseEntity
 from pybel.struct.filters import filter_nodes
 from pybel.struct.pipeline import in_place_transformation
@@ -28,10 +27,10 @@ log = logging.getLogger(__name__)
 
 @in_place_transformation
 def overlay_data(
-        graph: BELGraph,
-        data: Mapping[BaseEntity, Any],
-        label: Optional[str] = None,
-        overwrite: bool = False,
+    graph: BELGraph,
+    data: Mapping[BaseEntity, Any],
+    label: Optional[str] = None,
+    overwrite: bool = False,
 ) -> None:
     """Overlay tabular data on the network.
 
@@ -57,13 +56,13 @@ def overlay_data(
 
 @in_place_transformation
 def overlay_type_data(
-        graph: BELGraph,
-        data: Mapping[str, float],
-        func: str,
-        namespace: str,
-        label: Optional[str] = None,
-        overwrite: bool = False,
-        impute: Optional[float] = None,
+    graph: BELGraph,
+    data: Mapping[str, float],
+    func: str,
+    namespace: str,
+    label: Optional[str] = None,
+    overwrite: bool = False,
+    impute: Optional[float] = None,
 ) -> None:
     """Overlay tabular data on the network using the given namespace.
 
@@ -80,7 +79,7 @@ def overlay_type_data(
     :param impute: The value to use for missing data
     """
     new_data = {
-        node: data.get(node[NAME], impute)
+        node: data.get(node.entity.name, impute)
         for node in filter_nodes(graph, function_namespace_inclusion_builder(func, namespace))
     }
 
@@ -88,10 +87,10 @@ def overlay_type_data(
 
 
 def load_differential_gene_expression(
-        path: str,
-        gene_symbol_column: str = 'Gene.symbol',
-        logfc_column: str = 'logFC',
-        aggregator: Optional[Callable[[List[float]], float]] = None,
+    path: str,
+    gene_symbol_column: str = 'Gene.symbol',
+    logfc_column: str = 'logFC',
+    aggregator: Optional[Callable[[List[float]], float]] = None,
 ) -> Mapping[str, float]:
     """Load and pre-process a differential gene expression data.
 

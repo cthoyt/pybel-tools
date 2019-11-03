@@ -22,7 +22,7 @@ import pandas as pd
 from pybel import BELGraph
 from pybel.cli import graph_pickle_argument
 from pybel.constants import (
-    ASSOCIATION, CAUSAL_DECREASE_RELATIONS, CAUSAL_INCREASE_RELATIONS, IDENTIFIER, NAME, RELATION,
+    ASSOCIATION, CAUSAL_DECREASE_RELATIONS, CAUSAL_INCREASE_RELATIONS, RELATION,
 )
 from pybel.dsl import CentralDogma, Gene, ListAbundance, ProteinModification, Rna
 from pybel.typing import EdgeData
@@ -154,9 +154,9 @@ def update_spia_matrices(spia_matrices: Dict[str, pd.DataFrame],
             for variant in v.variants:
                 if not isinstance(variant, ProteinModification):
                     continue
-                if variant[IDENTIFIER][NAME] == "Ub":
+                elif variant.entity.name == "Ub":
                     spia_matrices["activation_ubiquination"][u_name][v_name] = 1
-                elif variant[IDENTIFIER][NAME] == "Ph":
+                elif variant.entity.name == "Ph":
                     spia_matrices["activation_phosphorylation"][u_name][v_name] = 1
         elif isinstance(v, (Gene, Rna)):  # Normal increase, add activation
             spia_matrices['expression'][u_name][v_name] = 1
@@ -169,9 +169,9 @@ def update_spia_matrices(spia_matrices: Dict[str, pd.DataFrame],
             for variant in v.variants:
                 if not isinstance(variant, ProteinModification):
                     continue
-                if variant[IDENTIFIER][NAME] == "Ub":
+                elif variant.entity.name == "Ub":
                     spia_matrices['inhibition_ubiquination'][u_name][v_name] = 1
-                elif variant[IDENTIFIER][NAME] == "Ph":
+                elif variant.entity.name == "Ph":
                     spia_matrices["inhibition_phosphorylation"][u_name][v_name] = 1
         elif isinstance(v, (Gene, Rna)):  # Normal decrease, check which matrix
             spia_matrices["repression"][u_name][v_name] = 1
