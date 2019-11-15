@@ -108,10 +108,10 @@ class PTMConverter(ReifiedConverter):
             and isinstance(v, CentralDogma)
             and v.variants
             and any(
-            variant.entity.name in cls.synonyms
-            for variant in v.variants
-            if isinstance(variant, ProteinModification)
-        )
+                variant.entity.name in cls.synonyms
+                for variant in v.variants
+                if isinstance(variant, ProteinModification)
+            )
         )
 
 
@@ -237,9 +237,9 @@ class FragmentationConverter(ReifiedConverter):
             and edge_data['relation'] in CAUSAL_RELATIONS
             and "variants" in v
             and any(
-            isinstance(var_, fragment)
-            for var_ in v["variants"]
-        )
+                isinstance(var_, fragment)
+                for var_ in v["variants"]
+            )
         )
 
 

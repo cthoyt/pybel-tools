@@ -165,14 +165,23 @@ def get_separate_unstable_correlation_triples(graph: BELGraph) -> SetOfNodeTripl
 
 def _iterate_separate_unstable_correlation_triples(cg) -> Iterable[NodeTriple]:
     for a, b, c in get_correlation_triangles(cg):
-        if POSITIVE_CORRELATION in cg[a][b] and POSITIVE_CORRELATION in cg[b][c] and NEGATIVE_CORRELATION in \
-            cg[a][c]:
+        if (
+            POSITIVE_CORRELATION in cg[a][b]
+            and POSITIVE_CORRELATION in cg[b][c]
+            and NEGATIVE_CORRELATION in cg[a][c]
+        ):
             yield b, a, c
-        if POSITIVE_CORRELATION in cg[a][b] and NEGATIVE_CORRELATION in cg[b][c] and POSITIVE_CORRELATION in \
-            cg[a][c]:
+        if (
+            POSITIVE_CORRELATION in cg[a][b]
+            and NEGATIVE_CORRELATION in cg[b][c]
+            and POSITIVE_CORRELATION in cg[a][c]
+        ):
             yield a, b, c
-        if NEGATIVE_CORRELATION in cg[a][b] and POSITIVE_CORRELATION in cg[b][c] and POSITIVE_CORRELATION in \
-            cg[a][c]:
+        if (
+            NEGATIVE_CORRELATION in cg[a][b]
+            and POSITIVE_CORRELATION in cg[b][c]
+            and POSITIVE_CORRELATION in cg[a][c]
+        ):
             yield c, a, b
 
 
