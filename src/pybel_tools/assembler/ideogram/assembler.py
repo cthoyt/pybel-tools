@@ -12,7 +12,7 @@ from bio2bel_hgnc.models import HumanGene
 
 from pybel import BELGraph
 from pybel.dsl import CentralDogma
-from ..jinja_utils import build_template_renderer
+from pybel.io.jinja_utils import build_template_renderer
 
 __all__ = [
     'to_html',

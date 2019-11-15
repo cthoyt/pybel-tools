@@ -9,7 +9,7 @@ from typing import Optional, TextIO, Tuple
 
 from pybel import BELGraph
 from pybel.dsl import BaseEntity
-from ..jinja_utils import build_template_renderer
+from pybel.io.jinja_utils import build_template_renderer
 from ...summary import BELGraphSummary
 from ...utils import prepare_c3, prepare_c3_time_series
 
