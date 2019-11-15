@@ -5,10 +5,7 @@
 import random
 from typing import Any, Mapping, Optional, TextIO
 
-import bio2bel_hgnc
 from IPython.display import Javascript
-from bio2bel_entrez.parser import get_human_refseq_slim_df
-from bio2bel_hgnc.models import HumanGene
 
 from pybel import BELGraph
 from pybel.dsl import CentralDogma
@@ -76,6 +73,10 @@ def _generate_id() -> str:
 
 def prerender(graph: BELGraph, hgnc_manager=None) -> Mapping[str, Mapping[str, Any]]:
     """Generate the annotations JSON for Ideogram."""
+    import bio2bel_hgnc
+    from bio2bel_entrez.parser import get_human_refseq_slim_df
+    from bio2bel_hgnc.models import HumanGene
+
     if hgnc_manager is None:
         hgnc_manager = bio2bel_hgnc.Manager()
 
