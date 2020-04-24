@@ -95,10 +95,10 @@ def prerender(graph: BELGraph, hgnc_manager=None) -> Mapping[str, Mapping[str, A
 
     human_genes = (
         hgnc_manager
-        .session
-        .query(HumanGene.symbol, HumanGene.location)
-        .filter(HumanGene.symbol.in_(hgnc_symbols))
-        .all()
+            .session
+            .query(HumanGene.symbol, HumanGene.location)
+            .filter(HumanGene.symbol.in_(hgnc_symbols))
+            .all()
     )
     for human_gene in human_genes:
         if human_gene.symbol not in result:
