@@ -7,8 +7,8 @@ from typing import Callable, Iterable, List, Mapping, Optional, Set, TypeVar
 
 from pybel import BELGraph, BaseEntity
 from pybel.constants import ANNOTATIONS, HAS_VARIANT, IS_A, NAME, NAMESPACE, ORTHOLOGOUS, PART_OF, RELATION
+from pybel.struct.filters import concatenate_node_predicates
 from pybel.struct.filters.edge_predicates import edge_has_annotation
-from pybel.struct.filters.node_filters import concatenate_node_predicates
 from pybel.struct.filters.typing import NodePredicates
 from ..utils import group_as_sets
 

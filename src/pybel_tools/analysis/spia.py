@@ -21,9 +21,7 @@ import pandas as pd
 
 from pybel import BELGraph
 from pybel.cli import graph_pickle_argument
-from pybel.constants import (
-    ASSOCIATION, CAUSAL_DECREASE_RELATIONS, CAUSAL_INCREASE_RELATIONS, RELATION,
-)
+from pybel.constants import ASSOCIATION, CAUSAL_DECREASE_RELATIONS, CAUSAL_INCREASE_RELATIONS, RELATION
 from pybel.dsl import CentralDogma, Gene, ListAbundance, ProteinModification, Rna
 from pybel.typing import EdgeData
 
@@ -135,11 +133,12 @@ def build_spia_matrices(nodes: Set[str]) -> Dict[str, pd.DataFrame]:
     return matrices
 
 
-def update_spia_matrices(spia_matrices: Dict[str, pd.DataFrame],
-                         u: CentralDogma,
-                         v: CentralDogma,
-                         edge_data: EdgeData,
-                         ) -> None:
+def update_spia_matrices(
+    spia_matrices: Dict[str, pd.DataFrame],
+    u: CentralDogma,
+    v: CentralDogma,
+    edge_data: EdgeData,
+) -> None:
     """Populate the adjacency matrix."""
     if u.namespace.upper() != 'HGNC' or v.namespace.upper() != 'HGNC':
         return
