@@ -33,7 +33,7 @@ class TestSummaryAssembler(unittest.TestCase):
                 self.assertIn('<html', contents)
                 self.assertIn('PTPN6', contents)
 
-    @unittest.skipUnless(bio2bel_entrez and bio2bel_hgnc, 'Need to upgrade Bio2BEL to PyBEL 14')
+    @unittest.skip('Need to upgrade Bio2BEL to PyBEL 14')
     def test_ideogram_to_html_path(self):
         """Test to_html_path."""
         with tempfile.TemporaryDirectory() as tmpdirname:
