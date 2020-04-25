@@ -102,23 +102,25 @@ def function_namespace_inclusion_builder(func: str, namespace: Strings) -> NodeP
     :param namespace: The namespace to search by
     """
     if isinstance(namespace, str):
+        namespace = namespace.lower()
+
         def function_namespaces_filter(_: BELGraph, node: BaseEntity) -> bool:
             """Pass only for nodes that have the enclosed function and enclosed namespace."""
             return (
-                node.function == func
+                node.function.lower() == func.lower()
                 and isinstance(node, BaseAbundance)
                 and node.namespace == namespace
             )
 
     elif isinstance(namespace, Iterable):
-        namespaces = set(namespace)
+        namespaces = {n.lower() for n in namespace}
 
         def function_namespaces_filter(_: BELGraph, node: BaseEntity) -> bool:
             """Pass only for nodes that have the enclosed function and namespace in the enclose set."""
             return (
                 node.function == func
                 and isinstance(node, BaseAbundance)
-                and node.namespace in namespaces
+                and node.namespace.lower() in namespaces
             )
 
     else:

@@ -21,7 +21,7 @@ from pybel import BELGraph
 from pybel.dsl import Abundance, Gene
 from pybel.utils import ensure_quotes
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 hgnc_symbol_pattern = re.compile(r"^[A-Z0-9-]+$|^C[0-9XY]+orf[0-9]+$")
 
@@ -84,7 +84,7 @@ def munge_cell(cell, line=None, validators=None):
 
     if validators is not None and all(re.match(validator, c) is None for validator in validators):
         if line:
-            log.info("Munge cell error: aprox in line: %s: %s", line, c)
+            logger.info("Munge cell error: aprox in line: %s: %s", line, c)
         return None
 
     return [x.strip() for x in str(c).strip().split(',')]
@@ -246,13 +246,13 @@ def get_neurommsig_bel(
                         )
 
     if missing_features:
-        log.warning('Missing Features in %s', disease)
+        logger.warning('Missing Features in %s', disease)
         for feature in missing_features:
-            log.warning(feature)
+            logger.warning(feature)
 
     if fixed_caps:
-        log.warning('Fixed capitalization')
+        logger.warning('Fixed capitalization')
         for broken, fixed in fixed_caps:
-            log.warning('%s -> %s', broken, fixed)
+            logger.warning('%s -> %s', broken, fixed)
 
     return graph

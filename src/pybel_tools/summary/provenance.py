@@ -37,7 +37,7 @@ __all__ = [
     'count_confidences',
 ]
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def _generate_citation_dict(graph: BELGraph) -> Mapping[str, Mapping[Tuple[BaseEntity, BaseEntity], str]]:

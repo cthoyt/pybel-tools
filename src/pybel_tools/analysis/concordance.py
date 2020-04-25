@@ -30,7 +30,7 @@ __all__ = [
     'calculate_concordance_probability_by_annotation',
 ]
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 UP = CAUSAL_INCREASE_RELATIONS | {POSITIVE_CORRELATION}
 DOWN = CAUSAL_DECREASE_RELATIONS | {NEGATIVE_CORRELATION}
@@ -134,7 +134,7 @@ def edge_concords(
             return Concordance.incorrect
 
         else:
-            log.warning('%s %s %s %s %s', u, source_regulation, relation, v, target_regulation)
+            logger.warning('%s %s %s %s %s', u, source_regulation, relation, v, target_regulation)
             return Concordance.ambiguous
 
     elif source_regulation == -1:
@@ -160,7 +160,7 @@ def edge_concords(
             return Concordance.incorrect
 
         else:
-            log.warning('%s %s %s %s %s', u, source_regulation, relation, v, target_regulation)
+            logger.warning('%s %s %s %s %s', u, source_regulation, relation, v, target_regulation)
             return Concordance.ambiguous
 
     else:  # source_regulation == 0

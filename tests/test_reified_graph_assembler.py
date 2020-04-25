@@ -236,8 +236,8 @@ class TestAssembleReifiedGraph(unittest.TestCase):
         """Test the conversion of a bel statement like A -> r(B)"""
         # example from Colorectal Cancer Model v2.0.6 @ scai
         # act(p(HGNC:CTNNB1), ma(tscript)) increases r(HGNC:BIRC5)
-        ctnnb1 = protein('HGNC', 'CTNNB1', '')
-        birc5 = rna('HGNC', 'BIRC5', '')
+        ctnnb1 = protein('HGNC', name='CTNNB1')
+        birc5 = rna('HGNC', name='BIRC5')
 
         # a(MESH:Microglia) reg deg(a(CHEBI:"amyloid-beta"))
         bel_graph = BELGraph()
@@ -245,7 +245,7 @@ class TestAssembleReifiedGraph(unittest.TestCase):
             ctnnb1,
             birc5,
             evidence='10.1038/s41586-018-0368-8',
-            citation='PMID:18075512',
+            citation='18075512',
             subject_modifier=activity('tscript')
         )
 

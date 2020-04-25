@@ -20,7 +20,7 @@ __all__ = [
     'prepare_c3',
 ]
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 CONFIDENCES = 'None', 'Very Low', 'Low', 'Medium', 'High', 'Very High'
 

@@ -74,9 +74,8 @@ from tqdm import tqdm, trange
 from pybel import BELGraph
 from pybel.constants import BIOPROCESS, CAUSAL_DECREASE_RELATIONS, CAUSAL_INCREASE_RELATIONS, RELATION
 from pybel.dsl import BaseEntity
-from pybel.struct.filters.node_selection import get_nodes_by_function
+from pybel.struct.filters import get_nodes_by_function
 from pybel.struct.grouping import get_subgraphs_by_annotation
-from ..constants import WEIGHT
 from ..generation import generate_bioprocess_mechanisms, generate_mechanism
 
 __all__ = [
@@ -92,7 +91,7 @@ __all__ = [
     'Runner',
 ]
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 #: The key for the heat diffusion score in the node's data dictionary
 SCORE = 'score'
@@ -189,7 +188,7 @@ def calculate_average_scores_on_subgraphs(
     """
     results = {}
 
-    log.info('calculating results for %d candidate mechanisms using %d permutations', len(subgraphs), runs)
+    logger.info('calculating results for %d candidate mechanisms using %d permutations', len(subgraphs), runs)
 
     it = subgraphs.items()
 
@@ -303,7 +302,7 @@ def multirun(
             runner.run()
             yield runner
         except Exception:
-            log.debug('Run %s failed for %s', i, node)
+            logger.debug('Run %s failed for %s', i, node)
 
 
 class Runner:
@@ -328,14 +327,14 @@ class Runner:
         """
         self.graph: BELGraph = graph.copy()
         self.target_node = target_node
-        self.key = key or WEIGHT
+        self.key = key or 'weight'
         self.default_score = default_score or DEFAULT_SCORE
         self.tag = tag or SCORE
 
         for node, data in self.graph.nodes(data=True):
             if not self.graph.predecessors(node):
                 self.graph.nodes[node][self.tag] = data.get(self.key, 0)
-                log.log(5, 'initializing %s with %s', target_node, self.graph.nodes[node][self.tag])
+                logger.log(5, 'initializing %s with %s', target_node, self.graph.nodes[node][self.tag])
 
     def iter_leaves(self) -> Iterable[BaseEntity]:
         """Return an iterable over all nodes that are leaves.
@@ -393,20 +392,20 @@ class Runner:
         ]
 
         node, deg = min(nodes, key=itemgetter(1))
-        log.log(5, 'checking %s (in/out ratio: %.3f)', node, deg)
+        logger.log(5, 'checking %s (in/out ratio: %.3f)', node, deg)
 
         possible_edges = self.graph.in_edges(node, keys=True)
-        log.log(5, 'possible edges: %s', possible_edges)
+        logger.log(5, 'possible edges: %s', possible_edges)
 
         edge_to_remove = random.choice(possible_edges)
-        log.log(5, 'chose: %s', edge_to_remove)
+        logger.log(5, 'chose: %s', edge_to_remove)
 
         return edge_to_remove
 
     def remove_random_edge(self):
         """Remove a random in-edge from the node with the lowest in/out degree ratio."""
         u, v, k = self.get_random_edge()
-        log.log(5, 'removing %s, %s (%s)', u, v, k)
+        logger.log(5, 'removing %s, %s (%s)', u, v, k)
         self.graph.remove_edge(u, v, k)
 
     def remove_random_edge_until_has_leaves(self) -> None:
@@ -425,12 +424,12 @@ class Runner:
         leaves = set(self.iter_leaves())
 
         if not leaves:
-            log.warning('no leaves.')
+            logger.warning('no leaves.')
             return set()
 
         for leaf in leaves:
             self.graph.nodes[leaf][self.tag] = self.calculate_score(leaf)
-            log.log(5, 'chomping %s', leaf)
+            logger.log(5, 'chomping %s', leaf)
 
         return leaves
 
@@ -535,7 +534,7 @@ def workflow_aggregate(
     scores = [runner.get_final_score() for runner in runners]
 
     if not scores:
-        log.warning('Unable to run the heat diffusion workflow for %s', node)
+        logger.warning('Unable to run the heat diffusion workflow for %s', node)
         return
 
     if aggregator is None:
@@ -616,7 +615,7 @@ def workflow_all_aggregate(
                 aggregator=aggregator
             )
         except Exception:
-            log.exception('could not run on %', bioprocess_node)
+            logger.exception('could not run on %', bioprocess_node)
 
     return results
 

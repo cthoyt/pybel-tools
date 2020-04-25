@@ -27,14 +27,14 @@ from pybel.typing import EdgeData
 from ..summary.contradictions import pair_has_contradiction
 from ..utils import pairwise
 
-log = logging.getLogger(__name__)
-
 __all__ = [
     'rank_causalr_hypothesis',
     'run_cna',
     'get_path_effect',
     'rank_edges',
 ]
+
+logger = logging.getLogger(__name__)
 
 causal_effect_dict = {
     INCREASES: 1,
@@ -186,10 +186,10 @@ def run_cna(graph: BELGraph, root: BaseEntity, targets, relationship_dict=None):
                 causal_effects.append((root, target, Effect.inhibition))
 
             else:
-                log.warning('Exception in set: {}.'.format(effects_in_path))
+                logger.warning('Exception in set: {}.'.format(effects_in_path))
 
         except nx.NetworkXNoPath:
-            log.warning('No shortest path between: {} and {}.'.format(root, target))
+            logger.warning('No shortest path between: {} and {}.'.format(root, target))
 
     return causal_effects
 

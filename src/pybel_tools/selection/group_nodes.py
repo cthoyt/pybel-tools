@@ -6,7 +6,8 @@ from collections import defaultdict
 from typing import Callable, Iterable, List, Mapping, Optional, Set, TypeVar
 
 from pybel import BELGraph, BaseEntity
-from pybel.constants import ANNOTATIONS, HAS_VARIANT, IS_A, NAME, NAMESPACE, ORTHOLOGOUS, PART_OF, RELATION
+from pybel.constants import ANNOTATIONS, HAS_VARIANT, IS_A, ORTHOLOGOUS, PART_OF, RELATION
+from pybel.dsl import BaseConcept
 from pybel.struct.filters import concatenate_node_predicates
 from pybel.struct.filters.edge_predicates import edge_has_annotation
 from pybel.struct.filters.typing import NodePredicates
@@ -72,7 +73,7 @@ def average_node_annotation(
 
 def group_nodes_by_annotation_filtered(
     graph: BELGraph,
-    node_predicates: NodePredicates = None,
+    node_predicates: NodePredicates,
     annotation: str = 'Subgraph',
 ) -> Mapping[str, Set[BaseEntity]]:
     """Group the nodes occurring in edges by the given annotation, with a node filter applied.
@@ -82,13 +83,16 @@ def group_nodes_by_annotation_filtered(
     :param annotation: The annotation to use for grouping
     :return: A dictionary of {annotation value: set of nodes}
     """
-    node_filter = concatenate_node_predicates(node_predicates)
+    if node_predicates is None:
+        raise ValueError('Just use group_nodes_by_annotation() if you do not have a node filter')
+
+    node_predicate = concatenate_node_predicates(node_predicates)
 
     return {
         key: {
             node
             for node in nodes
-            if node_filter(graph, node)
+            if node_predicate(graph, node)
         }
         for key, nodes in group_nodes_by_annotation(graph, annotation).items()
     }
@@ -110,14 +114,16 @@ def get_mapped_nodes(
     :param names: List or set of values from which we want to map nodes from
     :return: Main node to variants/groups.
     """
-    names = set(names)
+    names = {n.lower() for n in names}
+    namespace = namespace.lower()
 
     return group_as_sets(
         (parent_node, mapped_node)
         for parent_node, mapped_node, d in graph.edges(data=True)
         if (
-            parent_node.get(NAMESPACE) == namespace
-            and parent_node.get(NAME) in names
+            isinstance(parent_node, BaseConcept)
+            and parent_node.namespace.lower() == namespace
+            and parent_node.name.lower() in names
             and d[RELATION] in {IS_A, PART_OF, HAS_VARIANT, ORTHOLOGOUS}
         )
     )

@@ -13,7 +13,7 @@ ccl2_mgi = Protein('MGI', 'Ccl2')
 ccl2_ccr2_complex = ComplexAbundance([ccl2, ccr2])
 chemokine_family = Protein('FPLX', 'chemokine protein family')
 
-HGNC = 'HGNC'
+HGNC = 'hgnc'
 
 
 class TestMapping(unittest.TestCase):

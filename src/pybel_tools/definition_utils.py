@@ -18,7 +18,7 @@ __all__ = [
     'export_namespaces',
 ]
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 DATETIME_FMT = '%Y-%m-%dT%H:%M:%S'
 DATE_FMT = '%Y-%m-%d'
@@ -160,18 +160,18 @@ def export_namespace(
     directory = os.getcwd() if directory is None else directory
     path = os.path.join(directory, f'{namespace}.belns')
 
-    log.info('Outputting to %s', path)
+    logger.info('Outputting to %s', path)
     right_names = get_names_by_namespace(graph, namespace)
-    log.info('Graph has %d correct names in %s', len(right_names), namespace)
+    logger.info('Graph has %d correct names in %s', len(right_names), namespace)
     wrong_names = get_incorrect_names_by_namespace(graph, namespace)
-    log.info('Graph has %d incorrect names in %s', len(wrong_names), namespace)
+    logger.info('Graph has %d incorrect names in %s', len(wrong_names), namespace)
     undefined_ns_names = get_undefined_namespace_names(graph, namespace)
-    log.info('Graph has %d names in missing namespace %s', len(undefined_ns_names), namespace)
+    logger.info('Graph has %d names in missing namespace %s', len(undefined_ns_names), namespace)
 
     names = (right_names | wrong_names | undefined_ns_names)
 
     if 0 == len(names):
-        log.warning(f'{namespace} is empty')
+        logger.warning(f'{namespace} is empty')
 
     with open(path, 'w') as file:
         write_namespace(

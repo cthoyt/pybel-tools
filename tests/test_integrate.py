@@ -9,7 +9,7 @@ from pybel.constants import GENE
 from pybel.dsl import Gene, Protein, Rna
 from pybel_tools.integration import overlay_type_data
 
-HGNC = 'HGNC'
+HGNC = 'hgnc'
 
 
 class TestIntegrate(unittest.TestCase):
@@ -37,7 +37,7 @@ class TestIntegrate(unittest.TestCase):
 
         label = 'dgxp'
 
-        overlay_type_data(g, {'a': 1, 'b': 2, 'c': -1}, GENE, HGNC, label=label, impute=0)
+        overlay_type_data(g, {'a': 1, 'b': 2, 'c': -1}, Gene, HGNC, label=label, impute=0)
 
         for node in g1, g2, g3, g4:
             self.assertIn(label, g.nodes[node])

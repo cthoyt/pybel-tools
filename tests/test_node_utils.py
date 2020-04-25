@@ -14,7 +14,7 @@ class TestMerge(unittest.TestCase):
     def test_merge_nodes_by_name(self):
         graph = BELGraph()
         priority = ['ncbigene', 'hgnc']
-        a_hgnc, a_entrez = [Protein(namespace, 'a') for namespace in ('hgnc', 'ncbigene')]
+        a_hgnc, a_entrez = [Protein(namespace=namespace, name='a') for namespace in ('hgnc', 'ncbigene')]
         b = Protein('ncbigene', 'b')
         graph.add_increases(a_hgnc, b, citation=n(), evidence=n())
         graph.add_increases(a_entrez, b, citation=n(), evidence=n())
