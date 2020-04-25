@@ -2,10 +2,10 @@
 
 """Collapse functions to supplement :mod:`pybel.struct.mutation.collapse`."""
 
+import itertools as itt
 import logging
 from collections import defaultdict
 
-import itertools as itt
 import networkx as nx
 from tqdm import tqdm
 
