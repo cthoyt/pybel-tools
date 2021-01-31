@@ -22,16 +22,6 @@ X = TypeVar('X')
 Y = TypeVar('Y')
 
 
-def pairwise(iterable: Iterable[X]) -> Iterable[Tuple[X, X]]:
-    """Iterate over pairs in list.
-
-    s -> (s0,s1), (s1,s2), (s2, s3), ...
-    """
-    a, b = itt.tee(iterable)
-    next(b, None)
-    return zip(a, b)
-
-
 def group_as_sets(pairs: Iterable[Tuple[X, Y]]) -> Mapping[X, Set[Y]]:
     """Group elements in the iterable in a dictionary of sets."""
     rv = defaultdict(set)

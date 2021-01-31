@@ -15,6 +15,7 @@ from operator import itemgetter
 from typing import Dict, Mapping, Tuple
 
 import networkx as nx
+from more_itertools import pairwise
 
 from pybel import BELGraph, BaseEntity
 from pybel.constants import (
@@ -24,8 +25,7 @@ from pybel.constants import (
     TRANSCRIBED_TO, TRANSLATED_TO,
 )
 from pybel.typing import EdgeData
-from ..summary.contradictions import pair_has_contradiction
-from ..utils import pairwise
+from pybel_tools.summary.contradictions import pair_has_contradiction
 
 __all__ = [
     'rank_causalr_hypothesis',

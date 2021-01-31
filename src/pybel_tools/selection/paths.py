@@ -7,6 +7,7 @@ from operator import itemgetter
 from typing import Any, List, Mapping, Optional, Tuple
 
 import networkx as nx
+from more_itertools import pairwise
 
 from pybel import BELGraph, BaseEntity
 from pybel.constants import (
@@ -16,7 +17,6 @@ from pybel.constants import (
     TRANSCRIBED_TO, TRANSLATED_TO,
 )
 from pybel.struct.mutation import get_nodes_in_all_shortest_paths
-from ..utils import pairwise
 
 __all__ = [
     'get_nodes_in_all_shortest_paths',
