@@ -127,7 +127,7 @@
                         {% if d['citation'] %}
                             <tr>
                                 <td>
-                                    {{ 'pmid' if d['citation']['type'] =='PubMed' else d['citation']['type'] }}:{{ d['citation']['reference'] }}
+                                    {{ d['citation'].curie }}
                                 </td>
                                 <td>{{ graph.edge_to_bel(u, v, d) }}</td>
                             </tr>
