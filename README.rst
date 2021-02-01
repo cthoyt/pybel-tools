@@ -16,13 +16,13 @@ Installation |pypi_version| |python_versions| |pypi_license|
 PyBEL Tools can be installed easily from PyPI_ with the following code in
 your favorite terminal:
 
-.. code-block:: bash
+.. code-block:: sh
 
     $ pip install pybel_tools
 
 or from the latest code on `GitHub <https://github.com/pybel/pybel-tools>`_ with:
 
-.. code-block:: bash
+.. code-block:: sh
 
     $ pip install git+https://github.com/pybel/pybel-tools.git
 
@@ -39,14 +39,6 @@ Acknowledgements
 This package was originally developed as part of the master's work of
 `Charles Tapley Hoyt <https://github.com/cthoyt>`_ at `Fraunhofer SCAI <https://www.scai.fraunhofer.de/>`_.
 
-Links
------
-- Documented on `Read the Docs <https://pybel-tools.readthedocs.io/>`_
-- Versioned on `GitHub <https://github.com/pybel/pybel-tools>`_
-- Tested on `Travis CI <https://travis-ci.org/pybel/pybel-tools>`_
-- Distributed by PyPI_
-
-.. _PyPI: https://pypi.python.org/pypi/pybel_tools
 
 .. |build| image:: https://github.com/pybel/pybel-tools/workflows/Tests/badge.svg
     :target: https://github.com/pybel/pybel-tools/actions
